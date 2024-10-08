@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "804958021896",
+    "project_id": "dacn-dev",
+    "storage_bucket": "dacn-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804958021896:android:afad04cbf32adce12d64bd",
+        "android_client_info": {
+          "package_name": "com.dacn.conexion.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "804958021896-60b7h4u4m8111cbmqh7n7uiv59i16d79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_SeZ63O79xVhxoYajpIIqTI2AmjJmbjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "804958021896-60b7h4u4m8111cbmqh7n7uiv59i16d79.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "804958021896-cl6enq20tto0a550ridsk9pmtkk7pcp9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

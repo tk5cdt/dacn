@@ -11,6 +11,7 @@ dependencies:
     path: packages/api_repository
   bloc: ^8.1.4
   envied: ^0.5.4+1
+  firebase_core: ^3.6.0
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6
