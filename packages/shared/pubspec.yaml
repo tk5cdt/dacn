@@ -15,4 +15,4 @@ dev_dependencies:
 
 dependencies:
   logger: ^2.4.0
-  powersync: ^1.7.0
+  powersync: ^1.5.3
