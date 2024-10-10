@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "864221569797",
+    "project_id": "dacn-staging",
+    "storage_bucket": "dacn-staging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864221569797:android:512d98918a3dd1c402cd6c",
+        "android_client_info": {
+          "package_name": "com.dacn.conexion.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864221569797-mk87cbmdvovk7ie203bkg8ujpi0m13v6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtO76Wp76xHZ-13-js0N3ad0YG7QqltBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864221569797-mk87cbmdvovk7ie203bkg8ujpi0m13v6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "864221569797-ni3ukv9m14or8v63qlp1lq73p3a1c7ec.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dacn.conexion.staging"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
