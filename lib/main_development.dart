@@ -11,5 +11,6 @@ void main() {
     return const App(apiRepository: apiRepository);
   }, 
   appFlavor: AppFlavor.development(),
-  firebaseOptions: DefaultFirebaseOptions.currentPlatform,);
+  firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+  );
 }

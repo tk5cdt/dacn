@@ -1,6 +1,6 @@
 import 'package:conexion/l10n/arb/app_localizations.dart';
 import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/todos/view/todos_page.dart';
+import 'package:conexion/login/login.dart';
 import 'package:flutter/material.dart';
 
 class AppView extends StatelessWidget {
@@ -18,7 +18,7 @@ class AppView extends StatelessWidget {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const TodosPage(),
+      home: const LoginPage(),
     );
   }
 }
