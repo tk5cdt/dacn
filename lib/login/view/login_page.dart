@@ -11,7 +11,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return const AppScaffold(
       body: SafeArea(
           child: Center(
         child: Column(
@@ -64,18 +64,28 @@ class GoogleSignInButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ignore: lines_longer_than_80_chars
-    return ElevatedButton.icon(
-      onPressed: () async {
+    return Tappable(
+      color: context.theme.focusColor,
+      borderRadius: 24,
+      animationEffect: TappableAnimationEffect.scale,
+      scaleStrength: ScaleStrength.xxxxs,
+      scaleAlignment: Alignment.bottomCenter,
+      onTap: () async {
         try {
           await _googleSignIn();
         } catch (e, st) {
           logE('Google sign in failed', error: e, stackTrace: st);
         }
       },
-      icon: Assets.icons.google.svg(width: 24, height: 24),
-      label: Text(
-        'Google sign in',
-        style: Theme.of(context).textTheme.headlineSmall,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs + AppSpacing.xxs,
+        ),
+        child: Text(
+          'Google sign in',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
       ),
     );
   }
@@ -91,26 +101,29 @@ class LogoutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: Supabase.instance.client.auth.onAuthStateChange,
-        builder: (context, snapshot) {
-          if (snapshot.hasData){
-            final session = snapshot.data!.session;
-            if (session != null) {
-              return ElevatedButton.icon(
-                onPressed: _logout,
-                icon: const Icon(Icons.logout),
-                label: Text(
-                  'Logout',
-                  // ignore: lines_longer_than_80_chars
-                  style: Theme.of(context).textTheme.headlineSmall?.apply(color: Colors.red),
-                ),
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
+      stream: Supabase.instance.client.auth.onAuthStateChange,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final session = snapshot.data!.session;
+          if (session != null) {
+            return ElevatedButton.icon(
+              onPressed: _logout,
+              icon: const Icon(Icons.logout),
+              label: Text(
+                'Logout',
+                // ignore: lines_longer_than_80_chars
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.apply(color: Colors.red),
+              ),
+            );
+          } else {
+            return const SizedBox.shrink();
           }
-          return const SizedBox.shrink();
-        },
-      );
+        }
+        return const SizedBox.shrink();
+      },
+    );
   }
 }

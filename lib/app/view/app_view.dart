@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:conexion/l10n/arb/app_localizations.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/login/login.dart';
@@ -10,12 +11,9 @@ class AppView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        ),
-        useMaterial3: true,
-      ),
+      themeMode: ThemeMode.light,
+      theme: const AppTheme().theme,
+      darkTheme: const AppDarkTheme().theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const LoginPage(),

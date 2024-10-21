@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:app_ui/app_ui.dart';
 import 'package:bloc/bloc.dart';
 import 'package:conexion/app/di/di.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -54,6 +55,8 @@ Future<void> bootstrap(
       await Firebase.initializeApp(options: firebaseOptions);
       final powerSyncRepository = PowerSyncRepository(env: appFlavor.getEnv);
       await powerSyncRepository.initialize();
+
+      SystemUiOverlayTheme.setPortraitOrientation();
 
       runApp(await builder(powerSyncRepository));
     },
