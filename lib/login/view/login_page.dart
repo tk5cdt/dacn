@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/di/di.dart';
 import 'package:env/env.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,9 @@ class GoogleSignInButton extends StatelessWidget {
       idToken: idToken,
       accessToken: accessToken,
     );
+    // await Supabase.instance.client.auth.signInWithOAuth(
+    //   OAuthProvider.google
+    // );
   }
 
   @override
@@ -68,7 +72,7 @@ class GoogleSignInButton extends StatelessWidget {
           logE('Google sign in failed', error: e, stackTrace: st);
         }
       },
-      icon: const Icon(Icons.auto_awesome),
+      icon: Assets.icons.google.svg(width: 24, height: 24),
       label: Text(
         'Google sign in',
         style: Theme.of(context).textTheme.headlineSmall,

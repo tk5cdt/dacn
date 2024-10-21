@@ -9,6 +9,8 @@ environment:
 dependencies:
   api_repository:
     path: packages/api_repository
+  app_ui:
+    path: packages/app_ui
   bloc: ^8.1.4
   env:
     path: packages/env
