@@ -7,6 +7,8 @@ environment:
   sdk: ^3.4.0
 
 dev_dependencies:
+  app_ui:
+    path: ../app_ui
   env:
     path: ../env
   mocktail: ^1.0.4
