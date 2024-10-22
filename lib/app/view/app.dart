@@ -1,9 +1,7 @@
 import 'package:api_repository/api_repository.dart';
 import 'package:conexion/app/view/app_view.dart';
-import 'package:conexion/counter/counter.dart';
 import 'package:conexion/l10n/arb/app_localizations.dart';
 import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/todos/cubit/todos_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

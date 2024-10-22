@@ -22,7 +22,7 @@ To run the desired flavor either use the launch configuration in VSCode/Android 
 
 ```sh
 # Development
-$ flutter run --flavor development --target lib/main_development.dart
+$ flutter run --flavor development --target lib/main_development.dart --web-port 7357
 
 # Staging
 $ flutter run --flavor staging --target lib/main_staging.dart
