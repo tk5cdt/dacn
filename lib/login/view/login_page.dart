@@ -1,5 +1,6 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/di/di.dart';
+import 'package:conexion/login/widgets/widgets.dart';
 import 'package:env/env.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,11 +13,13 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const AppScaffold(
+      releaseFocus: true,
       body: SafeArea(
           child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            LoginForm(),
             GoogleSignInButton(),
             LogoutButton(),
           ],

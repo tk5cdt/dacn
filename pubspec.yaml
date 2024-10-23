@@ -14,6 +14,7 @@ dependencies:
   bloc: ^8.1.4
   env:
     path: packages/env
+  equatable: ^2.0.5
   firebase_core: ^3.4.0
   flutter:
     sdk: flutter
@@ -21,6 +22,8 @@ dependencies:
   flutter_gen: any
   flutter_localizations:
     sdk: flutter
+  form_fields:
+    path: packages/form_fields
   get_it: ^8.0.0
   google_sign_in: ^6.2.1
   intl: ^0.19.0
