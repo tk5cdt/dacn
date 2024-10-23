@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart' show EquatableMixin;
 import 'package:form_fields/form_fields.dart';
 import 'package:formz/formz.dart';
 
-
 /// {@template email}
 /// Formz input for email. It can be empty or invalid.
 /// {@endtemplate}
@@ -31,13 +30,17 @@ class Email extends FormzInput<String, EmailValidationError>
   /// Email validation errors message
   @override
   Map<EmailValidationError?, String?> get validationErrorMessage => {
-        EmailValidationError.empty: 'This field is required',
+        EmailValidationError.empty: '',
+        // EmailValidationError.empty: 'This field is required',
         EmailValidationError.invalid: 'Email is not correct',
         null: null,
       };
 
   @override
   List<Object> get props => [isPure, value];
+
+  // ignore: public_member_api_docs
+  bool get invalid => validator(value) != null;
 }
 
 /// Validation errors for [Email]. It can be empty, invalid or already

@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/home/home.dart';
-import 'package:conexion/login/login.dart';
+import 'package:conexion/auth/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
