@@ -1,27 +1,91 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/di/di.dart';
+import 'package:conexion/auth/login/cubit/login_cubit.dart';
+import 'package:conexion/auth/login/widgets/auth_provider_sign_in_button.dart';
+import 'package:conexion/auth/login/widgets/login_form.dart';
+import 'package:conexion/auth/login/widgets/sign_in_button.dart';
+import 'package:conexion/auth/login/widgets/widgets.dart';
 import 'package:env/env.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared/shared.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:user_repository/user_repository.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const AppScaffold(
-      body: SafeArea(
-          child: Center(
+    return BlocProvider(
+      create: (context) =>
+          LoginCubit(userRepository: context.read<UserRepository>()),
+      child: const LoginView(),
+    );
+  }
+}
+
+class LoginView extends StatelessWidget {
+  const LoginView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      releaseFocus: true,
+      resizeToAvoidBottomInset: true,
+      body: AppConstrainedScrollView(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xlg,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GoogleSignInButton(),
-            LogoutButton(),
+            const Gap.v(AppSpacing.xxxlg + AppSpacing.xxxlg),
+            const AppLogo(
+              height: AppSpacing.xxxlg,
+              fit: BoxFit.fitHeight,
+              width: double.infinity,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LoginForm(),
+                  const Padding(
+                    padding: EdgeInsets.only(
+                      bottom: AppSpacing.md,
+                      top: AppSpacing.xs,
+                    ),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: ForgotPasswordButton(),
+                    ),
+                  ),
+                  const SignInButton(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
+                    child: AppDivider(
+                      withText: true,
+                    ),
+                  ),
+                  AuthProviderSignInButton(
+                    provider: AuthProvider.google,
+                    onPressed: () =>
+                        context.read<LoginCubit>().loginWithGoogle(),
+                  ),
+                  // GoogleSignInButton(),
+                  // Gap.v(AppSpacing.xxxlg),
+                  // LogoutButton(),
+                ],
+              ),
+            ),
+            const SignUpNewAccountButton(),
           ],
         ),
-      )),
+      ),
     );
   }
 }
