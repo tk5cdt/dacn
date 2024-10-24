@@ -11,7 +11,7 @@ import 'package:user_repository/user_repository.dart';
 
 void main() {
   bootstrap(
-    (powerSyncRepository) {
+    (powerSyncRepository) async {
       final tokenStorage = InMemoryTokenStorage();
 
       final iOSClientId = getIt<AppFlavor>().getEnv(Env.iOSClientId);
@@ -30,7 +30,10 @@ void main() {
       final userRepository = UserRepository(
         authenticationClient: supabaseAuthenticationClient,
       );
-      return App(userRepository: userRepository);
+            return App(
+        user: await userRepository.user.first,
+        userRepository: userRepository,
+      );
     },
     appFlavor: AppFlavor.production(),
     firebaseOptions: DefaultFirebaseOptions.currentPlatform,
