@@ -86,7 +86,6 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     if (releaseFocus) {
       return Tappable(
-        animationEffect: TappableAnimationEffect.none,
         onTap: () => _releaseFocus(context),
         child: _MaterialScaffold(
           top: top,
@@ -201,6 +200,30 @@ class _MaterialScaffold extends StatelessWidget {
       bottomSheet: bottomSheet,
     ).withAdaptiveSystemTheme(context);
   }
+}
+
+/// Pop scope extension that wraps widget with [PopScope].
+extension PopScopeX on Widget {
+  /// Wraps widget with [PopScope].
+  Widget withPopScope(
+    void Function(bool, dynamic)? onPopInvokedWithResult, {
+    bool? canPop,
+  }) =>
+      onPopInvokedWithResult == null && canPop == null
+          ? this
+          : PopScope(
+              onPopInvokedWithResult: onPopInvokedWithResult,
+              canPop: canPop ?? true,
+              child: this,
+            );
+}
+
+extension WillPopScopeX on Widget {
+  /// Wraps widget with [WillPopScope].
+  Widget withWillPopScope(void Function(bool)? onPopInvoked) => PopScope(
+        child: this,
+        onPopInvoked: onPopInvoked,
+      );
 }
 
 /// Extension used to respectively change the `systemNavigationBar` theme.

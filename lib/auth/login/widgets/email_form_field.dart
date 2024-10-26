@@ -1,6 +1,6 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/auth/login/cubit/login_cubit.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
@@ -54,6 +54,9 @@ class _EmailFormFieldState extends State<EmailFormField> {
       errorText: emailError,
       focusNode: _focusNode,
       hintText: context.l10n.emailText,
+      decoration: const InputDecoration(
+        fillColor: Colors.white,
+      ),
       textInputAction: TextInputAction.next,
       textInputType: TextInputType.emailAddress,
       autofillHints: const [AutofillHints.email],

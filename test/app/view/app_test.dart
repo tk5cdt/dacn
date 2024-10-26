@@ -10,7 +10,7 @@ class MockUser extends Mock implements User {}
 
 void main() {
   group('App', () {
-    testWidgets('has a title and message', (tester) async {
+    testWidgets('renders Scaffold', (tester) async {
       // Build our app and trigger a frame.
       await tester.pumpWidget(
         App(

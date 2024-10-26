@@ -1,4 +1,5 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:conexion/auth/forgot_password/view/forgot_password_page.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
@@ -12,11 +13,11 @@ class ForgotPasswordButton extends StatelessWidget {
       throttle: true,
       throttleDuration: 650.ms,
       onTap: () {
-        // Navigator.pushAndRemoveUntil(
-        //   context,
-        //   ManageForgotPasswordPage.route(),
-        //   (_) => true,
-        // );
+        Navigator.pushAndRemoveUntil(
+          context,
+          ManageForgotPasswordPage.route(),
+          (_) => true,
+        );
       },
       child: Text(
         context.l10n.forgotPasswordText,

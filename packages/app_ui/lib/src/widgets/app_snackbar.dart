@@ -355,9 +355,9 @@ class AppSnackbarState extends State<AppSnackbar>
                       }
                       animateOut();
                     },
-                    borderRadius: 13,
+                    borderRadius: BorderRadius.circular(13),
                     // color: context.theme.colorScheme.secondaryContainer,
-                    color: currentMessage?.backgroundColor ?? AppColors.blue,
+                    backgroundColor: currentMessage?.backgroundColor ?? AppColors.blue,
                     // color: appStateSettings['materialYou']
                     //     ? dynamicPastel(
                     //         context,

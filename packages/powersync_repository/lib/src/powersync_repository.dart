@@ -45,6 +45,8 @@ class SupabaseConnector extends PowerSyncBackendConnector {
 
     // Use Supabase token for PowerSync
     final session = Supabase.instance.client.auth.currentSession;
+
+    ///log session
     shared.logD('Session: ${session?.user.toJson()}');
     if (session == null) {
       // Not logged in
