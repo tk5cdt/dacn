@@ -174,7 +174,7 @@ class SupabaseAuthenticationClient implements AuthenticationClient {
         token: token,
         email: email,
       );
-      await _powerSyncRepository.updateUser(password: newPassword);
+      await _powerSyncRepository.updateUser(data: {'password': newPassword});
     } catch (error, stackTrace) {
       Error.throwWithStackTrace(ResetPasswordFailure(error), stackTrace);
     }

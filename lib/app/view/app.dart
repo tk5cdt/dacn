@@ -1,9 +1,10 @@
-import 'package:api_repository/api_repository.dart';
+import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
-import 'package:conexion/app/view/app_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';
+
+final snackbarKey = GlobalKey<AppSnackbarState>();
 
 class App extends StatelessWidget {
   const App({
@@ -28,4 +29,19 @@ class App extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Snack bar to show messages to the user.
+void openSnackbar(
+  SnackbarMessage message, {
+  bool clearIfQueue = false,
+  bool undismissable = false,
+}) {
+  snackbarKey.currentState
+      ?.post(message, clearIfQueue: clearIfQueue, undismissable: undismissable);
+}
+
+// closes the snackbar
+void closeSnackbar() {
+  snackbarKey.currentState?.closeAll();
 }

@@ -1,6 +1,6 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/auth/login/cubit/login_cubit.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
@@ -43,7 +43,7 @@ class AuthProviderSignInButton extends StatelessWidget {
       child: Tappable(
         throttle: true,
         throttleDuration: 650.ms,
-        borderRadius: 10,
+        borderRadius: BorderRadius.circular(10),
         onTap: isInProgress ? null : onPressed,
         child: isInProgress
             ? Center(child: AppCircularProgress(context.adaptiveColor))

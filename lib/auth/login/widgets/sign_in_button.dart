@@ -1,6 +1,6 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/auth/login/login.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

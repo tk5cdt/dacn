@@ -3,6 +3,7 @@ import 'package:conexion/auth/cubit/auth_cubit.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 /// {@template sign_up_account_button}
 /// Sign up widget that contains sign up button.
 /// {@endtemplate}

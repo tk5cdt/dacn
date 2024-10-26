@@ -1,4 +1,5 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:conexion/app/app.dart';
 import 'package:conexion/app/di/di.dart';
 import 'package:conexion/auth/login/cubit/login_cubit.dart';
 import 'package:conexion/auth/login/widgets/auth_provider_sign_in_button.dart';
@@ -83,6 +84,12 @@ class LoginView extends StatelessWidget {
               ),
             ),
             const SignUpNewAccountButton(),
+            const Gap.v(AppSpacing.md),
+            ElevatedButton(
+              onPressed: () => context.read<UserRepository>().logOut(),
+              child: const Text('Log out'),
+            ),
+            
           ],
         ),
       ),
@@ -129,10 +136,9 @@ class GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: lines_longer_than_80_chars
     return Tappable(
-      color: context.theme.focusColor,
-      borderRadius: 24,
-      animationEffect: TappableAnimationEffect.scale,
-      scaleStrength: ScaleStrength.xxxxs,
+      backgroundColor: context.theme.focusColor,
+      borderRadius: BorderRadius.circular(10),
+      scaleStrength: ScaleStrength.xxs,
       scaleAlignment: Alignment.bottomCenter,
       onTap: () async {
         try {

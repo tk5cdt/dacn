@@ -16,7 +16,6 @@ class UserRepository {
   /// the authentication state changes.
   Stream<User> get user => _authenticationClient.user
       .map((user) => User.fromAuthenticationUser(authenticationUser: user))
-      .startWith(User.anonymous)
       .asBroadcastStream();
 
   /// Starts the Sign In with Google Flow.

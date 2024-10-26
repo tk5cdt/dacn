@@ -3,7 +3,6 @@ import 'package:animations/animations.dart';
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/app/home/home.dart';
-import 'package:conexion/auth/login/login.dart';
 import 'package:conexion/auth/view/auth_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +20,9 @@ GoRouter router(AppBloc appBloc) {
       ),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) {
+          return HomePage(navigationShell: navigationShell);
+        },
         branches: [
           StatefulShellBranch(
             routes: [
@@ -146,9 +148,6 @@ GoRouter router(AppBloc appBloc) {
             ],
           ),
         ],
-        builder: (context, state, navigationShell) {
-          return HomePage(navigationShell: navigationShell);
-        },
       ),
     ],
     redirect: (context, state) {
@@ -175,9 +174,13 @@ class GoRouterAppBlocRefreshStream extends ChangeNotifier {
   GoRouterAppBlocRefreshStream(Stream<AppState> stream) {
     notifyListeners();
     _subscription = stream.asBroadcastStream().listen((appState) {
+      if (_appState == appState) return;
+      _appState = appState;
       notifyListeners();
     });
   }
+
+  AppState _appState = const AppState.unauthenticated();
 
   late final StreamSubscription<dynamic> _subscription;
 

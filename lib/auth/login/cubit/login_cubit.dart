@@ -24,6 +24,9 @@ class LoginCubit extends Cubit<LoginState> {
         state.copyWith(showPassword: !state.showPassword),
       );
 
+  /// Emits initial state of login screen.
+  void resetState() => emit(const LoginState.initial());
+
   /// Email value was changed, triggering new changes in state.
   void onEmailChanged(String newValue) {
     final previousScreenState = state;
@@ -37,7 +40,9 @@ class LoginCubit extends Cubit<LoginState> {
             newValue,
           );
 
-    final newScreenState = state.copyWith(email: newEmailState);
+    final newScreenState = state.copyWith(
+      email: newEmailState,
+    );
 
     emit(newScreenState);
   }
@@ -47,9 +52,13 @@ class LoginCubit extends Cubit<LoginState> {
     final previousEmailState = previousScreenState.email;
     final previousEmailValue = previousEmailState.value;
 
-    final newEmailState = Email.validated(previousEmailValue);
+    final newEmailState = Email.validated(
+      previousEmailValue,
+    );
 
-    final newScreenState = state.copyWith(email: newEmailState);
+    final newScreenState = state.copyWith(
+      email: newEmailState,
+    );
 
     emit(newScreenState);
   }
@@ -85,6 +94,18 @@ class LoginCubit extends Cubit<LoginState> {
       password: newPasswordState,
     );
     emit(newScreenState);
+  }
+
+  Future<void> loginWithGoogle() async {
+    emit(state.copyWith(status: LogInSubmissionStatus.googleAuthInProgress));
+    try {
+      await _userRepository.logInWithGoogle();
+      emit(state.copyWith(status: LogInSubmissionStatus.success));
+    } on LogInWithGoogleCanceled {
+      emit(state.copyWith(status: LogInSubmissionStatus.idle));
+    } catch (error, stackTrace) {
+      _errorFormatter(error, stackTrace);
+    }
   }
 
   Future<void> onSubmit() async {
@@ -139,17 +160,5 @@ class LoginCubit extends Cubit<LoginState> {
   void idle() {
     const initialState = LoginState.initial();
     emit(initialState);
-  }
-
-  Future<void> loginWithGoogle() async {
-    emit(state.copyWith(status: LogInSubmissionStatus.googleAuthInProgress));
-    try {
-      await _userRepository.logInWithGoogle();
-      emit(state.copyWith(status: LogInSubmissionStatus.success));
-    } on LogInWithGoogleCanceled {
-      emit(state.copyWith(status: LogInSubmissionStatus.idle));
-    } catch (error, stackTrace) {
-      _errorFormatter(error, stackTrace);
-    }
   }
 }

@@ -80,6 +80,8 @@ class AppTextField extends StatelessWidget {
     this.autofillHints,
     this.errorMaxLines,
     this.labelStyle,
+    this.decoration = const InputDecoration(),
+    this.fillColor,
   });
 
   /// Creates a new [AppTextField] with a filled border.
@@ -152,6 +154,8 @@ class AppTextField extends StatelessWidget {
     InputBorder? disabledBorder,
     Iterable<String>? autofillHints,
     int? errorMaxLines,
+    InputDecoration? decoration,
+    Color? fillColor,
   }) : this(
           key: key,
           autofillHints: autofillHints,
@@ -222,6 +226,8 @@ class AppTextField extends StatelessWidget {
           filled: filled,
           border: const UnderlineInputBorder(),
           errorMaxLines: errorMaxLines,
+          decoration: decoration ?? const InputDecoration(),
+          fillColor: fillColor,
         );
 
   final String? hintText, labelText, errorText, initialValue;
@@ -282,6 +288,9 @@ class AppTextField extends StatelessWidget {
   final TextDirection textDirection;
   final Iterable<String>? autofillHints;
   final int? errorMaxLines;
+  final InputDecoration decoration;
+
+  final dynamic fillColor;
 
   @override
   Widget build(BuildContext context) {
@@ -347,7 +356,6 @@ class AppTextField extends StatelessWidget {
         constraints: constraints,
         suffixText: suffixText,
         labelStyle: labelStyle,
-        floatingLabelAlignment: FloatingLabelAlignment.start,
         floatingLabelBehavior: floatingLabelBehaviour,
         labelText: labelText,
         hintText: hintText,
