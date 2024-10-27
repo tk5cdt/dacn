@@ -4,6 +4,7 @@ import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/app/home/home.dart';
 import 'package:conexion/auth/view/auth_page.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -124,16 +125,7 @@ GoRouter router(AppBloc appBloc) {
                 path: '/user',
                 pageBuilder: (context, state) {
                   return CustomTransitionPage(
-                    child: AppScaffold(
-                      body: Center(
-                        child: ElevatedButton(
-                          onPressed: () => context
-                              .read<AppBloc>()
-                              .add(const AppLogoutRequested()),
-                          child: const Text('Logout'),
-                        ),
-                      ),
-                    ),
+                    child: const UserProfilePage(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       return SharedAxisTransition(
