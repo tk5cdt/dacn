@@ -12,6 +12,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 GoRouter router(AppBloc appBloc) {
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/feed',
     routes: [
       GoRoute(
