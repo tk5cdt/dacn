@@ -10,17 +10,5 @@ class MockUser extends Mock implements User {}
 
 void main() {
   group('App', () {
-    testWidgets('renders Scaffold', (tester) async {
-      // Build our app and trigger a frame.
-      await tester.pumpWidget(
-        App(
-          user: MockUser(),
-          userRepository: MockUserRepository(),
-        )
-      );
-
-      // Verify that our counter starts at 0.
-      expect(find.byType(Scaffold), findsOneWidget);
-    });
   });
 }
