@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: ^3.4.0
-  
+
 dependencies:
   animations: ^2.0.11
   api_repository:
@@ -15,6 +15,8 @@ dependencies:
   bloc: ^8.1.4
   conexion_blocks_ui:
     path: packages/conexion_blocks_ui
+  database_client:
+    path: packages/database_client
   env:
     path: packages/env
   equatable: ^2.0.5
@@ -32,6 +34,8 @@ dependencies:
   google_sign_in: ^6.2.1
   intl: ^0.19.0
   path: ">=1.8.3 <=1.9.0"
+  posts_repository:
+    path: packages/posts_repository
   powersync: ^1.7.0
   powersync_repository:
     path: packages/powersync_repository

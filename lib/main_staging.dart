@@ -2,8 +2,10 @@ import 'package:conexion/app/app.dart';
 import 'package:conexion/app/di/di.dart';
 import 'package:conexion/bootstrap.dart';
 import 'package:conexion/firebase_options_staging.dart';
+import 'package:database_client/database_client.dart';
 import 'package:env/env.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:supabase_authentication_client/supabase_authentication_client.dart';
 import 'package:token_storage/token_storage.dart';
@@ -27,12 +29,22 @@ void main() {
         googleSignIn: googleSignIn,
       );
 
+      final powerSyncDatabaseClient = PowerSyncDatabaseClient(
+        powerSyncRepository: powerSyncRepository,
+      );
+
       final userRepository = UserRepository(
+        databaseClient: powerSyncDatabaseClient,
         authenticationClient: supabaseAuthenticationClient,
       );
-            return App(
+
+      final postRepository = PostsRepository(
+        databaseClient: powerSyncDatabaseClient,
+      );
+      return App(
         user: await userRepository.user.first,
         userRepository: userRepository,
+        postsRepository: postRepository,
       );
     },
     appFlavor: AppFlavor.staging(),

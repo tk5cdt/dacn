@@ -1,4 +1,4 @@
-name: user_repository
+name: posts_repository
 description: A Very Good Project created by Very Good CLI.
 version: 0.1.0+1
 publish_to: none
@@ -7,16 +7,14 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
-  authentication_client: 
-    path: ../authentication_client/authentication_client
   database_client:
     path: ../database_client
-  powersync_repository:
-    path: ../powersync_repository
-  rxdart: ^0.28.0
+  flutter:
+    sdk: flutter
   shared:
     path: ../shared
-  
+  user_repository:
+    path: ../user_repository
 
 dev_dependencies:
   mocktail: ^1.0.4

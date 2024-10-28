@@ -282,6 +282,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  database_client:
+    dependency: "direct main"
+    description:
+      path: "packages/database_client"
+      relative: true
+    source: path
+    version: "0.1.0+1"
   diff_match_patch:
     dependency: transitive
     description:
@@ -908,6 +915,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  posts_repository:
+    dependency: "direct main"
+    description:
+      path: "packages/posts_repository"
+      relative: true
+    source: path
+    version: "0.1.0+1"
   powersync:
     dependency: "direct main"
     description:

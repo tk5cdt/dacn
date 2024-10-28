@@ -124,8 +124,10 @@ GoRouter router(AppBloc appBloc) {
               GoRoute(
                 path: '/user',
                 pageBuilder: (context, state) {
+                  final user = context.select((AppBloc bloc) => bloc.state.user);
+
                   return CustomTransitionPage(
-                    child: const UserProfilePage(),
+                    child: UserProfilePage(userId: user.id),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       return SharedAxisTransition(

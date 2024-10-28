@@ -2,6 +2,7 @@ import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:posts_repository/posts_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
 final snackbarKey = GlobalKey<AppSnackbarState>();
@@ -10,16 +11,25 @@ class App extends StatelessWidget {
   const App({
     required this.user,
     required this.userRepository,
+    required this.postsRepository,
     super.key,
   });
 
   final User user;
   final UserRepository userRepository;
+  final PostsRepository postsRepository;
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: userRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(
+          value: userRepository,
+        ),
+        RepositoryProvider.value(
+          value: postsRepository,
+        ),
+      ],
       child: BlocProvider(
         create: (context) => AppBloc(
           user: user,
