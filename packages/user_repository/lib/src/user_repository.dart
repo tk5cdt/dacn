@@ -1,16 +1,20 @@
 import 'package:authentication_client/authentication_client.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:database_client/database_client.dart';
 import 'package:user_repository/user_repository.dart';
 
 /// {@template user_repository}
 /// A package that manages user flow.
 /// {@endtemplate}
-class UserRepository {
+class UserRepository extends UserBaseRepository {
   /// {@macro user_repository}
-  const UserRepository({required AuthenticationClient authenticationClient})
-      : _authenticationClient = authenticationClient;
+  const UserRepository({
+    required AuthenticationClient authenticationClient,
+    required DatabaseClient databaseClient,
+  })  : _authenticationClient = authenticationClient,
+        _databaseClient = databaseClient;
 
   final AuthenticationClient _authenticationClient;
+  final DatabaseClient _databaseClient;
 
   /// Stream of [User] which will emit the current user when
   /// the authentication state changes.
@@ -155,19 +159,20 @@ class UserRepository {
     }
   }
 
-//   @override
-//   String? get currentUserId => _databaseClient.currentUserId;
+  @override
+  String? get currentUserId => _databaseClient.currentUserId;
 
-//   @override
-//   Stream<User> profile({required String id}) => _databaseClient.profile(id: id);
+  @override
+  Stream<User> profile({required String userId}) =>
+      _databaseClient.profile(userId: userId);
 
-//   @override
-//   Stream<int> followersCountOf({required String userId}) =>
-//       _databaseClient.followersCountOf(userId: userId);
+  @override
+  Stream<int> followersCountOf({required String userId}) =>
+      _databaseClient.followersCountOf(userId: userId);
 
-//   @override
-//   Stream<int> followingsCountOf({required String userId}) =>
-//       _databaseClient.followingsCountOf(userId: userId);
+  @override
+  Stream<int> followingsCountOf({required String userId}) =>
+      _databaseClient.followingsCountOf(userId: userId);
 
 //   @override
 //   Future<List<User>> getFollowers({String? userId}) =>

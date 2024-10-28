@@ -1,19 +1,43 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
+import 'package:conexion/user_profile/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:shared/shared.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:posts_repository/posts_repository.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:user_repository/user_repository.dart';
 
 class UserProfilePage extends StatelessWidget {
-  const UserProfilePage({super.key});
+  const UserProfilePage({
+    required this.userId,
+    super.key,
+  });
+
+  final String userId;
 
   @override
   Widget build(BuildContext context) {
-    return const UserProfileView();
+    return BlocProvider(
+      create: (context) => UserProfileBloc(
+        userId: userId,
+        postsRepository: context.read<PostsRepository>(),
+        userRepository: context.read<UserRepository>(),
+      )
+        ..add(const UserProfileSubscriptionRequested())
+        ..add(const UserProfilePostsCountSubscriptionRequested())
+        ..add(const UserProfileFollowingsCountSubscriptionRequested())
+        ..add(const UserProfileFollowersCountSubscriptionRequested()),
+      child: UserProfileView(
+        userId: userId,
+      ),
+    );
   }
 }
 
 class UserProfileView extends StatefulWidget {
-  const UserProfileView({super.key});
+  const UserProfileView({required this.userId, super.key});
+
+  final String userId;
 
   @override
   State<UserProfileView> createState() => _UserProfileViewState();
@@ -36,6 +60,8 @@ class _UserProfileViewState extends State<UserProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.select((UserProfileBloc bloc) => bloc.state.user);
+
     return AppScaffold(
       body: DefaultTabController(
         length: 2,
@@ -47,7 +73,14 @@ class _UserProfileViewState extends State<UserProfileView> {
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 sliver: MultiSliver(
-                  children: const [ UserProfileAppBar() ],
+                  children: [
+                    const UserProfileAppBar(),
+                    if (!user.isAnonymous) ...[
+                      UserProfileHeader(
+                        userId: widget.userId,
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ];
@@ -64,8 +97,11 @@ class UserProfileAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isOwner = context.select((UserProfileBloc bloc) => bloc.isOwner);
+    final user = context.select((UserProfileBloc bloc) => bloc.state.user);
+
     return SliverPadding(
-      padding: const EdgeInsets.only(right: AppSpacing.md), 
+      padding: const EdgeInsets.only(right: AppSpacing.md),
       sliver: SliverAppBar(
         centerTitle: false,
         pinned: !ModalRoute.of(context)!.isFirst,
@@ -73,13 +109,13 @@ class UserProfileAppBar extends StatelessWidget {
         title: Row(
           children: [
             Flexible(
-              flex: 12,
-              child: Text(
-                'Truong nee ',
-                style: context.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              )
-            ),
+                flex: 12,
+                child: Text(
+                  '${user.displayFullName} ',
+                  style:
+                      context.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                )),
             Flexible(
               child: Assets.icons.verifiedUser.svg(
                 width: AppSize.iconSizeSmall,
@@ -89,7 +125,7 @@ class UserProfileAppBar extends StatelessWidget {
           ],
         ),
         actions: [
-          if (!true)
+          if (!isOwner)
             const UserProfileActions()
           else ...[
             const UserProfileAddMediaButton(),
@@ -123,9 +159,7 @@ class UserProfileSettingsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tappable(
       onTap: () => context.showListOptionsModal(
-        options: [
-
-        ],
+        options: [],
       ).then((option) {
         if (option == null) return;
         option.onTap(context);
