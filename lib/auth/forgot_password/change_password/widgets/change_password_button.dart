@@ -34,6 +34,7 @@ class ChangePasswordButton extends StatelessWidget {
           > 600 => context.screenWidth * .6,
           _ => context.screenWidth,
         },
+        minHeight: 48,
       ),
       child: child,
     );

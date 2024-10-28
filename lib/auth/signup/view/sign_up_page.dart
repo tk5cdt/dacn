@@ -33,8 +33,16 @@ class SignUpView extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: AppSpacing.xxxlg + AppSpacing.xlg),
-            AppLogo(
-              fit: BoxFit.fitHeight,
+            // AppLogo(
+            //   fit: BoxFit.fitHeight,
+            // ),
+            Text(
+              'Conexion',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Pacifico',
+              ),
             ),
             AvatarImagePicker(),
             Expanded(
@@ -48,7 +56,7 @@ class SignUpView extends StatelessWidget {
             ),
             //Login in account button
             SignInIntoAccountButton(),
-            Gap.v(AppSpacing.md),
+            Gap.v(AppSpacing.lg),
           ],
         ),
       ),
