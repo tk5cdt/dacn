@@ -37,8 +37,8 @@ GoRouter router(AppBloc appBloc) {
                       body: Center(
                         child: ElevatedButton(
                           onPressed: () => context
-                              .read<AppBloc>()
-                              .add(const AppLogoutRequested()),
+                          .read<AppBloc>()
+                          .add(const AppLogoutRequested()),
                           child: const Text('Logout'),
                         ),
                       ),
