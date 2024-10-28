@@ -8,6 +8,7 @@ import 'package:conexion/user_profile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:user_repository/user_repository.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -34,10 +35,11 @@ GoRouter router(AppBloc appBloc) {
                   return CustomTransitionPage(
                     child: AppScaffold(
                       body: Center(
-                        child: Text(
-                          'Feed',
-                          style: context.headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        child: ElevatedButton(
+                          onPressed: () => context
+                              .read<AppBloc>()
+                              .add(const AppLogoutRequested()),
+                          child: const Text('Logout'),
                         ),
                       ),
                     ),
@@ -124,7 +126,8 @@ GoRouter router(AppBloc appBloc) {
               GoRoute(
                 path: '/user',
                 pageBuilder: (context, state) {
-                  final user = context.select((AppBloc bloc) => bloc.state.user);
+                  final user =
+                      context.select((AppBloc bloc) => bloc.state.user);
 
                   return CustomTransitionPage(
                     child: UserProfilePage(userId: user.id),
