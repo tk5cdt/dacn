@@ -43,10 +43,18 @@ class LoginView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Gap.v(AppSpacing.xxxlg + AppSpacing.xxxlg),
-            const AppLogo(
-              height: AppSpacing.xxxlg,
-              fit: BoxFit.fitHeight,
-              width: double.infinity,
+            // const AppLogo(
+            //   height: AppSpacing.xxxlg,
+            //   fit: BoxFit.fitHeight,
+            //   width: double.infinity,
+            // ),
+            const Text(
+              'Conexion',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Pacifico',
+              ),
             ),
             Expanded(
               child: Column(
@@ -84,12 +92,11 @@ class LoginView extends StatelessWidget {
               ),
             ),
             const SignUpNewAccountButton(),
-            const Gap.v(AppSpacing.md),
-            ElevatedButton(
-              onPressed: () => context.read<UserRepository>().logOut(),
-              child: const Text('Log out'),
-            ),
-            
+            const Gap.v(AppSpacing.lg),
+            // ElevatedButton(
+            //   onPressed: () => context.read<UserRepository>().logOut(),
+            //   child: const Text('Log out'),
+            // ),
           ],
         ),
       ),

@@ -58,6 +58,7 @@ class _EmailFormFieldState extends State<EmailFormField> {
         fillColor: Colors.white,
       ),
       textInputAction: TextInputAction.next,
+      cursorColor: Colors.blueAccent,
       textInputType: TextInputType.emailAddress,
       autofillHints: const [AutofillHints.email],
       onChanged: (v) => _debouncer.run(
