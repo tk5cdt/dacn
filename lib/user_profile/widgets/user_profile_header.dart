@@ -70,7 +70,7 @@ class UserProfileStatisticsCounts extends StatelessWidget {
         context.select((UserProfileBloc bloc) => bloc.state.followingsCount);
 
     return Row(
-      spacing: AppSpacing.sm,
+      // spacing: AppSpacing.sm,
       children: <Widget>[
         Expanded(
           child: UserProfileStatistic(
