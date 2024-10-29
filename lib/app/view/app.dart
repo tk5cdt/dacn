@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:user_repository/user_repository.dart';
 import '../../selector/selector.dart';
 
 final snackbarKey = GlobalKey<AppSnackbarState>();
+
+final loadingIndeterminateKey = GlobalKey<AppLoadingIndeterminateState>();
 
 class App extends StatelessWidget {
   const App({
@@ -48,6 +52,10 @@ class App extends StatelessWidget {
     );
   }
 }
+
+void toggleLoadingIndeterminate({bool enable = true, bool autoHide = false}) =>
+    loadingIndeterminateKey.currentState
+        ?.setVisibility(visible: enable, autoHide: autoHide);
 
 /// Snack bar to show messages to the user.
 void openSnackbar(

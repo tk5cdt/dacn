@@ -243,7 +243,22 @@ class UserProfileAddMediaButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tappable(
-      onTap: () {},
+      onTap: () => context.showListOptionsModal(
+        title: context.l10n.createText,
+        options: createMediaModalOptions(
+          reelLabel: context.l10n.reelText,
+          postLabel: context.l10n.postText,
+          storyLabel: context.l10n.storyText,
+          context: context,
+          goTo: (route, {extra}) =>
+              context.pushNamed(route, extra: extra),
+          enableStory: true,
+          
+        ),
+      ).then((option) {
+        if (option == null) return;
+        option.onTap(context);
+      }),
       child: const Icon(
         Icons.add_box_outlined,
         size: AppSize.iconSize,

@@ -135,7 +135,7 @@ class EditProfileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return UserProfileButton(
       label: context.l10n.editProfileText,
-      // onTap: () => context.pushNamed(AppRoutes.editProfile.name),
+      onTap: () => context.pushNamed('edit_profile'),
     );
   }
 }

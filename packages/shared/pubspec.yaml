@@ -11,13 +11,20 @@ dev_dependencies:
     path: ../app_ui
   env:
     path: ../env
+  image_picker_plus:
+    path: ../image_picker_plus
   mocktail: ^1.0.4
   test: ^1.25.2
   very_good_analysis: ^6.0.0
 
 dependencies:
+  blurhash: ^1.1.1
   flutter:
     sdk: flutter
+  flutter_image: ^4.1.11
+  flutter_image_compress: ^2.3.0
   intl: ^0.19.0
   logger: ^2.4.0
   powersync: ^1.5.3
+  uuid: ^4.5.1
+  video_compress: ^3.1.3

@@ -41,7 +41,7 @@ class AppView extends StatelessWidget {
                       children: [
                         child!,
                         AppSnackbar(key: snackbarKey),
-                        // AppLoadingIndeterminate(key: loadingIndeterminateKey),
+                        AppLoadingIndeterminate(key: loadingIndeterminateKey),
                       ],
                     );
                   },
