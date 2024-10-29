@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
+import '../../selector/selector.dart';
+
 final snackbarKey = GlobalKey<AppSnackbarState>();
 
 class App extends StatelessWidget {
@@ -30,11 +32,17 @@ class App extends StatelessWidget {
           value: postsRepository,
         ),
       ],
-      child: BlocProvider(
-        create: (context) => AppBloc(
-          user: user,
-          userRepository: userRepository,
-        ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AppBloc(
+              user: user,
+              userRepository: userRepository,
+            ),
+          ),
+          BlocProvider(create: (_) => LocaleBloc()),
+          BlocProvider(create: (_) => ThemeModeBloc()),
+        ],
         child: const AppView(),
       ),
     );

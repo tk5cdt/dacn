@@ -182,40 +182,40 @@ class UserRepository extends UserBaseRepository {
 //   Future<List<User>> getFollowings({String? userId}) =>
 //       _databaseClient.getFollowings(userId: userId);
 
-//   @override
-//   Future<void> follow({
-//     required String followToId,
-//     String? followerId,
-//   }) =>
-//       _databaseClient.follow(
-//         followToId: followToId,
-//         followerId: followerId,
-//       );
+  @override
+  Future<void> follow({
+    required String followToId,
+    String? followerId,
+  }) =>
+      _databaseClient.follow(
+        followToId: followToId,
+        followerId: followerId,
+      );
 
 //   @override
 //   Future<void> removeFollower({required String id}) =>
 //       _databaseClient.removeFollower(id: id);
 
-//   @override
-//   Future<void> unfollow({required String unfollowId, String? unfollowerId}) =>
-//       _databaseClient.unfollow(
-//         unfollowId: unfollowId,
-//         unfollowerId: unfollowerId,
-//       );
+  @override
+  Future<void> unfollow({required String unfollowId, String? unfollowerId}) =>
+      _databaseClient.unfollow(
+        unfollowId: unfollowId,
+        unfollowerId: unfollowerId,
+      );
 
-//   @override
-//   Future<bool> isFollowed({
-//     required String userId,
-//     String? followerId,
-//   }) =>
-//       _databaseClient.isFollowed(followerId: followerId, userId: userId);
+  @override
+  Future<bool> isFollowed({
+    required String userId,
+    required String followerId,
+  }) =>
+      _databaseClient.isFollowed(followerId: followerId, userId: userId);
 
-//   @override
-//   Stream<bool> followingStatus({
-//     required String userId,
-//     String? followerId,
-//   }) =>
-//       _databaseClient.followingStatus(followerId: followerId, userId: userId);
+  @override
+  Stream<bool> followingStatus({
+    required String userId,
+    String? followerId,
+  }) =>
+      _databaseClient.followingStatus(followerId: followerId, userId: userId);
 
 //   @override
 //   Future<void> updateUser({
