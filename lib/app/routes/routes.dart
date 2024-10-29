@@ -35,11 +35,10 @@ GoRouter router(AppBloc appBloc) {
                   return CustomTransitionPage(
                     child: AppScaffold(
                       body: Center(
-                        child: ElevatedButton(
-                          onPressed: () => context
-                          .read<AppBloc>()
-                          .add(const AppLogoutRequested()),
-                          child: const Text('Logout'),
+                        child: Text(
+                          'Feed',
+                          style: context.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
