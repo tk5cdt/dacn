@@ -1,7 +1,7 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:conexion/app/app.dart';
 import 'package:conexion/app/bloc/app_bloc.dart';
 import 'package:conexion/app/routes/routes.dart';
-import 'package:conexion/app/view/app.dart';
 import 'package:conexion/auth/view/auth_page.dart';
 import 'package:conexion/l10n/arb/app_localizations.dart';
 import 'package:conexion/l10n/l10n.dart';
@@ -22,6 +22,8 @@ class AppView extends StatelessWidget {
       builder: (context, locale) {
         return BlocBuilder<ThemeModeBloc, ThemeMode>(
           builder: (context, themeMode) {
+            WidgetsBinding.instance
+                  .addPostFrameCallback((_)=> initUtilities(context, locale));
             return AnimatedSwitcher(
               duration: 300.ms,
               child: MediaQuery(

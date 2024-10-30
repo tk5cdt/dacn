@@ -252,6 +252,13 @@ class UserProfileAddMediaButton extends StatelessWidget {
           context: context,
           goTo: (route, {extra}) =>
               context.pushNamed(route, extra: extra),
+          onCreateReelTap: () => PickImage().pickVideo(
+            context, 
+            onMediaPicked: (context, details) => context.pushNamed(
+              'publish_post',
+              extra: CreatePostProps(details: details, isReel: true,),
+            ),
+          ),
           enableStory: true,
           
         ),
