@@ -76,6 +76,7 @@ List<ModalOption> createMediaModalOptions({
   required BuildContext context,
   required void Function(String route, {Object? extra}) goTo,
   required bool enableStory,
+  required VoidCallback onCreateReelTap,
   ValueSetter<String>? onStoryCreated,
 }) =>
     <ModalOption>[

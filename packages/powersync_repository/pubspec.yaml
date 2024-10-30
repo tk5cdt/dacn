@@ -17,7 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
   path: ">=1.8.3 <=1.9.0"
-  powersync: ^1.7.0
+  powersync: ^1.8.8
   shared:
     path: ../shared
   supabase: ^2.3.0

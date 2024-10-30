@@ -18,8 +18,7 @@ class PickImage {
 
   static final PickImage _internal = PickImage._();
 
-  late TabsTexts _tabsTexts;
-
+  late TabsTexts _tabsTexts = const TabsTexts();
   // ignore: use_setters_to_change_properties
   void init({TabsTexts? tabsTexts}) {
     _tabsTexts = tabsTexts ?? const TabsTexts();
