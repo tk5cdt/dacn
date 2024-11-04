@@ -17,6 +17,7 @@ dev_dependencies:
 dependencies:
   app_ui:
     path: ../app_ui
+  bloc_concurrency: ^0.2.5
   blurhash: ^1.1.1
   dio: ^5.7.0
   env:

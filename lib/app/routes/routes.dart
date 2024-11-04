@@ -6,9 +6,11 @@ import 'package:conexion/app/home/home.dart';
 import 'package:conexion/auth/view/auth_page.dart';
 import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion/user_profile/widgets/user_profile_create_post.dart';
+import 'package:conexion/user_profile/widgets/user_profile_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:posts_repository/posts_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -201,6 +203,49 @@ GoRouter router(AppBloc appBloc) {
                             },
                           ),
                         ],
+                      ),
+                      GoRoute(
+                        path: 'statistics',
+                        name: 'user_statistics',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        pageBuilder: (context, state) {
+                          final userId = state.uri.queryParameters['user_id']!;
+                          final tabIndex = state.extra! as int;
+
+                          return CustomTransitionPage(
+                            key: state.pageKey,
+                            child: BlocProvider(
+                              create: (context) => UserProfileBloc(
+                                userId: userId,
+                                userRepository: context.read<UserRepository>(),
+                                postsRepository:
+                                    context.read<PostsRepository>(),
+                              )
+                                ..add(const UserProfileSubscriptionRequested())
+                                ..add(
+                                  const UserProfileFollowingsCountSubscriptionRequested(),
+                                )
+                                ..add(
+                                  const UserProfileFollowersCountSubscriptionRequested(),
+                                ),
+                              child: UserProfileStatistics(tabIndex: tabIndex),
+                            ),
+                            transitionsBuilder: (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              child,
+                            ) {
+                              return SharedAxisTransition(
+                                animation: animation,
+                                secondaryAnimation: secondaryAnimation,
+                                transitionType:
+                                    SharedAxisTransitionType.horizontal,
+                                child: child,
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
               ),

@@ -8,3 +8,4 @@ export 'throttler.dart';
 export 'uid.dart';
 export 'utilities/utilities.dart';
 export 'video_plus.dart';
+export 'stream_transformers.dart';
