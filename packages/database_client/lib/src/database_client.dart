@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:powersync_repository/powersync_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
@@ -18,9 +19,17 @@ abstract class UserBaseRepository {
 
   Future<bool> isFollowed({required String followerId, required String userId});
 
+  Future<List<User>> getFollowers({String? userId});
+
+  Future<List<User>> getFollowings({String? userId});
+
+  Stream<List<User>> followers({required String userId});
+
   Future<void> follow({required String followToId, String? followerId});
 
   Future<void> unfollow({required String unfollowId, String? unfollowerId});
+
+  Future<void> removeFollower({required String id});
 }
 
 abstract class PostsBaseRepository {
@@ -73,7 +82,11 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
       ''',
         parameters: [userId],
       ).map(
-        (event) => event.first['posts_count'] as int,
+        (event) {
+          print('Posts count in db: ${event.first['posts_count']}');
+          return event.first['posts_count'] as int;
+        }
+        // (event) => event.first['posts_count'] as int,
       );
       
   @override
@@ -83,7 +96,12 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
         'WHERE subscribed_to_id = ?',
         parameters: [userId],
       ).map(
-        (event) => event.first['subscription_count'] as int,
+        (event) {
+          print('Followers count in db: ${event.first['subscription_count']}');
+          print('userId: $userId');
+          return event.first['subscription_count'] as int;
+        }
+        // (event) => event.first['subscription_count'] as int,
       );
 
   @override
@@ -95,6 +113,7 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
       ).map(
         (event) => event.first['subscription_count'] as int,
       );
+      
 
   @override
   Stream<bool> followingStatus({
@@ -167,6 +186,84 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
     );
   }
 
+  @override
+  Stream<List<User>> followers({required String userId}) async* {
+    final streamResult = _powerSyncRepository.db().watch(
+      'SELECT subscriber_id FROM subscriptions WHERE subscribed_to_id = ? ',
+      parameters: [userId],
+    );
+    await for (final result in streamResult) {
+      final followers = <User>[];
+      final followersFutures = await Future.wait(
+        result.where((row) => row.isNotEmpty).safeMap(
+              (row) => _powerSyncRepository.db().getOptional(
+                'SELECT * FROM profiles WHERE id = ?',
+                [row['subscriber_id']],
+              ),
+            ),
+      );
+      for (final user in followersFutures) {
+        if (user == null) continue;
+        final follower = User.fromJson(user);
+        followers.add(follower);
+      }
+      yield followers;
+    }
+  }
+
+  @override
+  Future<List<User>> getFollowers({String? userId}) async {
+    final followersId = await _powerSyncRepository.db().getAll(
+      'SELECT subscriber_id FROM subscriptions WHERE subscribed_to_id = ? ',
+      [userId ?? currentUserId],
+    );
+    if (followersId.isEmpty) return [];
+
+    final followers = <User>[];
+    for (final followerId in followersId) {
+      final result = await _powerSyncRepository.db().execute(
+        'SELECT * FROM profiles WHERE id = ?',
+        [followerId['subscriber_id']],
+      );
+      if (result.isEmpty) continue;
+      final follower = User.fromJson(result.first);
+      followers.add(follower);
+    }
+    return followers;
+  }
+
+  @override
+  Future<List<User>> getFollowings({String? userId}) async {
+    final followingsUserId = await _powerSyncRepository.db().getAll(
+      'SELECT subscribed_to_id FROM subscriptions WHERE subscriber_id = ? ',
+      [userId ?? currentUserId],
+    );
+    if (followingsUserId.isEmpty) return [];
+
+    final followings = <User>[];
+    for (final followingsUserId in followingsUserId) {
+      final result = await _powerSyncRepository.db().execute(
+        'SELECT * FROM profiles WHERE id = ?',
+        [followingsUserId['subscribed_to_id']],
+      );
+      if (result.isEmpty) continue;
+      final following = User.fromJson(result.first);
+      followings.add(following);
+    }
+    return followings;
+  }
+
+  @override
+  Future<void> removeFollower({required String id}) async {
+    if (currentUserId == null) return;
+    await _powerSyncRepository.db().execute(
+      '''
+          DELETE FROM subscriptions WHERE subscriber_id = ? AND subscribed_to_id = ?
+      ''',
+      [id, currentUserId],
+    );
+  }
+
    @override
   Future<Post?> createPost({
     required String id,
@@ -200,5 +297,5 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
     final row = Map<String, dynamic>.from((result.first as ResultSet).first);
     final author = User.fromJson(result.last as Row);
     return Post.fromJson(row).copyWith(author: author);
-  } 
+  }
 }

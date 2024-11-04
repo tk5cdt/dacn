@@ -174,13 +174,13 @@ class UserRepository extends UserBaseRepository {
   Stream<int> followingsCountOf({required String userId}) =>
       _databaseClient.followingsCountOf(userId: userId);
 
-//   @override
-//   Future<List<User>> getFollowers({String? userId}) =>
-//       _databaseClient.getFollowers(userId: userId);
+  @override
+  Future<List<User>> getFollowers({String? userId}) =>
+      _databaseClient.getFollowers(userId: userId);
 
-//   @override
-//   Future<List<User>> getFollowings({String? userId}) =>
-//       _databaseClient.getFollowings(userId: userId);
+  @override
+  Future<List<User>> getFollowings({String? userId}) =>
+      _databaseClient.getFollowings(userId: userId);
 
   @override
   Future<void> follow({
@@ -192,9 +192,9 @@ class UserRepository extends UserBaseRepository {
         followerId: followerId,
       );
 
-//   @override
-//   Future<void> removeFollower({required String id}) =>
-//       _databaseClient.removeFollower(id: id);
+  @override
+  Future<void> removeFollower({required String id}) =>
+      _databaseClient.removeFollower(id: id);
 
   @override
   Future<void> unfollow({required String unfollowId, String? unfollowerId}) =>
@@ -249,7 +249,7 @@ class UserRepository extends UserBaseRepository {
 //         excludeUserIds: excludeUserIds,
 //       );
 
-//   @override
-//   Stream<List<User>> followers({required String userId}) =>
-//       _databaseClient.followers(userId: userId);
+  @override
+  Stream<List<User>> followers({required String userId}) =>
+      _databaseClient.followers(userId: userId);
 }
