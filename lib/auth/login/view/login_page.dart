@@ -85,7 +85,7 @@ class LoginView extends StatelessWidget {
                     onPressed: () =>
                         context.read<LoginCubit>().loginWithGoogle(),
                   ),
-                  // GoogleSignInButton(),
+                  // const GoogleSignInButton(),
                   // Gap.v(AppSpacing.xxxlg),
                   // LogoutButton(),
                 ],
@@ -134,9 +134,7 @@ class GoogleSignInButton extends StatelessWidget {
       idToken: idToken,
       accessToken: accessToken,
     );
-    // await Supabase.instance.client.auth.signInWithOAuth(
-    //   OAuthProvider.google
-    // );
+    await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.google);
   }
 
   @override

@@ -30,6 +30,15 @@ abstract class UserBaseRepository {
   Future<void> unfollow({required String unfollowId, String? unfollowerId});
 
   Future<void> removeFollower({required String id});
+
+  /// Updates currently authenticated database user's metadata.
+  Future<void> updateUser({
+    String? fullName,
+    String? email,
+    String? username,
+    String? avatarUrl,
+    String? pushToken,
+  });
 }
 
 abstract class PostsBaseRepository {
@@ -37,7 +46,7 @@ abstract class PostsBaseRepository {
 
   Stream<int> postsAmountOf({required String userId});
 
-   // Create a new post with provided details.
+  // Create a new post with provided details.
   Future<Post?> createPost({
     required String id,
     required String caption,
@@ -48,7 +57,8 @@ abstract class PostsBaseRepository {
 /// {@template database_client}
 /// A Very Good Project created by Very Good CLI.
 /// {@endtemplate}
-abstract class DatabaseClient implements UserBaseRepository, PostsBaseRepository {
+abstract class DatabaseClient
+    implements UserBaseRepository, PostsBaseRepository {
   /// {@macro database_client}
   const DatabaseClient();
 }
@@ -65,7 +75,8 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
       _powerSyncRepository.supabase.auth.currentSession?.user.id;
 
   @override
-  Stream<User> profile({required String userId}) => _powerSyncRepository.db().watch(
+  Stream<User> profile({required String userId}) =>
+      _powerSyncRepository.db().watch(
         '''
         select * from profile where id = ?
       ''',
@@ -81,28 +92,26 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
         select count(*) as posts_count from posts where user_id = ?
       ''',
         parameters: [userId],
-      ).map(
-        (event) {
-          print('Posts count in db: ${event.first['posts_count']}');
-          return event.first['posts_count'] as int;
-        }
-        // (event) => event.first['posts_count'] as int,
-      );
-      
+      ).map((event) {
+        print('Posts count in db: ${event.first['posts_count']}');
+        return event.first['posts_count'] as int;
+      }
+          // (event) => event.first['posts_count'] as int,
+          );
+
   @override
   Stream<int> followersCountOf({required String userId}) =>
       _powerSyncRepository.db().watch(
         'SELECT COUNT(*) AS subscription_count FROM subscriptions '
         'WHERE subscribed_to_id = ?',
         parameters: [userId],
-      ).map(
-        (event) {
-          print('Followers count in db: ${event.first['subscription_count']}');
-          print('userId: $userId');
-          return event.first['subscription_count'] as int;
-        }
-        // (event) => event.first['subscription_count'] as int,
-      );
+      ).map((event) {
+        print('Followers count in db: ${event.first['subscription_count']}');
+        print('userId: $userId');
+        return event.first['subscription_count'] as int;
+      }
+          // (event) => event.first['subscription_count'] as int,
+          );
 
   @override
   Stream<int> followingsCountOf({required String userId}) =>
@@ -113,7 +122,6 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
       ).map(
         (event) => event.first['subscription_count'] as int,
       );
-      
 
   @override
   Stream<bool> followingStatus({
@@ -144,7 +152,7 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
     );
     return result.isNotEmpty;
   }
-  
+
   @override
   Future<void> follow({
     required String followToId,
@@ -264,7 +272,7 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
     );
   }
 
-   @override
+  @override
   Future<Post?> createPost({
     required String id,
     required String caption,
@@ -298,4 +306,24 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
     final author = User.fromJson(result.last as Row);
     return Post.fromJson(row).copyWith(author: author);
   }
+
+  @override
+  Future<void> updateUser({
+    String? fullName,
+    String? email,
+    String? username,
+    String? avatarUrl,
+    String? pushToken,
+    String? password,
+  }) =>
+      _powerSyncRepository.updateUser(
+        email: email,
+        password: password,
+        data: {
+          if (fullName != null) 'full_name': fullName,
+          if (username != null) 'username': username,
+          if (avatarUrl != null) 'avatar_url': avatarUrl,
+          if (pushToken != null) 'push_token': pushToken,
+        },
+      );
 }

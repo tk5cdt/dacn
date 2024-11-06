@@ -4,6 +4,7 @@ import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/app/home/home.dart';
 import 'package:conexion/auth/view/auth_page.dart';
+import 'package:conexion/feed/view/feed_page.dart';
 import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion/user_profile/widgets/user_profile_create_post.dart';
 import 'package:conexion/user_profile/widgets/user_profile_statistics.dart';
@@ -36,15 +37,7 @@ GoRouter router(AppBloc appBloc) {
                 path: '/feed',
                 pageBuilder: (context, state) {
                   return CustomTransitionPage(
-                    child: AppScaffold(
-                      body: Center(
-                        child: Text(
-                          'Feed',
-                          style: context.headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
+                    child: const FeedPage(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       return SharedAxisTransition(
@@ -145,91 +138,45 @@ GoRouter router(AppBloc appBloc) {
                   );
                 },
                 routes: [
-                      GoRoute(
-                        path: 'create_post',
-                        name: 'create_post',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        pageBuilder: (context, state) {
-                          final pickVideo = state.extra as bool? ?? false;
+                  GoRoute(
+                    path: 'create_post',
+                    name: 'create_post',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      final pickVideo = state.extra as bool? ?? false;
 
-                          return CustomTransitionPage(
-                            key: state.pageKey,
-                            child: UserProfileCreatePost(
-                              pickVideo: pickVideo,
-                              wantKeepAlive: false,
-                            ),
-                            transitionsBuilder: (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              child,
-                            ) {
-                              return SharedAxisTransition(
-                                animation: animation,
-                                secondaryAnimation: secondaryAnimation,
-                                transitionType:
-                                    SharedAxisTransitionType.horizontal,
-                                child: child,
-                              );
-                            },
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: UserProfileCreatePost(
+                          pickVideo: pickVideo,
+                          wantKeepAlive: false,
+                        ),
+                        transitionsBuilder: (
+                          context,
+                          animation,
+                          secondaryAnimation,
+                          child,
+                        ) {
+                          return SharedAxisTransition(
+                            animation: animation,
+                            secondaryAnimation: secondaryAnimation,
+                            transitionType: SharedAxisTransitionType.horizontal,
+                            child: child,
                           );
                         },
-                        routes: [
-                          GoRoute(
-                            name: 'publish_post',
-                            path: 'publish_post',
-                            parentNavigatorKey: _rootNavigatorKey,
-                            pageBuilder: (context, state) {
-                              final props = state.extra! as CreatePostProps;
-
-                              return CustomTransitionPage(
-                                key: state.pageKey,
-                                child: CreatePostPage(props: props),
-                                transitionsBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
-                                ) {
-                                  return SharedAxisTransition(
-                                    animation: animation,
-                                    secondaryAnimation: secondaryAnimation,
-                                    transitionType:
-                                        SharedAxisTransitionType.horizontal,
-                                    child: child,
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                      );
+                    },
+                    routes: [
                       GoRoute(
-                        path: 'statistics',
-                        name: 'user_statistics',
+                        name: 'publish_post',
+                        path: 'publish_post',
                         parentNavigatorKey: _rootNavigatorKey,
                         pageBuilder: (context, state) {
-                          final userId = state.uri.queryParameters['user_id']!;
-                          final tabIndex = state.extra! as int;
+                          final props = state.extra! as CreatePostProps;
 
                           return CustomTransitionPage(
                             key: state.pageKey,
-                            child: BlocProvider(
-                              create: (context) => UserProfileBloc(
-                                userId: userId,
-                                userRepository: context.read<UserRepository>(),
-                                postsRepository:
-                                    context.read<PostsRepository>(),
-                              )
-                                ..add(const UserProfileSubscriptionRequested())
-                                ..add(
-                                  const UserProfileFollowingsCountSubscriptionRequested(),
-                                )
-                                ..add(
-                                  const UserProfileFollowersCountSubscriptionRequested(),
-                                ),
-                              child: UserProfileStatistics(tabIndex: tabIndex),
-                            ),
+                            child: CreatePostPage(props: props),
                             transitionsBuilder: (
                               context,
                               animation,
@@ -248,6 +195,99 @@ GoRouter router(AppBloc appBloc) {
                         },
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: 'statistics',
+                    name: 'user_statistics',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      final userId = state.uri.queryParameters['user_id']!;
+                      final tabIndex = state.extra! as int;
+
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: BlocProvider(
+                          create: (context) => UserProfileBloc(
+                            userId: userId,
+                            userRepository: context.read<UserRepository>(),
+                            postsRepository: context.read<PostsRepository>(),
+                          )
+                            ..add(const UserProfileSubscriptionRequested())
+                            ..add(
+                              const UserProfileFollowingsCountSubscriptionRequested(),
+                            )
+                            ..add(
+                              const UserProfileFollowersCountSubscriptionRequested(),
+                            ),
+                          child: UserProfileStatistics(tabIndex: tabIndex),
+                        ),
+                        transitionsBuilder: (
+                          context,
+                          animation,
+                          secondaryAnimation,
+                          child,
+                        ) {
+                          return SharedAxisTransition(
+                            animation: animation,
+                            secondaryAnimation: secondaryAnimation,
+                            transitionType: SharedAxisTransitionType.horizontal,
+                            child: child,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'edit',
+                    name: 'edit_profile',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: const UserProfileEdit(),
+                        transitionsBuilder: (
+                          context,
+                          animation,
+                          secondaryAnimation,
+                          child,
+                        ) {
+                          return SharedAxisTransition(
+                            animation: animation,
+                            secondaryAnimation: secondaryAnimation,
+                            transitionType: SharedAxisTransitionType.vertical,
+                            child: child,
+                          );
+                        },
+                      );
+                    },
+                    routes: [
+                      GoRoute(
+                        path: 'info/:label',
+                        name: 'edit_profile_info',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        pageBuilder: (context, state) {
+                          final query = state.uri.queryParameters;
+                          final label = state.pathParameters['label']!;
+                          final appBarTitle = query['title']!;
+                          final description = query['description'];
+                          final infoValue = query['value'];
+                          final infoType = state.extra as ProfileEditInfoType?;
+
+                          return MaterialPage<void>(
+                            fullscreenDialog: true,
+                            child: ProfileInfoEditPage(
+                              appBarTitle: appBarTitle,
+                              description: description,
+                              infoValue: infoValue,
+                              infoLabel: label,
+                              infoType: infoType!,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
@@ -278,13 +318,13 @@ class GoRouterAppBlocRefreshStream extends ChangeNotifier {
   GoRouterAppBlocRefreshStream(Stream<AppState> stream) {
     notifyListeners();
     _subscription = stream.asBroadcastStream().listen((appState) {
-      if (_appState == appState) return;
-      _appState = appState;
+      // if (_appState == appState) return;
+      // _appState = appState;
       notifyListeners();
     });
   }
 
-  AppState _appState = const AppState.unauthenticated();
+  // AppState _appState = const AppState.unauthenticated();
 
   late final StreamSubscription<dynamic> _subscription;
 

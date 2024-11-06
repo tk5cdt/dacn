@@ -70,6 +70,9 @@ class LogInWithAppleFailure extends AuthenticationException {
 class LogInWithGoogleFailure extends AuthenticationException {
   /// {@macro log_in_with_google_failure}
   const LogInWithGoogleFailure(super.error);
+
+  @override
+  String toString() => 'LogInWithGoogleFailure: $error';
 }
 
 /// {@template log_in_with_google_canceled}
@@ -78,6 +81,8 @@ class LogInWithGoogleFailure extends AuthenticationException {
 class LogInWithGoogleCanceled extends AuthenticationException {
   /// {@macro log_in_with_google_canceled}
   const LogInWithGoogleCanceled(super.error);
+  @override
+  String toString() => 'LogInWithGoogleCanceled: $error';
 }
 
 /// {@template log_in_with_github_failure}

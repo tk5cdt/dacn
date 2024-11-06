@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:app_ui/app_ui.dart';
 import 'package:bloc/bloc.dart';
 import 'package:conexion/app/di/di.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -38,14 +39,12 @@ class AppBlocObserver extends BlocObserver {
 
 Future<void> bootstrap(
   AppBuilder builder, {
-    required AppFlavor appFlavor,
-    required FirebaseOptions firebaseOptions,
-  }
-) async {
+  required AppFlavor appFlavor,
+  required FirebaseOptions firebaseOptions,
+}) async {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
-
 
   Bloc.observer = const AppBlocObserver();
 
@@ -56,7 +55,7 @@ Future<void> bootstrap(
       setupDi(appFlavor: appFlavor);
 
       await Firebase.initializeApp(options: firebaseOptions);
-      
+
       HydratedBloc.storage = await HydratedStorage.build(
         storageDirectory: kIsWeb
             ? HydratedStorage.webStorageDirectory
@@ -68,7 +67,7 @@ Future<void> bootstrap(
 
       SystemUiOverlayTheme.setPortraitOrientation();
 
-      runApp(await builder(powerSyncRepository));
+      runApp(TranslationProvider(child: await builder(powerSyncRepository)));
     },
     (error, stack) {
       logE(error.toString(), stackTrace: stack);

@@ -1,11 +1,4 @@
-name: conexion
-description: A Very Good Project created by Very Good CLI.
-version: 1.0.0+1
-publish_to: none
-
-environment:
-  sdk: ^3.4.0
-
+---
 dependencies:
   animations: ^2.0.11
   api_repository:
@@ -13,6 +6,9 @@ dependencies:
   app_ui:
     path: packages/app_ui
   bloc: ^8.1.4
+  build_runner: ^2.4.13
+  con_blocks:
+    path: packages/con_blocks
   conexion_blocks_ui:
     path: packages/conexion_blocks_ui
   database_client:
@@ -33,8 +29,10 @@ dependencies:
   go_router: ^14.3.0
   google_sign_in: ^6.2.1
   hydrated_bloc: ^9.1.5
+  image_picker_plus:
+    path: packages/image_picker_plus
   intl: ^0.19.0
-  path: ">=1.8.3 <=1.9.0"
+  path: '>=1.8.3 <=1.9.0'
   path_provider: ^2.1.4
   posts_repository:
     path: packages/posts_repository
@@ -43,27 +41,32 @@ dependencies:
     path: packages/powersync_repository
   shared:
     path: packages/shared
-  image_picker_plus:
-    path: packages/image_picker_plus
+  slang: ^4.1.0
+  slang_build_runner: ^4.1.0
+  slang_flutter: ^4.1.0
   sliver_tools: ^0.2.12
   supabase_authentication_client:
     path: packages/authentication_client/supabase_authentication_client
   supabase_flutter: ^2.6.0
+  timeago: ^3.7.0
   token_storage:
     path: packages/authentication_client/token_storage
   user_repository:
     path: packages/user_repository
-
+description: A Very Good Project created by Very Good CLI.
 dev_dependencies:
   bloc_test: ^9.1.7
-  build_runner: ^2.4.11
   envied_generator: ^0.5.4+1
   flutter_test:
     sdk: flutter
   meta: ^1.15.0
   mocktail: ^1.0.4
   very_good_analysis: ^6.0.0
-
+environment:
+  sdk: ^3.4.0
 flutter:
-  uses-material-design: true
   generate: true
+  uses-material-design: true
+name: conexion
+publish_to: none
+version: 1.0.0+1

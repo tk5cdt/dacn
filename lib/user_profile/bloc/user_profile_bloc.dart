@@ -17,9 +17,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
         _postsRepository = postsRepository,
         _userId = userId ?? userRepository.currentUserId ?? '',
         super(const UserProfileState.initial()) {
-    on<UserProfileSubscriptionRequested>(
-      _onUserProfileSubscriptionRequested
-    );
+    on<UserProfileSubscriptionRequested>(_onUserProfileSubscriptionRequested);
     on<UserProfilePostsCountSubscriptionRequested>(
       _onUserProfilePostsCountSubscriptionRequested,
     );
@@ -41,9 +39,12 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     on<UserProfileFollowUserRequested>(
       _onUserProfileFollowUserRequested,
     );
-    
+
     on<UserProfileRemoveFollowerRequested>(
-      _onUserProfileRemoveFollowerRequested
+      _onUserProfileRemoveFollowerRequested,
+    );
+    on<UserProfileUpdateRequested>(
+      _onUserProfileUpdateRequested,
     );
   }
   final String _userId;
@@ -157,6 +158,25 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
       await _userRepository.removeFollower(id: event.userId ?? _userId);
     } catch (error, stackTrace) {
       addError(error, stackTrace);
+    }
+  }
+
+  Future<void> _onUserProfileUpdateRequested(
+    UserProfileUpdateRequested event,
+    Emitter<UserProfileState> emit,
+  ) async {
+    try {
+      await _userRepository.updateUser(
+        email: event.email,
+        username: event.username,
+        fullName: event.fullName,
+        avatarUrl: event.avatarUrl,
+        pushToken: event.pushToken,
+      );
+      emit(state.copyWith(status: UserProfileStatus.userUpdated));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: UserProfileStatus.userUpdateFailed));
     }
   }
 }

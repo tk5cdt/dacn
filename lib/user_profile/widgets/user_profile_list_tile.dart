@@ -1,12 +1,13 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/bloc/app_bloc.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
 import 'package:conexion/user_profile/widgets/user_profile_button.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
+import 'package:conexion_blocks_ui/src/user_profile/user_profile_avatar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
@@ -32,10 +33,9 @@ class _UserProfileListTileState extends State<UserProfileListTile> {
   void initState() {
     super.initState();
     if (widget.follower) {
-      _isFollowed =
-          context.read<UserRepository>().isFollowed(
-            userId: widget.user.id, 
-            followerId: context.read<AppBloc>().state.user.id, 
+      _isFollowed = context.read<UserRepository>().isFollowed(
+            userId: widget.user.id,
+            followerId: context.read<AppBloc>().state.user.id,
           );
     }
   }
@@ -82,8 +82,12 @@ class _UserProfileListTileState extends State<UserProfileListTile> {
           //   enableInactiveBorder: false,
           //   radius: 26,
           // ),
-          CircleAvatar(
-            foregroundImage: NetworkImage(widget.user.avatarUrl ?? ''),
+          // CircleAvatar(
+          //   foregroundImage: NetworkImage(widget.user.avatarUrl ?? ''),
+          //   radius: 26,
+          // ),
+          UserProfileAvatar(
+            avatarUrl: widget.user.avatarUrl,
             radius: 26,
           ),
           Expanded(
