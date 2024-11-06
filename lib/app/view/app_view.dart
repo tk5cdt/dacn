@@ -20,10 +20,13 @@ class AppView extends StatelessWidget {
 
     return BlocBuilder<LocaleBloc, Locale>(
       builder: (context, locale) {
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => LocaleSettings.setLocaleRaw(locale.languageCode),
+        );
         return BlocBuilder<ThemeModeBloc, ThemeMode>(
           builder: (context, themeMode) {
             WidgetsBinding.instance
-                  .addPostFrameCallback((_)=> initUtilities(context, locale));
+                .addPostFrameCallback((_) => initUtilities(context, locale));
             return AnimatedSwitcher(
               duration: 300.ms,
               child: MediaQuery(

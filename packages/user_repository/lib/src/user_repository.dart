@@ -1,5 +1,6 @@
 import 'package:authentication_client/authentication_client.dart';
 import 'package:database_client/database_client.dart';
+import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
 
 /// {@template user_repository}
@@ -7,10 +8,10 @@ import 'package:user_repository/user_repository.dart';
 /// {@endtemplate}
 class UserRepository extends UserBaseRepository {
   /// {@macro user_repository}
-  const UserRepository({
-    required AuthenticationClient authenticationClient,
-    required DatabaseClient databaseClient,
-  })  : _authenticationClient = authenticationClient,
+  const UserRepository(
+      {required AuthenticationClient authenticationClient,
+      required DatabaseClient databaseClient})
+      : _authenticationClient = authenticationClient,
         _databaseClient = databaseClient;
 
   final AuthenticationClient _authenticationClient;
@@ -29,9 +30,12 @@ class UserRepository extends UserBaseRepository {
   Future<void> logInWithGoogle() async {
     try {
       await _authenticationClient.logInWithGoogle();
+      logE('Login with Google successful');
     } on LogInWithGoogleFailure {
+      logE('Login with Google failed');
       rethrow;
     } on LogInWithGoogleCanceled {
+      logE('Login with Google canceled');
       rethrow;
     } catch (error, stackTrace) {
       Error.throwWithStackTrace(LogInWithGoogleFailure(error), stackTrace);
@@ -217,21 +221,21 @@ class UserRepository extends UserBaseRepository {
   }) =>
       _databaseClient.followingStatus(followerId: followerId, userId: userId);
 
-//   @override
-//   Future<void> updateUser({
-//     String? fullName,
-//     String? email,
-//     String? username,
-//     String? avatarUrl,
-//     String? pushToken,
-//   }) =>
-//       _databaseClient.updateUser(
-//         fullName: fullName,
-//         email: email,
-//         username: username,
-//         avatarUrl: avatarUrl,
-//         pushToken: pushToken,
-//       );
+  @override
+  Future<void> updateUser({
+    String? fullName,
+    String? email,
+    String? username,
+    String? avatarUrl,
+    String? pushToken,
+  }) =>
+      _databaseClient.updateUser(
+        fullName: fullName,
+        email: email,
+        username: username,
+        avatarUrl: avatarUrl,
+        pushToken: pushToken,
+      );
 
 //   @override
 //   Future<List<User>> searchUsers({

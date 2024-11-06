@@ -202,28 +202,28 @@ class SignUpCubit extends Cubit<SignupState> {
     if (!isFormValid) return;
 
     try {
-      // String? imageUrlResponse;
-      // if (avatarFile != null) {
-      //   final imageBytes =
-      //       await PickImage().imageBytes(file: File(avatarFile.path));
-      //   final avatarsStorage = Supabase.instance.client.storage.from('avatars');
+      String? imageUrlResponse;
+      if (avatarFile != null) {
+        final imageBytes =
+            await PickImage().imageBytes(file: File(avatarFile.path));
+        final avatarsStorage = Supabase.instance.client.storage.from('avatars');
 
-      //   final fileExt = avatarFile.path.split('.').last.toLowerCase();
-      //   final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
-      //   final filePath = fileName;
-      //   await avatarsStorage.uploadBinary(
-      //     filePath,
-      //     imageBytes,
-      //     fileOptions: FileOptions(
-      //       contentType: 'image/$fileExt',
-      //       cacheControl: '360000',
-      //     ),
-      //   );
-      //   imageUrlResponse = await avatarsStorage.createSignedUrl(
-      //     filePath,
-      //     60 * 60 * 24 * 365 * 10,
-      //   );
-      // }
+        final fileExt = avatarFile.path.split('.').last.toLowerCase();
+        final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
+        final filePath = fileName;
+        await avatarsStorage.uploadBinary(
+          filePath,
+          imageBytes,
+          fileOptions: FileOptions(
+            contentType: 'image/$fileExt',
+            cacheControl: '360000',
+          ),
+        );
+        imageUrlResponse = await avatarsStorage.createSignedUrl(
+          filePath,
+          60 * 60 * 24 * 365 * 10,
+        );
+      }
 
       // final pushToken = await _notificationsClient.fetchToken();
 
@@ -232,7 +232,7 @@ class SignUpCubit extends Cubit<SignupState> {
         password: state.password.value,
         fullName: state.fullName.value,
         username: state.username.value,
-        // avatarUrl: imageUrlResponse,
+        avatarUrl: imageUrlResponse,
         // pushToken: pushToken,
       );
 

@@ -24,6 +24,7 @@ class SupabaseAuthenticationClient implements AuthenticationClient {
   final TokenStorage _tokenStorage;
   final PowerSyncRepository _powerSyncRepository;
   final GoogleSignIn _googleSignIn;
+  // final SupabaseClient _supabaseClient;
 
   /// Stream of [AuthenticationUser] which will emit the current user when
   /// the authentication state changes.

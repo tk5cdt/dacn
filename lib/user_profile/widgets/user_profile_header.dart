@@ -1,10 +1,9 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
-import 'package:conexion/user_profile/widgets/user_profile_button.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
+import 'package:conexion_blocks_ui/src/user_profile/user_profile_avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared/shared.dart';
@@ -36,9 +35,20 @@ class UserProfileHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(user.avatarUrl ?? ''),
-                  radius: 32,
+                // CircleAvatar(
+                //   backgroundImage: NetworkImage(user.avatarUrl ?? ''),
+                //   radius: 32,
+                // ),
+                UserProfileAvatar(
+                  avatarUrl: user.avatarUrl,
+                  onLongPress: (avatarUrl) => avatarUrl == null
+                      ? null
+                      : context.showImagePreview(avatarUrl),
+                  onTap: (imageUrl) {
+                    if (imageUrl == null) return;
+                    if (!isOwner) context.showImagePreview(imageUrl);
+                    if (isOwner) {}
+                  },
                 ),
                 const Gap.h(AppSpacing.md),
                 Expanded(

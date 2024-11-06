@@ -1,0 +1,10 @@
+{
+    "likedBy_rich": "Liked by {name} {and} {others}",
+    "@likedBy_rich": {
+        "placeholders": {
+            "name": {},
+            "and": {},
+            "others": {}
+        }
+    }
+}

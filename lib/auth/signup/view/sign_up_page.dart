@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/auth/auth.dart';
 import 'package:conexion/auth/signup/widgets/widgets.dart';
@@ -5,6 +7,7 @@ import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:conexion_blocks_ui/src/widgets/widgets.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -20,23 +23,30 @@ class SignUpPage extends StatelessWidget {
   }
 }
 
-class SignUpView extends StatelessWidget {
+class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
 
   @override
+  State<SignUpView> createState() => _SignUpViewState();
+}
+
+class _SignUpViewState extends State<SignUpView> {
+  File? _avatarFile;
+
+  @override
   Widget build(BuildContext context) {
-    return const AppScaffold(
+    return AppScaffold(
       releaseFocus: true,
       resizeToAvoidBottomInset: true,
       body: AppConstrainedScrollView(
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.xlg),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xlg),
         child: Column(
           children: [
-            SizedBox(height: AppSpacing.xxxlg + AppSpacing.xlg),
+            const SizedBox(height: AppSpacing.xxxlg + AppSpacing.xlg),
             // AppLogo(
             //   fit: BoxFit.fitHeight,
             // ),
-            Text(
+            const Text(
               'Conexion',
               style: TextStyle(
                 fontSize: 36,
@@ -44,19 +54,27 @@ class SignUpView extends StatelessWidget {
                 fontFamily: 'Pacifico',
               ),
             ),
-            AvatarImagePicker(),
+            AvatarImagePicker(
+              onUpload: (_, avatarFile) {
+                setState(() {
+                  _avatarFile = avatarFile;
+                });
+              },
+            ),
             Expanded(
               child: Column(
                 children: [
-                  Gap.v(AppSpacing.xlg),
-                  SignUpForm(),
-                  SignUpButton(),
+                  const Gap.v(AppSpacing.xlg),
+                  const SignUpForm(),
+                  SignUpButton(
+                    avatarFile: _avatarFile,
+                  ),
                 ],
               ),
             ),
             //Login in account button
-            SignInIntoAccountButton(),
-            Gap.v(AppSpacing.lg),
+            const SignInIntoAccountButton(),
+            const Gap.v(AppSpacing.lg),
           ],
         ),
       ),
