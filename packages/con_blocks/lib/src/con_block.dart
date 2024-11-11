@@ -1,4 +1,5 @@
 import 'package:con_blocks/con_blocks.dart';
+import 'package:con_blocks/src/post_reel_block.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
@@ -24,6 +25,10 @@ abstract class ConBlock {
     switch (type) {
       case PostLargeBlock.identifier:
         return PostLargeBlock.fromJson(json);
+      case PostSponsoredBlock.identifier:
+        return PostSponsoredBlock.fromJson(json);
+      case PostReelBlock.identifier:
+        return PostReelBlock.fromJson(json);
     }
     return UnknownBlock();
   }
