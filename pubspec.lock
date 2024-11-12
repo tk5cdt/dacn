@@ -5,23 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: f256b0c0ba6c7577c15e2e4e114755640a875e885099367bf6e012b19314c834
+      sha256: "0b2f2bd91ba804e53a61d757b986f89f1f9eaed5b11e4b2f5a2468d86d6c9fc7"
       url: "https://pub.dev"
     source: hosted
-    version: "72.0.0"
-  _macros:
-    dependency: transitive
-    description: dart
-    source: sdk
-    version: "0.3.2"
+    version: "67.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: b652861553cd3990d8ed361f7979dc6d7053a9ac8843fa73820ab68ce5410139
+      sha256: "37577842a27e4338429a1cbc32679d508836510b056f1eedf0c8d20e39c1383d"
       url: "https://pub.dev"
     source: hosted
-    version: "6.7.0"
+    version: "6.4.1"
   animations:
     dependency: "direct main"
     description:
@@ -421,10 +416,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "7856d364b589d1f08986e140938578ed36ed948581fbc3bc9aef1805039ac5ab"
+      sha256: "99e066ce75c89d6b29903d788a7bb9369cf754f7b24bf70bf4b6d6d6b26853b9"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.7"
+    version: "2.3.6"
   dartx:
     dependency: transitive
     description:
@@ -1129,14 +1124,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
-  macros:
-    dependency: transitive
-    description:
-      name: macros
-      sha256: "0acaed5d6b7eab89f63350bccd82119e6c602df0f391260d0e32b5e23db79536"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.2-main.4"
   matcher:
     dependency: transitive
     description:
@@ -1356,18 +1343,18 @@ packages:
     dependency: "direct main"
     description:
       name: powersync
-      sha256: "4e5d6add6602d9a891ede698f7c9ab8c9ce01ef445d9c0679802e637aa9734cd"
+      sha256: "3bd04f183ee5e8fa41731e6f4eb07b6cfd5c23de44b7a51b0354a563a7bc9997"
       url: "https://pub.dev"
     source: hosted
-    version: "1.8.8"
+    version: "1.9.3"
   powersync_flutter_libs:
     dependency: transitive
     description:
       name: powersync_flutter_libs
-      sha256: "86bd4626c2fb00dcfa4207bb1ec07e5d79a0ec2f728959757190b1a72116e1be"
+      sha256: bb91a9f74ba989d3e5183ba7b6742b1ccc829955be03e6196bccff7f4946dbce
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.1"
+    version: "0.4.3"
   powersync_repository:
     dependency: "direct main"
     description:
@@ -1679,10 +1666,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite_async
-      sha256: "1f7b36e6b5b459bae89941ae1d3ae8151a3c14b8242c3b94e75aea4a692361e2"
+      sha256: d66fb6e6d07c1a834743326c033029f75becbb1fad6823d709f921872abc3d5b
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.1"
+    version: "0.11.0"
   stack_trace:
     dependency: transitive
     description:
