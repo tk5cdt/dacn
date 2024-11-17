@@ -16,6 +16,8 @@ dependencies:
   rxdart: ^0.28.0
   shared:
     path: ../shared
+  con_blocks:
+    path: ../con_blocks
   
 
 dev_dependencies:

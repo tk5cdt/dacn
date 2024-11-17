@@ -2,6 +2,7 @@
 // ignore_for_file: use_setters_to_change_properties
 
 import 'package:con_blocks/con_blocks.dart';
+import 'package:conexion_blocks_ui/src/post_large/index.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
@@ -43,7 +44,7 @@ class PostLarge extends StatefulWidget {
     required this.onPressed,
     required this.onUserTap,
     required this.withInViewNotifier,
-    // required this.postOptionsSettings,
+    required this.postOptionsSettings,
     this.postAuthorAvatarBuilder,
     this.videoPlayerBuilder,
     this.postIndex,
@@ -65,7 +66,7 @@ class PostLarge extends StatefulWidget {
   final ValueSetter<bool> onCommentsTap;
   final OnPostShareTap onPostShareTap;
   final ValueSetter<String> onUserTap;
-  // final PostOptionsSettings postOptionsSettings;
+  final PostOptionsSettings postOptionsSettings;
   final AvatarBuilder? postAuthorAvatarBuilder;
   final VideoPlayerBuilder? videoPlayerBuilder;
   final int? postIndex;
@@ -103,60 +104,60 @@ class _PostLargeState extends State<PostLarge> {
   Widget build(BuildContext context) {
     final isSponsored = widget.block is PostSponsoredBlock;
 
-    return Container();
-    // final postMedia = PostMedia(
-    //   isLiked: widget.isLiked,
-    //   media: widget.block.media,
-    //   likePost: widget.likePost,
-    //   onPageChanged: _updateCurrentIndex,
-    //   videoPlayerBuilder: widget.videoPlayerBuilder,
-    //   postIndex: widget.postIndex,
-    //   withInViewNotifier: widget.withInViewNotifier,
-    // );
+    //return Container();
+    final postMedia = PostMedia(
+      isLiked: widget.isLiked,
+      media: widget.block.media,
+      likePost: widget.likePost,
+      onPageChanged: _updateCurrentIndex,
+      videoPlayerBuilder: widget.videoPlayerBuilder,
+      postIndex: widget.postIndex,
+      withInViewNotifier: widget.withInViewNotifier,
+    );
 
-    // Widget postHeader({Color? color}) => PostHeader(
-    //       follow: widget.follow,
-    //       block: widget.block,
-    //       color: color,
-    //       isOwner: widget.isOwner,
-    //       isSponsored: isSponsored,
-    //       isFollowed: widget.isFollowed,
-    //       enableFollowButton: widget.enableFollowButton,
-    //       postAuthorAvatarBuilder: widget.postAuthorAvatarBuilder,
-    //       postOptionsSettings: widget.postOptionsSettings,
-    //       onAvatarTap: (_) => _onAvatarTap.call(),
-    //     );
+    Widget postHeader({Color? color}) => PostHeader(
+          follow: widget.follow,
+          block: widget.block,
+          color: color,
+          isOwner: widget.isOwner,
+          isSponsored: isSponsored,
+          isFollowed: widget.isFollowed,
+          enableFollowButton: widget.enableFollowButton,
+          postAuthorAvatarBuilder: widget.postAuthorAvatarBuilder,
+          postOptionsSettings: widget.postOptionsSettings,
+          onAvatarTap: (_) => _onAvatarTap.call(),
+        );
 
-    // return Column(
-    //   crossAxisAlignment: CrossAxisAlignment.start,
-    //   children: [
-    //     if (widget.block.isReel)
-    //       Stack(
-    //         children: [
-    //           postMedia,
-    //           postHeader(color: Colors.white),
-    //         ],
-    //       )
-    //     else ...[
-    //       postHeader(),
-    //       postMedia,
-    //     ],
-    //     PostFooter(
-    //       block: widget.block,
-    //       indicatorValue: _indicatorValue,
-    //       mediasUrl: widget.block.mediaUrls,
-    //       isLiked: widget.isLiked,
-    //       likePost: widget.likePost,
-    //       likesCount: widget.likesCount,
-    //       commentsCount: widget.commentsCount,
-    //       onAvatarTap: (_) => _onAvatarTap(),
-    //       onUserTap: widget.onUserTap,
-    //       onCommentsTap: widget.onCommentsTap,
-    //       onPostShareTap: widget.onPostShareTap,
-    //       likesCountBuilder: widget.likesCountBuilder,
-    //       likersInFollowings: widget.likersInFollowings,
-    //     ),
-    //   ],
-    // );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.block.isReel)
+          Stack(
+            children: [
+              postMedia,
+              postHeader(color: Colors.white),
+            ],
+          )
+        else ...[
+          postHeader(),
+          postMedia,
+        ],
+        PostFooter(
+          block: widget.block,
+          indicatorValue: _indicatorValue,
+          mediasUrl: widget.block.mediaUrls,
+          isLiked: widget.isLiked,
+          likePost: widget.likePost,
+          likesCount: widget.likesCount,
+          commentsCount: widget.commentsCount,
+          onAvatarTap: (_) => _onAvatarTap(),
+          onUserTap: widget.onUserTap,
+          onCommentsTap: widget.onCommentsTap,
+          onPostShareTap: widget.onPostShareTap,
+          likesCountBuilder: widget.likesCountBuilder,
+          likersInFollowings: widget.likersInFollowings,
+        ),
+      ],
+    );
   }
 }

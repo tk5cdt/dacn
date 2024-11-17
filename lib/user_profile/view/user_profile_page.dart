@@ -16,10 +16,12 @@ import '../../selector/selector.dart';
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({
     required this.userId,
+    this.props = const UserProfileProps.build(),
     super.key,
   });
 
   final String userId;
+  final UserProfileProps props;
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +37,17 @@ class UserProfilePage extends StatelessWidget {
         ..add(const UserProfileFollowersCountSubscriptionRequested()),
       child: UserProfileView(
         userId: userId,
+        props: props
       ),
     );
   }
 }
 
 class UserProfileView extends StatefulWidget {
-  const UserProfileView({required this.userId, super.key});
+  const UserProfileView({required this.userId, required this.props, super.key});
 
   final String userId;
+  final UserProfileProps props;
 
   @override
   State<UserProfileView> createState() => _UserProfileViewState();

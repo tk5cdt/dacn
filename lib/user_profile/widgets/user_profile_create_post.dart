@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/view/app.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -331,15 +332,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // PostMedia(
-            //   media: _media,
-            //   withLikeOverlay: false,
-            //   withInViewNotifier: false,
-            //   autoHideCurrentIndex: false,
-            //   mediaCarouselSettings: const MediaCarouselSettings.empty(
-            //     viewportFraction: .9,
-            //   ),
-            // ),
+            PostMedia(
+              media: _media,
+              withLikeOverlay: false,
+              withInViewNotifier: false,
+              autoHideCurrentIndex: false,
+              mediaCarouselSettings: const MediaCarouselSettings.empty(
+                viewportFraction: .9,
+              ),
+            ),
             const Gap.v(AppSpacing.sm),
             CaptionInputField(
               captionController: _captionController,

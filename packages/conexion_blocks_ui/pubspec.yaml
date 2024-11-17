@@ -25,6 +25,16 @@ dependencies:
     path: ../user_repository
 
   shimmer: any
+  inview_notifier_list: ^3.0.0
+  octo_image: ^2.1.0
+  flutter_blurhash: ^0.8.2
+  smooth_video_progress: ^0.0.4
+  video_player: ^2.9.2
+  visibility_detector: ^0.4.0+2
+  flutter_animate: ^4.5.0
+  sprung: ^3.0.1
+  carousel_slider: ^5.0.0
+  avatar_stack: ^1.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
+import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:posts_repository/posts_repository.dart';
@@ -18,12 +19,14 @@ class App extends StatelessWidget {
     required this.user,
     required this.userRepository,
     required this.postsRepository,
+    required this.firebaseRemoteConfigRepository,
     super.key,
   });
 
   final User user;
   final UserRepository userRepository;
   final PostsRepository postsRepository;
+  final FirebaseRemoteConfigRepository firebaseRemoteConfigRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +37,9 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider.value(
           value: postsRepository,
+        ),
+        RepositoryProvider.value(
+          value: firebaseRemoteConfigRepository
         ),
       ],
       child: MultiBlocProvider(
