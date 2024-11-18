@@ -1,2 +1,12 @@
 export 'avatar_image_picker.dart';
 export 'shimmer_placeholder.dart';
+export 'follow_button.dart';
+export 'media_carousel.dart';
+export 'octo_blur_placeholder.dart';
+export 'inline_video.dart';
+export 'viewable.dart';
+export 'popping_icon_overlay.dart';
+export 'shimmer_placeholder.dart';
+export 'animated_visibility.dart';
+export 'time_ago.dart';
+export 'promo_floating_action.dart';

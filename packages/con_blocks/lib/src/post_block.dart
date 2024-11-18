@@ -120,73 +120,73 @@ extension PostBlockActions on PostBlock {
 // /// The action is created using the author ID of each element in the original
 // /// list.
 // /// {@endtemplate}
-// extension PostBlockListExtension on List<PostLargeBlock> {
-//   /// Provides each element in list of [PostLargeBlock] with action
-//   /// [NavigateToPostAuthorProfileAction].
-//   List<PostLargeBlock> get withNavigateToPostAuthorAction => map(
-//         (e) => e.copyWith(
-//           action: NavigateToPostAuthorProfileAction(authorId: e.author.id),
-//         ),
-//       ).toList();
-// }
+extension PostBlockListExtension on List<PostLargeBlock> {
+  /// Provides each element in list of [PostLargeBlock] with action
+  /// [NavigateToPostAuthorProfileAction].
+  List<PostLargeBlock> get withNavigateToPostAuthorAction => map(
+        (e) => e.copyWith(
+          action: NavigateToPostAuthorProfileAction(authorId: e.author.id),
+        ),
+      ).toList();
+}
 
-// /// {@template post_converter_extension}
-// /// Converts a [Post] instance into different types of [PostBlock] instances.
-// ///
-// /// Each conversion method creates a new instance of the corresponding
-// /// [PostBlock] type and initializes its properties using the properties of the
-// /// original [Post] instance.
-// ///
-// /// Example usage:
-// /// ```dart
-// /// Post post = ...;
-// ///
-// /// PostLargeBlock largeBlock = post.toPostLargeBlock(
-// ///   likersInFollowings: likers,
-// /// );
-// /// PostSmallBlock smallBlock = post.toPostSmallBlock;
-// /// PostReelBlock reelBlock = post.toPostReelBlock;
-// /// ```
-// /// {@endtemplate}
-// extension PostConverterExtension on Post {
-//   /// Converts [Post] instance into [PostLargeBlock] instance.
-//   PostLargeBlock get toPostLargeBlock => PostLargeBlock(
-//         id: id,
-//         author: PostAuthor.confirmed(
-//           id: author.id,
-//           avatarUrl: author.avatarUrl,
-//           username: author.displayUsername,
-//         ),
-//         createdAt: createdAt,
-//         media: media,
-//         caption: caption,
-//         action: NavigateToPostAuthorProfileAction(authorId: author.id),
-//       );
+/// {@template post_converter_extension}
+/// Converts a [Post] instance into different types of [PostBlock] instances.
+///
+/// Each conversion method creates a new instance of the corresponding
+/// [PostBlock] type and initializes its properties using the properties of the
+/// original [Post] instance.
+///
+/// Example usage:
+/// ```dart
+/// Post post = ...;
+///
+/// PostLargeBlock largeBlock = post.toPostLargeBlock(
+///   likersInFollowings: likers,
+/// );
+/// PostSmallBlock smallBlock = post.toPostSmallBlock;
+/// PostReelBlock reelBlock = post.toPostReelBlock;
+/// ```
+/// {@endtemplate}
+extension PostConverterExtension on Post {
+  /// Converts [Post] instance into [PostLargeBlock] instance.
+  PostLargeBlock get toPostLargeBlock => PostLargeBlock(
+        id: id,
+        author: PostAuthor.confirmed(
+          id: author.id,
+          avatarUrl: author.avatarUrl,
+          username: author.displayUsername,
+        ),
+        createdAt: createdAt,
+        media: media,
+        caption: caption,
+        action: NavigateToPostAuthorProfileAction(authorId: author.id),
+      );
 
-//   /// Converts [Post] instance into [PostSmallBlock] instance.
-//   PostSmallBlock get toPostSmallBlock => PostSmallBlock(
-//         id: id,
-//         author: PostAuthor.confirmed(
-//           id: author.id,
-//           avatarUrl: author.avatarUrl,
-//           username: author.displayUsername,
-//         ),
-//         createdAt: createdAt,
-//         media: media,
-//         caption: caption,
-//         action: NavigateToPostAuthorProfileAction(authorId: author.id),
-//       );
+  /// Converts [Post] instance into [PostSmallBlock] instance.
+  PostSmallBlock get toPostSmallBlock => PostSmallBlock(
+        id: id,
+        author: PostAuthor.confirmed(
+          id: author.id,
+          avatarUrl: author.avatarUrl,
+          username: author.displayUsername,
+        ),
+        createdAt: createdAt,
+        media: media,
+        caption: caption,
+        action: NavigateToPostAuthorProfileAction(authorId: author.id),
+      );
 
-//   /// Converts [Post] instance into [PostReelBlock] instance.
-//   PostReelBlock get toPostReelBlock => PostReelBlock(
-//         id: id,
-//         author: PostAuthor.confirmed(
-//           id: author.id,
-//           avatarUrl: author.avatarUrl,
-//           username: author.displayUsername,
-//         ),
-//         createdAt: createdAt,
-//         media: media,
-//         caption: caption,
-//       );
-// }
+  /// Converts [Post] instance into [PostReelBlock] instance.
+  PostReelBlock get toPostReelBlock => PostReelBlock(
+        id: id,
+        author: PostAuthor.confirmed(
+          id: author.id,
+          avatarUrl: author.avatarUrl,
+          username: author.displayUsername,
+        ),
+        createdAt: createdAt,
+        media: media,
+        caption: caption,
+      );
+}

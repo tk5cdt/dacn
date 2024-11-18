@@ -16,7 +16,7 @@ import 'package:user_repository/user_repository.dart';
 void main() {
   // ignore: lines_longer_than_80_chars
   bootstrap(
-    (powerSyncRepository) async {
+    (powerSyncRepository, firebaseRemoteConfigRepository,) async {
       final tokenStorage = InMemoryTokenStorage();
 
       final iOSClientId = getIt<AppFlavor>().getEnv(Env.iOSClientId);
@@ -48,6 +48,7 @@ void main() {
         user: await userRepository.user.first,
         userRepository: userRepository,
         postsRepository: postRepository,
+        firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
       );
     },
     appFlavor: AppFlavor.development(),

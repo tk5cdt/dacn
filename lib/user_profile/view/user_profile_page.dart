@@ -1,8 +1,13 @@
+import 'dart:math';
 import 'package:app_ui/app_ui.dart';
+import 'package:collection/equality.dart';
+import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion/app/bloc/app_bloc.dart';
+import 'package:conexion/feed/post/video/widgets/post_popup.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
 import 'package:conexion/user_profile/widgets/widgets.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -16,10 +21,12 @@ import '../../selector/selector.dart';
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({
     required this.userId,
+    this.props = const UserProfileProps.build(),
     super.key,
   });
 
   final String userId;
+  final UserProfileProps props;
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +42,17 @@ class UserProfilePage extends StatelessWidget {
         ..add(const UserProfileFollowersCountSubscriptionRequested()),
       child: UserProfileView(
         userId: userId,
+        props: props
       ),
     );
   }
 }
 
 class UserProfileView extends StatefulWidget {
-  const UserProfileView({required this.userId, super.key});
+  const UserProfileView({required this.userId, required this.props, super.key});
 
   final String userId;
+  final UserProfileProps props;
 
   @override
   State<UserProfileView> createState() => _UserProfileViewState();
@@ -51,24 +60,31 @@ class UserProfileView extends StatefulWidget {
 
 class _UserProfileViewState extends State<UserProfileView> {
   late ScrollController _nestedScrollController;
-
+  
+  UserProfileProps get props => widget.props;
+  
   @override
   void initState() {
-    _nestedScrollController = ScrollController();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _nestedScrollController.dispose();
-    super.dispose();
+    _nestedScrollController = ScrollController();
   }
 
   @override
   Widget build(BuildContext context) {
+    final promoAction =
+        props.promoBlockAction as NavigateToSponsoredPostAuthorProfileAction?;
     final user = context.select((UserProfileBloc bloc) => bloc.state.user);
 
     return AppScaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: !props.isSponsored
+          ? null
+          : PromoFloatingAction(
+              url: promoAction!.promoUrl,
+              promoImageUrl: promoAction.promoPreviewImageUrl,
+              title: context.l10n.learnMoreAboutUserPromoText,
+              subtitle: context.l10n.visitUserPromoWebsiteText,
+            ),
       body: DefaultTabController(
         length: 2,
         child: NestedScrollView(
@@ -80,9 +96,14 @@ class _UserProfileViewState extends State<UserProfileView> {
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 sliver: MultiSliver(
                   children: [
-                    const UserProfileAppBar(),
-                    if (!user.isAnonymous) ...[
-                      UserProfileHeader(userId: widget.userId),
+                    UserProfileAppBar(
+                      sponsoredPost: props.sponsoredPost,
+                    ),
+                    if (!user.isAnonymous || props.sponsoredPost != null) ...[
+                      UserProfileHeader(
+                        userId: widget.userId,
+                        sponsoredPost: props.sponsoredPost,
+                      ),
                       SliverPersistentHeader(
                         pinned: !ModalRoute.of(context)!.isFirst,
                         delegate: const _UserProfileTabBarDelegate(
@@ -110,9 +131,10 @@ class _UserProfileViewState extends State<UserProfileView> {
               ),
             ];
           },
-          body: const TabBarView(children: [
-            UserPostsPage(),
-            UserProfileMentionedPostsPage(),
+          body: TabBarView(
+            children: [
+              UserPostsPage(sponsoredPost: props.sponsoredPost),
+              const UserProfileMentionedPostsPage(),
           ]),
         ),
       ),
@@ -150,12 +172,19 @@ class _UserProfileTabBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class UserProfileAppBar extends StatelessWidget {
-  const UserProfileAppBar({super.key});
+  const UserProfileAppBar({this.sponsoredPost, super.key});
+
+  final PostSponsoredBlock? sponsoredPost;
 
   @override
   Widget build(BuildContext context) {
     final isOwner = context.select((UserProfileBloc bloc) => bloc.isOwner);
-    final user = context.select((UserProfileBloc bloc) => bloc.state.user);
+    final user$ = context.select((UserProfileBloc b) => b.state.user);
+    final user = sponsoredPost == null
+        ? user$
+        : user$.isAnonymous
+            ? sponsoredPost!.author.toUser
+            : user$;
 
     return SliverPadding(
       padding: const EdgeInsets.only(right: AppSpacing.md),
@@ -256,7 +285,7 @@ class UserProfileAddMediaButton extends StatelessWidget {
             context, 
             onMediaPicked: (context, details) => context.pushNamed(
               'publish_post',
-              extra: CreatePostProps(details: details, isReel: true,),
+              extra: CreatePostProps(details: details, pickVideo: true,),
             ),
           ),
           enableStory: true,
@@ -274,12 +303,95 @@ class UserProfileAddMediaButton extends StatelessWidget {
   }
 }
 
-class UserPostsPage extends StatelessWidget {
-  const UserPostsPage({super.key});
+class UserPostsPage extends StatefulWidget {
+  const UserPostsPage({this.sponsoredPost, super.key});
+
+  final PostSponsoredBlock? sponsoredPost;
+
+  @override
+  State<UserPostsPage> createState() => _UserPostsPageState();
+}
+
+class _UserPostsPageState extends State<UserPostsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
+  
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    final bloc = context.read<UserProfileBloc>();
+
+    return CustomScrollView(
+      cacheExtent: 2760,
+      slivers: [
+        SliverOverlapInjector(
+          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+        ),
+        BetterStreamBuilder<List<PostBlock>>(
+          initialData: const <PostBlock>[],
+          stream: bloc.userPosts(),
+          errorBuilder: (context, error) {
+            print('Error loading posts: $error');
+            return const SizedBox.shrink();
+          },
+          comparator: const ListEquality<PostBlock>().equals,
+          builder: (context, blocks) {
+            if (blocks.isEmpty && widget.sponsoredPost == null) {
+              return const EmptyPosts();
+            }
+            return SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 2,
+                crossAxisSpacing: 2,
+              ),
+              itemCount: widget.sponsoredPost != null ? 1 : blocks.length,
+              itemBuilder: (context, index) {
+                final block = widget.sponsoredPost ?? blocks[index];
+                final multiMedia = block.media.length > 1;
+
+                return PostPopup(
+                  block: block,
+                  index: index,
+                  builder: (_) => PostSmall(
+                    key: ValueKey(block.id),
+                    pinned: false,
+                    isReel: block.isReel,
+                    multiMedia: multiMedia,
+                    mediaUrl: block.firstMediaUrl!,
+                    imageThumbnailBuilder: (_, url) => PostSmallImage(url: url),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class PostSmallImage extends StatelessWidget {
+  const PostSmallImage({required this.url, super.key});
+
+  final String url;
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    /// AppSpacing.xxs is the padding of the image.
+    final screenWidth = (context.screenWidth - AppSpacing.xxs) / 3;
+    final pixelRatio = context.devicePixelRatio;
+
+    final size = min((screenWidth * pixelRatio) ~/ 1, 1920);
+    return ImageAttachmentThumbnail(
+      resizeHeight: size,
+      resizeWidth: size,
+      image: Attachment(imageUrl: url),
+      fit: BoxFit.cover,
+    );
   }
 }
 
@@ -288,7 +400,14 @@ class UserProfileMentionedPostsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return CustomScrollView(
+      slivers: [
+        SliverOverlapInjector(
+          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+        ),
+        const EmptyPosts(icon: Icons.person_pin_outlined),
+      ],
+    );
   }
 }
 

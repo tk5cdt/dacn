@@ -1,64 +1,282 @@
 import 'dart:math';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/l10n/slang/translations.g.dart';
+import 'package:conexion/feed/bloc/feed_bloc.dart';
+import 'package:conexion/feed/feed.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/network_error/network_error.dart';
+import 'package:conexion/user_profile/user_profile.dart';
+import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inview_notifier_list/inview_notifier_list.dart';
+import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
+import 'package:user_repository/user_repository.dart';
 
-class FeedPage extends StatelessWidget {
-  const FeedPage({super.key});
+class FeedPage extends StatefulWidget {
+  const FeedPage({super.key, this.initialPage = 1});
+
+  final int initialPage;
 
   @override
+  State<FeedPage> createState() => FeedPageState();
+}
+
+class FeedPageState extends State<FeedPage> {
+  late PageController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: widget.initialPage);
+    // context
+    //     .read<UserProfileBloc>()
+    //     .add(const UserProfileFetchFollowingsRequested());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+  @override
   Widget build(BuildContext context) {
-    return const FeedView();
+    print('Building FeedPage');
+    return Scaffold(
+      body: const FeedView(),
+    );
   }
 }
 
-class FeedView extends StatelessWidget {
+class FeedView extends StatefulWidget {
   const FeedView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final feed = List.generate(
-      10,
-      (index) => PostLargeBlock(
-        id: uuid.v4(),
-        author: PostAuthor.randomConfirmed(),
-        createdAt:
-            DateTime.now().subtract(Duration(days: Random().nextInt(365))),
-        media: [
-          ImageMedia(
-            id: uuid.v4(),
-            url:
-                'https://antimatter.vn/wp-content/uploads/2022/04/anh-meo-khoc-thet-meme.jpg',
-          )
-        ],
-        caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-      ),
+  State<FeedView> createState() => _FeedViewState();
+}
+
+class _FeedViewState extends State<FeedView> {
+  late ScrollController _nestedScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<FeedBloc>().add(const FeedPageRequested(page: 0));
+
+    _nestedScrollController = ScrollController();
+    FeedPageController().init(
+      nestedScrollController: _nestedScrollController,
+      context: context,
     );
+  }
+
+  @override
+  void dispose() {
+    _nestedScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // final feed = List.generate(
+    //   10,
+    //   (index) => PostLargeBlock(
+    //     id: uuid.v4(),
+    //     author: PostAuthor.randomConfirmed(),
+    //     createdAt:
+    //         DateTime.now().subtract(Duration(days: Random().nextInt(365))),
+    //     media: [
+    //       ImageMedia(
+    //         id: uuid.v4(),
+    //         url:
+    //             'https://antimatter.vn/wp-content/uploads/2022/04/anh-meo-khoc-thet-meme.jpg',
+    //       )
+    //     ],
+    //     caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+    //   ),
+    // );
+
+    // return AppScaffold(
+    //   body: Column(
+    //     children: [
+    //       Text.rich(
+    //         t.likedBy(
+    //           name: const TextSpan(text: 'John Doe'),
+    //           and: const TextSpan(text: ' and '),
+    //           others: const TextSpan(text: 'others'),
+    //         ),
+    //       ),
+    //       Expanded(
+    //         child: ListView.builder(
+    //           itemCount: feed.length,
+    //           itemBuilder: (context, index) {
+    //             final post = feed[index];
+    //             return Image.network(post.firstMediaUrl!);
+    //           },
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
 
     return AppScaffold(
-      body: Column(
-        children: [
-        //   Text.rich(
-        //     t.likedBy(
-        //       name: const TextSpan(text: 'John Doe'),
-        //       and: const TextSpan(text: ' and '),
-        //       others: const TextSpan(text: 'others'),
-        //     ),
-        //   ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: feed.length,
-              itemBuilder: (context, index) {
-                final post = feed[index];
-                return Image.network(post.firstMediaUrl!);
-              },
+      releaseFocus: true,
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        controller: _nestedScrollController,
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverOverlapAbsorber(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              sliver: FeedAppBar(innerBoxIsScrolled: innerBoxIsScrolled),
             ),
+          ];
+        },
+        body: const FeedBody(),
+      ),
+    );
+  }
+}
+
+class FeedBody extends StatelessWidget {
+  const FeedBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final feedPageController = FeedPageController();
+
+    return RefreshIndicator.adaptive(
+      onRefresh: () async {
+        context.read<FeedBloc>().add(const FeedRefreshRequested());
+        // context
+        //     .read<StoriesBloc>()
+        //     .add(const StoriesFetchUserFollowingsStories());
+        // FeedPageController().markAnimationAsUnseen();
+      },
+      child: InViewNotifierCustomScrollView(
+        //cacheExtent: 2760,
+        initialInViewIds: const ['0'],
+        isInViewPortCondition: (deltaTop, deltaBottom, vpHeight) {
+          return deltaTop < (0.5 * vpHeight) + 80.0 &&
+              deltaBottom > (0.5 * vpHeight) - 80.0;
+        },
+        slivers: [
+          SliverOverlapInjector(
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+          ),
+          //const StoriesCarousel(),
+          const AppSliverDivider(),
+          BlocBuilder<FeedBloc, FeedState>(
+            buildWhen: (previous, current) {
+              if (previous.status == FeedStatus.populated &&
+                  const ListEquality<ConBlock>().equals(
+                    previous.feed.feedPage.blocks,
+                    current.feed.feedPage.blocks,
+                  )) {
+                return false;
+              }
+              if (previous.status == current.status) return false;
+              return true;
+            },
+            builder: (context, state) {
+              final feedPage = state.feed.feedPage;
+              final hasMorePosts = feedPage.hasMore;
+              final isFailure = state.status == FeedStatus.failure;
+
+              return SliverList.builder(
+                itemCount: feedPage.blocks.length,
+                itemBuilder: (context, index) {
+                  final block = feedPage.blocks[index];
+                  return _buildBlock(
+                    context: context,
+                    index: index,
+                    feedLength: feedPage.totalBlocks,
+                    block: block,
+                    feedPageController: feedPageController,
+                    hasMorePosts: hasMorePosts,
+                    isFailure: isFailure,
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
     );
+
+    
+  }
+
+  Widget _buildBlock({
+    required BuildContext context,
+    required int index,
+    required int feedLength,
+    required ConBlock block,
+    required FeedPageController feedPageController,
+    required bool hasMorePosts,
+    required bool isFailure,
+  }) {
+    if (block is DividerHorizontalBlock) {
+      return DividerBlock(feedPageController: feedPageController);
+    }
+    if (block is SectionHeaderBlock) {
+      return switch (block.sectionType) {
+        SectionHeaderBlockType.suggested => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                child: Text(
+                  context.l10n.suggestedForYouText,
+                  style: context.headlineSmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const AppDivider(),
+            ],
+          ),
+      };
+    }
+    if (index + 1 == feedLength) {
+      if (isFailure) {
+        if (!hasMorePosts) return const SizedBox.shrink();
+        return NetworkError(
+          onRetry: () {
+            context.read<FeedBloc>().add(const FeedPageRequested());
+          },
+        );
+      } else {
+        return Padding(
+          padding: EdgeInsets.only(top: feedLength == 0 ? AppSpacing.md : 0),
+          child: FeedLoaderItem(
+            key: ValueKey(index),
+            onPresented: () => hasMorePosts
+                ? context.read<FeedBloc>().add(const FeedPageRequested())
+                : context
+                    .read<FeedBloc>()
+                    .add(const FeedRecommendedPostsPageRequested()),
+          ),
+        );
+      }
+    }
+    if (block is PostBlock) {
+      return PostView(
+        key: ValueKey(block.id),
+        block: block,
+        postIndex: index,
+        withInViewNotifier: block.isReel,
+      );
+    }
+
+    return Text('Unknown block type: ${block.type}');
   }
 }

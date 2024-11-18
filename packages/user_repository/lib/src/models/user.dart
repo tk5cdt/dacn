@@ -1,4 +1,5 @@
 import 'package:authentication_client/authentication_client.dart';
+import 'package:con_blocks/con_blocks.dart';
 import 'package:shared/shared.dart';
 
 /// {@template user}
@@ -78,4 +79,14 @@ class User extends AuthenticationUser {
       'is_new_user': isNewUser,
     };
   }
+}
+
+/// Extension that converts [PostAuthor] into [User] instance.
+extension UserToPostAuthorConverter on PostAuthor {
+  /// Converts a [PostAuthor] into a [User] instance.
+  User get toUser => User(
+        id: id,
+        avatarUrl: avatarUrl,
+        username: username,
+      );
 }
