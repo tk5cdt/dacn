@@ -29,10 +29,10 @@ class LocaleSelector extends StatelessWidget {
           ),
         ),
         // DropdownMenuItem(
-        //   value: const Locale('ru', 'RU'),
+        //   value: const Locale('vn', 'VN'),
         //   child: Text(
-        //     l10n.ruOptionText,
-        //     key: const Key('localeSelector_ru_dropdownMenuItem'),
+        //     l10n.vnOptionText,
+        //     key: const Key('localeSelector_vn_dropdownMenuItem'),
         //   ),
         // ),
       ],
