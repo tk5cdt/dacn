@@ -1,4 +1,5 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:conexion/chats/chats.dart';
 import 'package:conexion/feed/post/video/video.dart';
 import 'package:conexion/navigation/view/bottom_nav_bar.dart';
 import 'package:conexion/user_profile/user_profile.dart';
@@ -117,10 +118,7 @@ class _HomeViewState extends State<HomeView> {
                       onPopInvoked: () => HomeProvider().animateToPage(1),
                       onBackButtonTap: () => HomeProvider().animateToPage(1),
                     ),
-                  2 => AppScaffold(
-                    body: Center(
-                      child: Text('Chats page', style: context.headlineSmall,),)
-                    ),
+                  2 => const ChatsPage(),
                   _ => AppScaffold(
                     body: widget.navigationShell,
                     bottomNavigationBar: BottomNavBar(navigationShell: widget.navigationShell),

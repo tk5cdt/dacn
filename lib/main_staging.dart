@@ -1,3 +1,4 @@
+import 'package:chats_repository/chats_repository.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/app/di/di.dart';
 import 'package:conexion/bootstrap.dart';
@@ -33,6 +34,10 @@ void main() {
         powerSyncRepository: powerSyncRepository,
       );
 
+      final chatsRepository = ChatsRepository(
+        databaseClient: powerSyncDatabaseClient,
+      );
+
       final userRepository = UserRepository(
         databaseClient: powerSyncDatabaseClient,
         authenticationClient: supabaseAuthenticationClient,
@@ -45,6 +50,7 @@ void main() {
         user: await userRepository.user.first,
         userRepository: userRepository,
         postsRepository: postRepository,
+        chatsRepository: chatsRepository,
         firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
       );
     },
