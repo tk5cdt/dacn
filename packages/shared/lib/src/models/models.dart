@@ -3,6 +3,7 @@ export 'attachment_file.dart';
 export 'chat.dart';
 export 'image.dart';
 export 'media.dart';
+export 'message.dart';
 export 'modal_option.dart';
 export 'og_attachment.dart';
 export 'post.dart';
