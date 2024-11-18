@@ -8,6 +8,8 @@ dependencies:
   bloc: ^8.1.4
   bloc_concurrency: ^0.2.5
   build_runner: ^2.4.13
+  chats_repository:
+    path: packages/chats_repository
   collection: ^1.18.0
   con_blocks:
     path: packages/con_blocks

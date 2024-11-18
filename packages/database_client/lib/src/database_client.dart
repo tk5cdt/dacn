@@ -46,6 +46,48 @@ abstract class UserBaseRepository {
   });
 }
 
+abstract class ChatsBaseRepository {
+  /// Returns a stream of real-time chats of the user identified by [userId].
+  Stream<List<ChatInbox>> chatsOf({required String userId});
+
+  /// Returns a stream of real-time messages of the chat identified by [chatId].
+  // Stream<List<Message>> messagesOf({required String chatId});
+
+  /// Creates and send message with provided data. After sending the message
+  /// the notification is sent to the user, identified by [receiver]'s `id`.
+  // Future<void> sendMessage({
+  //   required String chatId,
+  //   required User sender,
+  //   required User receiver,
+  //   required Message message,
+  //   PostAuthor? postAuthor,
+  // });
+
+  /// Deletes the message with provided [messageId].
+  // Future<void> deleteMessage({required String messageId});
+
+  /// Deletes the chat with provided [chatId] and participant from the chat,
+  /// identified by [userId].
+  Future<void> deleteChat({required String chatId, required String userId});
+
+  /// Creates a new chat with provided [userId] and [participantId].
+  Future<void> createChat({
+    required String userId,
+    required String participantId,
+  });
+
+  /// Marks the message as read by [messageId].
+  // Future<void> readMessage({
+  //   required String messageId,
+  // });
+
+  /// Edits the message with provided [oldMessage] and [newMessage].
+  // Future<void> editMessage({
+  //   required Message oldMessage,
+  //   required Message newMessage,
+  // });
+}
+
 abstract class PostsBaseRepository {
   const PostsBaseRepository();
 
@@ -112,12 +154,13 @@ abstract class PostsBaseRepository {
 /// A Very Good Project created by Very Good CLI.
 /// {@endtemplate}
 abstract class DatabaseClient
-    implements UserBaseRepository, PostsBaseRepository {
+    implements UserBaseRepository, PostsBaseRepository, ChatsBaseRepository {
   /// {@macro database_client}
   const DatabaseClient();
 }
 
-class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
+class PowerSyncDatabaseClient
+    implements DatabaseClient, PostsBaseRepository, ChatsBaseRepository {
   const PowerSyncDatabaseClient({
     required PowerSyncRepository powerSyncRepository,
   }) : _powerSyncRepository = powerSyncRepository;
@@ -157,14 +200,12 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
         select count(*) as posts_count from posts where user_id = ?
       ''',
         parameters: [userId],
-
       ).map((event) {
         print('Posts count in db: ${event.first['posts_count']}');
         return event.first['posts_count'] as int;
       }
           // (event) => event.first['posts_count'] as int,
           );
-
 
   @override
   Stream<int> followersCountOf({required String userId}) =>
@@ -401,7 +442,7 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
     if (result.isEmpty) return null;
     return result.first['id'] as String;
   }
-  
+
   @override
   Future<List<Post>> getPage({
     required int offset,
@@ -453,7 +494,7 @@ ORDER BY created_at DESC LIMIT ?1 OFFSET ?2
           [limit, offset],
         );
         print('RESULT: $result');
-        
+
         final jsonListMedia = result.map((row) {
           final json = Map<String, dynamic>.from(row);
           return json['media'] as String;
@@ -542,7 +583,6 @@ RETURNING *
     final json = Map<String, dynamic>.from(row.first);
     return Post.fromJson(json);
   }
-
 
   @override
   Future<List<User>> getPostLikersInFollowings({
@@ -698,6 +738,134 @@ ORDER BY created_at DESC
           return <Post>[];
         }
       },
+    );
+  }
+
+  @override
+  Stream<List<ChatInbox>> chatsOf({required String userId}) =>
+      _powerSyncRepository.db().watch(
+        '''
+        select
+          c.id,
+          c.type,
+          c.name,
+          p2.id as participant_id,
+          p2.full_name as participant_name,
+          p2.email as participant_email,
+          p2.username as participant_username,
+          p2.avatar_url as participant_avatar_url,
+          p2.push_token as participant_push_token
+        from
+          conversations c
+          join participants pt on c.id = pt.conversation_id
+          join profiles p on pt.user_id = p.id
+          join participants pt2 on c.id = pt2.conversation_id
+          join profiles p2 on pt2.user_id = p2.id
+        where
+          pt.user_id = ?1
+          and pt2.user_id != ?1
+        ''',
+        parameters: [userId],
+      ).map(
+        (event) => event.safeMap(ChatInbox.fromRow).toList(growable: false),
+      );
+
+  @override
+  Future<void> createChat({
+    required String userId,
+    required String participantId,
+  }) async {
+    final alreadyExists = await _powerSyncRepository.db().getOptional(
+      '''
+      SELECT 1
+      FROM conversations c
+      JOIN participants p1 ON c.id = p1.conversation_id
+      JOIN participants p2 ON c.id = p2.conversation_id
+      WHERE p1.user_id = ? AND p2.user_id = ?
+      ''',
+      [userId, participantId],
+    );
+    if (alreadyExists != null) return;
+    final conversationId = uuid.v4();
+    final createdConversation = _powerSyncRepository.db().execute(
+      '''
+      insert into
+        conversations (id, type, name, created_at, updated_at)
+      values
+        (?, ?, '', ?, ?)
+      ''',
+      [conversationId, ChatType.oneOnOne.value, JiffyX.now(), JiffyX.now()],
+    );
+    final addParticipant1 = _powerSyncRepository.db().execute(
+      '''
+      insert into
+        participants (id, user_id, conversation_id)
+      values
+        (?, ?, ?)
+      ''',
+      [uuid.v4(), userId, conversationId],
+    );
+    final addParticipant2 = _powerSyncRepository.db().execute(
+      '''
+      insert into
+        participants (id, user_id, conversation_id)
+      values
+        (?, ?, ?)
+      ''',
+      [uuid.v4(), participantId, conversationId],
+    );
+    await createdConversation
+        .whenComplete(() => Future.wait([addParticipant1, addParticipant2]));
+  }
+
+@override
+  Future<void> deleteChat({
+    required String chatId,
+    required String userId,
+  }) async {
+//     final participants = (await _powerSyncRepository.db().get(
+//       '''
+// select
+//   count(*) as participants_count
+// from
+//   participants
+// where conversation_id = ?
+// ''',
+//       [chatId],
+//     ))['participants_count'] as int;
+//     if (participants >= 1) {
+//       final isParticipantInConversation = await _powerSyncRepository.db()
+// .get(
+//         '''
+// select
+//   *
+// from
+//   participants
+// where
+//   user_id = ?
+//   and conversation_id = ?
+//   ''',
+//         [userId, chatId],
+//       );
+//       if (isParticipantInConversation.isEmpty) return;
+//       await _powerSyncRepository.db().execute(
+//         '''
+// delete from participants
+// where
+//   user_id = ?
+//   and conversation_id = ?
+// ''',
+//         [userId, chatId],
+//       );
+//       return;
+//     }
+    await _powerSyncRepository.db().execute(
+      '''
+      delete from conversations
+      where
+        id = ?
+      ''',
+      [chatId],
     );
   }
 }

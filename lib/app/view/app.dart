@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:chats_repository/chats_repository.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/feed/feed.dart';
 import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
@@ -19,6 +20,7 @@ class App extends StatelessWidget {
   const App({
     required this.user,
     required this.userRepository,
+    required this.chatsRepository,
     required this.postsRepository,
     required this.firebaseRemoteConfigRepository,
     super.key,
@@ -26,6 +28,7 @@ class App extends StatelessWidget {
 
   final User user;
   final UserRepository userRepository;
+  final ChatsRepository chatsRepository;
   final PostsRepository postsRepository;
   final FirebaseRemoteConfigRepository firebaseRemoteConfigRepository;
 
@@ -35,6 +38,9 @@ class App extends StatelessWidget {
       providers: [
         RepositoryProvider.value(
           value: userRepository,
+        ),
+        RepositoryProvider.value(
+          value: chatsRepository,
         ),
         RepositoryProvider.value(
           value: postsRepository,
