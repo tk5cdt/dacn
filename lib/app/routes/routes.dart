@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:app_ui/app_ui.dart';
-import 'package:con_blocks/con_blocks.dart' hide FeedPage;
+import 'package:con_blocks/con_blocks.dart' hide FeedPage, ReelsPage;
 import 'package:conexion/app/app.dart';
 import 'package:conexion/app/home/home.dart';
 import 'package:conexion/auth/view/auth_page.dart';
@@ -9,6 +9,7 @@ import 'package:conexion/feed/feed.dart';
 import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion/user_profile/widgets/user_profile_create_post.dart';
 import 'package:conexion/user_profile/widgets/user_profile_statistics.dart';
+import 'package:conexion/reels/reels.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -145,24 +146,18 @@ GoRouter router(AppBloc appBloc) {
                 path: '/reels',
                 pageBuilder: (context, state) {
                   return CustomTransitionPage(
-                    child: AppScaffold(
-                      body: Center(
-                        child: Text(
-                          'Reels',
-                          style: context.headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: CurveTween(curve: Curves.easeInOut)
-                            .animate(animation),
-                        child: child,
+                        key: state.pageKey,
+                        child: const ReelsPage(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(
+                            opacity: CurveTween(
+                              curve: Curves.easeInOut,
+                            ).animate(animation),
+                            child: child,
+                          );
+                        },
                       );
-                    },
-                  );
                 },
               ),
             ],

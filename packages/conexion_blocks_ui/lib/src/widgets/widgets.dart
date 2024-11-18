@@ -10,3 +10,4 @@ export 'shimmer_placeholder.dart';
 export 'animated_visibility.dart';
 export 'time_ago.dart';
 export 'promo_floating_action.dart';
+export 'running_text.dart';

@@ -1,4 +1,4 @@
-export 'feed.dart';
 export 'bloc/feed_bloc.dart';
-export 'widgets/widgets.dart';
+export 'feed.dart';
 export 'view/feed_page.dart';
+export 'widgets/widgets.dart';
