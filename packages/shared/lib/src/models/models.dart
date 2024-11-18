@@ -7,3 +7,6 @@ export 'image.dart';
 export 'user_converter.dart';
 export 'post.dart';
 export 'attachment_file.dart';
+export 'post_options_settings.dart';
+export 'attachment.dart';
+export 'og_attachment.dart';
