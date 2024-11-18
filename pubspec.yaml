@@ -32,7 +32,7 @@ dependencies:
   flutter_markdown: ^0.7.4+1
   form_fields:
     path: packages/form_fields
-  get_it: ^8.0.0
+  get_it: ^8.0.2
   go_router: ^14.3.0
   google_sign_in: ^6.2.1
   hydrated_bloc: ^9.1.5
