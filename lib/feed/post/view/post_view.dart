@@ -170,14 +170,36 @@ class PostLargeView extends StatelessWidget {
       onPostShareTap: (postId, author) {
 
       },
-      // videoPlayerBuilder: !withCustomVideoPlayer
-      //     ? null
-      //     : (_, media, aspectRatio, isInView) => PostVideoPlayer(
-      //           videoPlayerType: videoPlayerType,
-      //           media: media,
-      //           aspectRatio: aspectRatio,
-      //           isInView: isInView,
-      //         ),
+      videoPlayerBuilder: !withCustomVideoPlayer
+          ? null
+          : (_, media, aspectRatio, isInView) {
+              final videoPlayerState = VideoPlayerInheritedWidget.of(context).videoPlayerState;
+
+              return VideoPlayerInViewNotifierWidget(
+                type: videoPlayerType, 
+                builder: (context, shouldPlay, child){
+                  final play = shouldPlay && isInView;
+                  return ValueListenableBuilder(
+                    valueListenable: videoPlayerState.withSound, 
+                    builder: (context, withSound, child){
+                      return InlineVideo(
+                        key: ValueKey(media.id),
+                        videoSettings: VideoSettings.build(
+                          videoUrl: media.url,
+                          shouldPlay: play,
+                          aspectRatio: aspectRatio,
+                          blurHash: media.blurHash,
+                          withSound: withSound,
+                          onSoundToggled: ({required enable}) => {
+                            videoPlayerState.withSound.value = enable,
+                          }
+                          )
+                        );
+                    }
+                    );
+                }
+                );
+          }
     );
   }
 }

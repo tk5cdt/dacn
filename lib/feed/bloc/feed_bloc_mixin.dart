@@ -207,6 +207,7 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
       offset: currentPage * feedPageLimit,
       limit: feedPageLimit,
     );
+    print("Fetched posts: ${posts.length}");
     final newPage = currentPage + 1;
     final hasMore = posts.length >= feedPageLimit;
 
@@ -362,76 +363,76 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
   }
 }
 
-// extension on Feed {
-//   List<PostBlock> updateFeedPage({
-//     required PageUpdate update,
-//   }) {
-//     try {
-//       return feedPage.blocks.selectPostsBlock().updateBlocks(update: update);
-//     } catch (_) {
-//       rethrow;
-//     }
-//   }
+extension on Feed {
+  List<PostBlock> updateFeedPage({
+    required PageUpdate update,
+  }) {
+    try {
+      return feedPage.blocks.selectPostsBlock().updateBlocks(update: update);
+    } catch (_) {
+      rethrow;
+    }
+  }
 
-//   List<PostBlock> updateReelsPage({
-//     required PageUpdate update,
-//   }) {
-//     try {
-//       return reelsPage.blocks
-//           .selectPostsBlock()
-//           .updateBlocks(update: update, isReels: true);
-//     } catch (_) {
-//       rethrow;
-//     }
-//   }
-// }
+  List<PostBlock> updateReelsPage({
+    required PageUpdate update,
+  }) {
+    try {
+      return reelsPage.blocks
+          .selectPostsBlock()
+          .updateBlocks(update: update, isReels: true);
+    } catch (_) {
+      rethrow;
+    }
+  }
+}
 
-// extension on List<ConBlock> {
-//   List<PostBlock> selectPostsBlock() => whereType<PostBlock>().toList();
+extension on List<ConBlock> {
+  List<PostBlock> selectPostsBlock() => whereType<PostBlock>().toList();
 
-//   ConBlock? findPostBlock({
-//     PostBlock? other,
-//     bool Function(PostBlock block)? test,
-//   }) =>
-//       firstWhereOrNull(
-//         (block) => switch (block) {
-//           final PostBlock block => (other == null || other.id == block.id) &&
-//               (test?.call(block) ?? true),
-//           _ => false,
-//         },
-//       );
-// }
+  ConBlock? findPostBlock({
+    PostBlock? other,
+    bool Function(PostBlock block)? test,
+  }) =>
+      firstWhereOrNull(
+        (block) => switch (block) {
+          final PostBlock block => (other == null || other.id == block.id) &&
+              (test?.call(block) ?? true),
+          _ => false,
+        },
+      );
+}
 
-// extension on List<PostBlock> {
-//   List<PostBlock> updateBlocks({
-//     required PageUpdate update,
-//     bool isReels = false,
-//   }) =>
-//       switch (update) {
-//         final FeedPageUpdate update => isReels
-//             ? _update<PostReelBlock>(
-//                 update: update,
-//                 isReels: isReels,
-//               )
-//             : _update<PostLargeBlock>(
-//                 update: update,
-//                 isReels: isReels,
-//               ),
-//       };
+extension on List<PostBlock> {
+  List<PostBlock> updateBlocks({
+    required PageUpdate update,
+    bool isReels = false,
+  }) =>
+      switch (update) {
+        final FeedPageUpdate update => isReels
+            ? _update<PostReelBlock>(
+                update: update,
+                isReels: isReels,
+              )
+            : _update<PostLargeBlock>(
+                update: update,
+                isReels: isReels,
+              ),
+      };
 
-//   List<PostBlock> _update<T extends PostBlock>({
-//     required PageUpdate update,
-//     required bool isReels,
-//   }) {
-//     try {
-//       return updateWith<T>(
-//         newItem: isReels ? update.newReelBlock : update.newLargeBlock,
-//         onUpdate: update.onUpdate,
-//         isDelete: update.type.isDelete,
-//         findItemCallback: (block, newBlock) => block.id == newBlock.id,
-//       );
-//     } catch (_) {
-//       rethrow;
-//     }
-//   }
-// }
+  List<PostBlock> _update<T extends PostBlock>({
+    required PageUpdate update,
+    required bool isReels,
+  }) {
+    try {
+      return updateWith<T>(
+        newItem: isReels ? update.newReelBlock : update.newLargeBlock,
+        onUpdate: update.onUpdate,
+        isDelete: update.type.isDelete,
+        findItemCallback: (block, newBlock) => block.id == newBlock.id,
+      );
+    } catch (_) {
+      rethrow;
+    }
+  }
+}

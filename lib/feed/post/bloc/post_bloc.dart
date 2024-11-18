@@ -43,6 +43,8 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
     on<PostLikersInFollowingsFetchRequested>(
       _onPostLikersInFollowingsFetchRequested,
     );
+    on<PostUpdateRequested>(_onPostUpdateRequested);
+    on<PostDeleteRequested>(_onPostDeleteRequested);
   }
   final UserRepository _userRepository;
   final PostsRepository _postsRepository;
@@ -147,6 +149,37 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
       final likersInFollowings =
           await _postsRepository.getPostLikersInFollowings(postId: id);
       emit(state.copyWith(likersInFollowings: likersInFollowings));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: PostStatus.failure));
+    }
+  }
+
+  Future<void> _onPostUpdateRequested(
+    PostUpdateRequested event,
+    Emitter<PostState> emit,
+  ) async {
+    try {
+      final post =
+          await _postsRepository.updatePost(id: id, caption: event.caption);
+
+      if (post != null) {
+        event.onPostUpdated?.call(post.toPostLargeBlock);
+      }
+      emit(state.copyWith(status: PostStatus.success));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: PostStatus.failure));
+    }
+  }
+
+  Future<void> _onPostDeleteRequested(
+    PostDeleteRequested event,
+    Emitter<PostState> emit,
+  ) async {
+    try {
+      await _postsRepository.deletePost(id: id);
+      emit(state.copyWith(status: PostStatus.success));
     } catch (error, stackTrace) {
       addError(error, stackTrace);
       emit(state.copyWith(status: PostStatus.failure));

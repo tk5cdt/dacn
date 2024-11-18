@@ -26,16 +26,16 @@ class FeedPage extends StatefulWidget {
   State<FeedPage> createState() => FeedPageState();
 }
 
-class FeedPageState extends State<FeedPage> with RouteAware {
+class FeedPageState extends State<FeedPage> {
   late PageController _controller;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage);
-    context
-        .read<UserProfileBloc>()
-        .add(const UserProfileFetchFollowingsRequested());
+    // context
+    //     .read<UserProfileBloc>()
+    //     .add(const UserProfileFetchFollowingsRequested());
   }
 
   @override
@@ -43,23 +43,16 @@ class FeedPageState extends State<FeedPage> with RouteAware {
     _controller.dispose();
     super.dispose();
   }
-
+  
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      // create: (context) => StoriesBloc(
-      //   storiesRepository: context.read<StoriesRepository>(),
-      //   userRepository: context.read<UserRepository>(),
-      // )..add(const StoriesFetchUserFollowingsStories()),
-      create: (context) {},
-      child: const FeedView(),
+    print('Building FeedPage');
+    return Scaffold(
+      body: const FeedView(),
     );
   }
 }
 
-/// {@template feed_view}
-/// The main FeedView widget that builds the UI for the feed screen.
-/// {@endtemplate}
 class FeedView extends StatefulWidget {
   const FeedView({super.key});
 
@@ -90,6 +83,47 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
+    // final feed = List.generate(
+    //   10,
+    //   (index) => PostLargeBlock(
+    //     id: uuid.v4(),
+    //     author: PostAuthor.randomConfirmed(),
+    //     createdAt:
+    //         DateTime.now().subtract(Duration(days: Random().nextInt(365))),
+    //     media: [
+    //       ImageMedia(
+    //         id: uuid.v4(),
+    //         url:
+    //             'https://antimatter.vn/wp-content/uploads/2022/04/anh-meo-khoc-thet-meme.jpg',
+    //       )
+    //     ],
+    //     caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
+    //   ),
+    // );
+
+    // return AppScaffold(
+    //   body: Column(
+    //     children: [
+    //       Text.rich(
+    //         t.likedBy(
+    //           name: const TextSpan(text: 'John Doe'),
+    //           and: const TextSpan(text: ' and '),
+    //           others: const TextSpan(text: 'others'),
+    //         ),
+    //       ),
+    //       Expanded(
+    //         child: ListView.builder(
+    //           itemCount: feed.length,
+    //           itemBuilder: (context, index) {
+    //             final post = feed[index];
+    //             return Image.network(post.firstMediaUrl!);
+    //           },
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
+
     return AppScaffold(
       releaseFocus: true,
       body: NestedScrollView(
@@ -99,7 +133,7 @@ class _FeedViewState extends State<FeedView> {
           return [
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              //sliver: FeedAppBar(innerBoxIsScrolled: innerBoxIsScrolled),
+              sliver: FeedAppBar(innerBoxIsScrolled: innerBoxIsScrolled),
             ),
           ];
         },
@@ -118,7 +152,7 @@ class FeedBody extends StatelessWidget {
 
     return RefreshIndicator.adaptive(
       onRefresh: () async {
-        // context.read<FeedBloc>().add(const FeedRefreshRequested());
+        context.read<FeedBloc>().add(const FeedRefreshRequested());
         // context
         //     .read<StoriesBloc>()
         //     .add(const StoriesFetchUserFollowingsStories());
@@ -174,6 +208,8 @@ class FeedBody extends StatelessWidget {
         ],
       ),
     );
+
+    
   }
 
   Widget _buildBlock({

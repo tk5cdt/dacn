@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
+
+import 'package:dio/dio.dart';
+import 'package:env/env.dart';
 import 'package:powersync_repository/powersync_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
@@ -46,6 +49,10 @@ abstract class UserBaseRepository {
 abstract class PostsBaseRepository {
   const PostsBaseRepository();
 
+  /// Returns the stream of real-time posts of the current user.
+  Stream<List<Post>> postsOf({String? userId});
+
+  /// Returns a stream of amount of posts of the user identified by [userId].
   Stream<int> postsAmountOf({required String userId});
 
   // Create a new post with provided details.
@@ -92,6 +99,13 @@ abstract class PostsBaseRepository {
 
   /// Returns a stream of amount of comments of the post identified by [postId].
   Stream<int> commentsAmountOf({required String postId});
+
+  /// Deletes the post with provided [id].
+  /// Returns the optional `id` of the deleted post.
+  Future<String?> deletePost({required String id});
+
+  /// Updates the post with provided [id] and optional parameters to update.
+  Future<Post?> updatePost({required String id, String? caption});
 }
 
 /// {@template database_client}
@@ -109,6 +123,17 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
   }) : _powerSyncRepository = powerSyncRepository;
 
   final PowerSyncRepository _powerSyncRepository;
+
+  Future<void> _checkConnection() async {
+    try {
+      final db = _powerSyncRepository.db();
+      final isConnected = await db.execute('SELECT 1');
+      print('Database connection check: ${isConnected.isNotEmpty}');
+    } catch (e) {
+      print('Database connection error: $e');
+      rethrow;
+    }
+  }
 
   @override
   String? get currentUserId =>
@@ -132,12 +157,14 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
         select count(*) as posts_count from posts where user_id = ?
       ''',
         parameters: [userId],
+
       ).map((event) {
         print('Posts count in db: ${event.first['posts_count']}');
         return event.first['posts_count'] as int;
       }
           // (event) => event.first['posts_count'] as int,
           );
+
 
   @override
   Stream<int> followersCountOf({required String userId}) =>
@@ -156,8 +183,7 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
   @override
   Stream<int> followingsCountOf({required String userId}) =>
       _powerSyncRepository.db().watch(
-        'SELECT COUNT(*) AS subscription_count FROM subscriptions '
-        'WHERE subscriber_id = ?',
+        'SELECT COUNT(*) AS subscription_count FROM subscriptions WHERE subscriber_id = ?',
         parameters: [userId],
       ).map(
         (event) => event.first['subscription_count'] as int,
@@ -368,12 +394,20 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
       );
 
   @override
+  Future<String?> deletePost({required String id}) async {
+    final result = await _powerSyncRepository
+        .db()
+        .execute('DELETE FROM posts WHERE id = ? RETURNING id', [id]);
+    if (result.isEmpty) return null;
+    return result.first['id'] as String;
+  }
+  
+  @override
   Future<List<Post>> getPage({
     required int offset,
     required int limit,
     bool onlyReels = false,
   }) async {
-//     if (onlyReels) {
 //       final result = await _powerSyncRepository.db().execute(
 //         '''
 // SELECT
@@ -399,7 +433,8 @@ class PowerSyncDatabaseClient implements DatabaseClient, PostsBaseRepository {
 //         posts.add(post);
 //       }
 //       return posts;
-//     }
+//   }
+
     final result = await _powerSyncRepository.db().computeWithDatabase(
       (db) async {
         final result = db.select(
@@ -417,6 +452,8 @@ ORDER BY created_at DESC LIMIT ?1 OFFSET ?2
     ''',
           [limit, offset],
         );
+        print('RESULT: $result');
+        
         final jsonListMedia = result.map((row) {
           final json = Map<String, dynamic>.from(row);
           return json['media'] as String;
@@ -487,6 +524,25 @@ ORDER BY created_at DESC LIMIT ?1 OFFSET ?2
 //     }).toList();
     return result;
   }
+
+  @override
+  Future<Post?> updatePost({required String id, String? caption}) async {
+    final row = await _powerSyncRepository.db().execute(
+      '''
+UPDATE posts
+SET
+  caption = ?2,
+  updated_at = ?3
+WHERE id = ?1
+RETURNING *
+''',
+      [id, caption, DateTime.timestamp().toIso8601String()],
+    );
+    if (row.isEmpty) return null;
+    final json = Map<String, dynamic>.from(row.first);
+    return Post.fromJson(json);
+  }
+
 
   @override
   Future<List<User>> getPostLikersInFollowings({
@@ -589,6 +645,59 @@ LIMIT ?3 OFFSET ?4
           WHERE user_id = ? AND $statement = ? AND $statement IS NOT NULL
       ''',
       [currentUserId, id],
+    );
+  }
+
+  @override
+  Stream<List<Post>> postsOf({String? userId}) {
+    if (currentUserId == null) return const Stream.empty();
+    if (userId == null) {
+      return _powerSyncRepository.db().watch(
+        '''
+SELECT
+  posts.*,
+  p.id as user_id,
+  p.avatar_url as avatar_url,
+  p.username as username,
+  p.full_name as full_name
+FROM
+  posts
+  left join profiles p on posts.user_id = p.id 
+WHERE user_id = ?1
+ORDER BY created_at DESC
+      ''',
+        parameters: [currentUserId],
+      ).map(
+        (event) => event
+            .safeMap((row) => Post.fromJson(Map<String, dynamic>.from(row)))
+            .toList(growable: false),
+      );
+    }
+    return _powerSyncRepository.db().watch(
+      '''
+SELECT
+  posts.*,
+  p.avatar_url as avatar_url,
+  p.username as username,
+  p.full_name as full_name
+FROM
+  posts
+  left join profiles p on posts.user_id = p.id 
+WHERE user_id = ?
+ORDER BY created_at DESC
+      ''',
+      parameters: [userId],
+    ).map(
+      (event) {
+        try {
+          return event
+              .map((row) => Post.fromJson(Map<String, dynamic>.from(row)))
+              .toList(growable: false);
+        } catch (e) {
+          print('Error parsing posts: $e');
+          return <Post>[];
+        }
+      },
     );
   }
 }

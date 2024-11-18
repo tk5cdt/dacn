@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
+import 'package:conexion/feed/feed.dart';
 import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,6 +53,13 @@ class App extends StatelessWidget {
           ),
           BlocProvider(create: (_) => LocaleBloc()),
           BlocProvider(create: (_) => ThemeModeBloc()),
+          BlocProvider(
+            create: (context) => FeedBloc(
+              postsRepository: context.read<PostsRepository>(),
+              firebaseRemoteConfigRepository:
+                  context.read<FirebaseRemoteConfigRepository>(),
+            ),
+          ),
         ],
         child: const AppView(),
       ),

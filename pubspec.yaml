@@ -6,6 +6,7 @@ dependencies:
   app_ui:
     path: packages/app_ui
   bloc: ^8.1.4
+  bloc_concurrency: ^0.2.5
   build_runner: ^2.4.13
   collection: ^1.18.0
   con_blocks:
@@ -47,6 +48,7 @@ dependencies:
   powersync: ^1.7.0
   powersync_repository:
     path: packages/powersync_repository
+  scrollable_positioned_list: ^0.3.8
   shared:
     path: packages/shared
   slang: ^4.2.1
@@ -61,6 +63,7 @@ dependencies:
     path: packages/authentication_client/token_storage
   user_repository:
     path: packages/user_repository
+  video_player_platform_interface_extra: ^5.0.1+1
 description: A Very Good Project created by Very Good CLI.
 dev_dependencies:
   bloc_test: ^9.1.7

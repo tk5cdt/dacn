@@ -15,3 +15,7 @@ export 'src/carousel_dot_indicator.dart';
 export 'src/likes_count.dart';
 export 'src/comments_count.dart';
 export 'src/post_large/index.dart';
+export 'src/post_small/post_small.dart';
+export 'src/posts/index.dart';
+export 'src/attachments/widgets/widgets.dart';
+export 'src/user_profile/user_profile_avatar.dart';

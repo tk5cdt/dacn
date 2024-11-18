@@ -139,6 +139,9 @@ class SupabaseConnector extends PowerSyncBackendConnector {
         /// a delay.
         rethrow;
       }
+    } catch (e) {
+      shared.logE('Upload error:', error: e);
+      rethrow;
     }
   }
 }
