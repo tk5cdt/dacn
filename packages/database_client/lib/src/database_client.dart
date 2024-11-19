@@ -495,121 +495,76 @@ class PowerSyncDatabaseClient
     required int limit,
     bool onlyReels = false,
   }) async {
-//       final result = await _powerSyncRepository.db().execute(
-//         '''
-// SELECT
-//   posts.*,
-//   p.id as user_id,
-//   p.avatar_url as avatar_url,
-//   p.username as username
-// FROM
-//   posts
-//   inner join profiles p on posts.user_id = p.id
-// WHERE array_length(array(posts.media), 1) = 1
-//   AND posts.media.type = '__video_media__'
-// LIMIT ?1 OFFSET ?2
-//     ''',
-//         [limit, offset],
-//       );
+    try {
+      final posts = await _powerSyncRepository.db().computeWithDatabase(
+        (db) async {
+          final whereClause = onlyReels
+              ? "WHERE json_array_length(media) = 1 AND json_extract(media, '\$[0].type') = '__video_media__'"
+              : "";
 
-//       final posts = <Post>[];
-
-//       for (final row in result) {
-//         final json = Map<String, dynamic>.from(row);
-//         final post = Post.fromJson(json);
-//         posts.add(post);
-//       }
-//       return posts;
-//   }
-
-    final result = await _powerSyncRepository.db().computeWithDatabase(
-      (db) async {
-        final result = db.select(
-          '''
-SELECT
-  posts.*,
-  p.id as user_id,
-  p.avatar_url as avatar_url,
-  p.username as username,
-  p.full_name as full_name
-FROM
-  posts
-  inner join profiles p on posts.user_id = p.id 
-ORDER BY created_at DESC LIMIT ?1 OFFSET ?2
-    ''',
-          [limit, offset],
-        );
-        print('RESULT: $result');
-
-        final jsonListMedia = result.map((row) {
-          final json = Map<String, dynamic>.from(row);
-          return json['media'] as String;
-        }).toList();
-
-        final receivePort = ReceivePort();
-
-        void computeJsonListMedia(List<dynamic> args) {
-          final sendPort = args[0] as SendPort;
-          final jsonListMedia = args[1] as List<String>;
-          final listMedia = jsonListMedia
-              .map(
-                (jsonMedia) => (jsonDecode(jsonMedia) as List<dynamic>)
-                    .cast<Map<String, dynamic>>(),
-              )
-              .toList();
-
-          return sendPort.send(listMedia);
-        }
-
-        final isolate = await Isolate.spawn(
-          computeJsonListMedia,
-          [receivePort.sendPort, jsonListMedia],
-        );
-        isolate.kill(priority: Isolate.immediate);
-        final media =
-            await receivePort.first as List<List<Map<String, dynamic>>>;
-
-        final posts = <Post>[];
-        for (var i = 0; i < result.length; i++) {
-          final json = Map<String, dynamic>.from(result[i]);
-          final post = Post(
-            id: json['id'] as String,
-            createdAt: DateTime.parse(json['created_at'] as String),
-            author: User(
-              id: json['user_id'] as String,
-              avatarUrl: json['avatar_url'] as String?,
-              username: json['username'] as String?,
-              fullName: json['full_name'] as String?,
-            ),
-            caption: json['caption'] as String,
-            media: List<Media>.from(media[i].map(Media.fromJson).toList()),
+          final result = db.select(
+            '''
+            SELECT
+              posts.*,
+              p.id as user_id,
+              p.avatar_url as avatar_url,
+              p.username as username,
+              p.full_name as full_name
+            FROM
+              posts
+              inner join profiles p on posts.user_id = p.id 
+            $whereClause
+            ORDER BY created_at DESC LIMIT ?1 OFFSET ?2
+            ''',
+            [limit, offset],
           );
-          posts.add(post);
-        }
-        return posts;
-      },
-    );
-// final result = await _powerSyncRepository.db().execute(
-//           '''
-// SELECT
-//   posts.*,
-//   p.id as user_id,
-//   p.avatar_url as avatar_url,
-//   p.username as username,
-//   p.full_name as full_name
-// FROM
-//   posts
-//   inner join profiles p on posts.user_id = p.id
-// ORDER BY created_at DESC LIMIT ?1 OFFSET ?2
-//     ''',
-//           [limit, offset],
-//         );
 
-//     final instaBlocks = result.map((row) {
-//       final json = Map<String, dynamic>.from(row);
-//       return Post.fromJson(json);
-//     }).toList();
-    return result;
+          print('Query result: $result');
+          if (result.isEmpty) {
+            print('No posts found');
+            return <Post>[];
+          }
+
+          return result
+              .map((row) {
+                try {
+                  final json = Map<String, dynamic>.from(row);
+                  final mediaStr = json['media'] as String?;
+                  if (mediaStr == null) return null;
+
+                  final mediaList = jsonDecode(mediaStr) as List;
+                  final media = mediaList
+                      .cast<Map<String, dynamic>>()
+                      .map(Media.fromJson)
+                      .toList();
+
+                  return Post(
+                    id: json['id'] as String,
+                    createdAt: DateTime.parse(json['created_at'] as String),
+                    author: User(
+                      id: json['user_id'] as String,
+                      avatarUrl: json['avatar_url'] as String?,
+                      username: json['username'] as String?,
+                      fullName: json['full_name'] as String?,
+                    ),
+                    caption: json['caption'] as String,
+                    media: media,
+                  );
+                } catch (e) {
+                  print('Error parsing post: $e');
+                  return null;
+                }
+              })
+              .whereType<Post>() // Filter out null values
+              .toList();
+        },
+      );
+
+      return posts;
+    } catch (e) {
+      print('Error in getPage: $e');
+      rethrow;
+    }
   }
 
   @override
