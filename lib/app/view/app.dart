@@ -4,10 +4,12 @@ import 'package:app_ui/app_ui.dart';
 import 'package:chats_repository/chats_repository.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/feed/feed.dart';
+import 'package:database_client/database_client.dart';
 import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:posts_repository/posts_repository.dart';
+import 'package:search_repository/search_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
 import '../../selector/selector.dart';
@@ -22,7 +24,9 @@ class App extends StatelessWidget {
     required this.userRepository,
     required this.chatsRepository,
     required this.postsRepository,
+    required this.searchRepository,
     required this.firebaseRemoteConfigRepository,
+    required this.databaseClient,
     super.key,
   });
 
@@ -30,12 +34,17 @@ class App extends StatelessWidget {
   final UserRepository userRepository;
   final ChatsRepository chatsRepository;
   final PostsRepository postsRepository;
+  final SearchRepository searchRepository;
   final FirebaseRemoteConfigRepository firebaseRemoteConfigRepository;
+  final DatabaseClient databaseClient;
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(
+          value: databaseClient,
+        ),
         RepositoryProvider.value(
           value: userRepository,
         ),
@@ -45,9 +54,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(
           value: postsRepository,
         ),
-        RepositoryProvider.value(
-          value: firebaseRemoteConfigRepository
-        ),
+        RepositoryProvider.value(value: firebaseRemoteConfigRepository),
       ],
       child: MultiBlocProvider(
         providers: [

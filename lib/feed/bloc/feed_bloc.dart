@@ -20,17 +20,24 @@ part 'feed_bloc_mixin.dart';
 part 'feed_event.dart';
 part 'feed_state.dart';
 
-class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin{
+class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin {
   FeedBloc({
     required PostsRepository postsRepository,
     required FirebaseRemoteConfigRepository firebaseRemoteConfigRepository,
   })  : _postsRepository = postsRepository,
         _firebaseRemoteConfigRepository = firebaseRemoteConfigRepository,
         super(const FeedState.initial()) {
-    print('FeedBloc constructor called');
     on<FeedPageRequested>(_onFeedPageRequested);
+    on<FeedReelsPageRequested>(
+      _onFeedReelsPageRequested,
+      transformer: sequential(),
+    );
     on<FeedRefreshRequested>(
       _onFeedRefreshRequested,
+      transformer: throttleDroppable(duration: 550.ms),
+    );
+    on<FeedReelsRefreshRequested>(
+      _onFeedReelsRefreshRequested,
       transformer: throttleDroppable(duration: 550.ms),
     );
     on<FeedRecommendedPostsPageRequested>(
@@ -55,16 +62,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin{
     FeedPageRequested event,
     Emitter<FeedState> emit,
   ) async {
-    print('FeedPageRequested triggered for page: ${event.page}');
+    emit(state.loading());
     try {
-      emit(state.loading());
-      print('State emitted: loading');
-
       final currentPage = event.page ?? state.feed.feedPage.page;
-      print('Fetching feed for page: $currentPage');
-
-      final (:newPage, :hasMore, :blocks) = await fetchFeedPage(page: currentPage);
-      print('Feed fetched - blocks count: ${blocks.length}');
+      final (:newPage, :hasMore, :blocks) =
+          await fetchFeedPage(page: currentPage);
 
       final feed = state.feed.copyWith(
         feedPage: state.feed.feedPage.copyWith(
@@ -76,11 +78,64 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin{
       );
 
       emit(state.populated(feed: feed));
-      print('State emitted: populated with ${blocks.length} blocks');
+
       if (!hasMore) add(const FeedRecommendedPostsPageRequested());
     } catch (error, stackTrace) {
-      print('Error in _onFeedPageRequested: $error');
-      print('Stack trace: $stackTrace');
+      addError(error, stackTrace);
+      emit(state.failure());
+    }
+  }
+
+  Future<void> _onFeedReelsPageRequested(
+    FeedReelsPageRequested event,
+    Emitter<FeedState> emit,
+  ) async {
+    emit(state.loading());
+    try {
+      final currentPage = event.page ?? state.feed.reelsPage.page;
+      final (:newPage, :hasMore, :blocks) = await fetchFeedPage(
+        page: currentPage,
+        withSponsoredBlocks: false,
+        mapper: postsToReelBlockMapper,
+      );
+
+      final feed = state.feed.copyWith(
+        reelsPage: state.feed.reelsPage.copyWith(
+          page: newPage,
+          hasMore: hasMore,
+          blocks: [...state.feed.reelsPage.blocks, ...blocks],
+          totalBlocks: state.feed.reelsPage.totalBlocks + blocks.length,
+        ),
+      );
+      emit(state.populated(feed: feed));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.failure());
+    }
+  }
+
+  Future<void> _onFeedReelsRefreshRequested(
+    FeedReelsRefreshRequested event,
+    Emitter<FeedState> emit,
+  ) async {
+    emit(state.loading());
+    try {
+      final (:newPage, :hasMore, :blocks) = await fetchFeedPage(
+        withSponsoredBlocks: false,
+        mapper: postsToReelBlockMapper,
+      );
+
+      final feed = state.feed.copyWith(
+        reelsPage: ReelsPage(
+          page: newPage,
+          hasMore: hasMore,
+          blocks: blocks,
+          totalBlocks: blocks.length,
+        ),
+      );
+      emit(state.populated(feed: feed));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
       emit(state.failure());
     }
   }
@@ -220,4 +275,4 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin{
       emit(state.failure());
     }
   }
-} 
+}
