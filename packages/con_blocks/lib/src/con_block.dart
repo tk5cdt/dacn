@@ -29,6 +29,10 @@ abstract class ConBlock {
         return PostSponsoredBlock.fromJson(json);
       case PostReelBlock.identifier:
         return PostReelBlock.fromJson(json);
+      case DividerHorizontalBlock.identifier:
+        return DividerHorizontalBlock.fromJson(json);
+        case SectionHeaderBlock.identifier:
+        return SectionHeaderBlock.fromJson(json);
     }
     return UnknownBlock();
   }

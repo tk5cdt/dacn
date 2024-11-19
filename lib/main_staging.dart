@@ -7,6 +7,7 @@ import 'package:database_client/database_client.dart';
 import 'package:env/env.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:posts_repository/posts_repository.dart';
+import 'package:search_repository/search_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:supabase_authentication_client/supabase_authentication_client.dart';
 import 'package:token_storage/token_storage.dart';
@@ -43,6 +44,8 @@ void main() {
         authenticationClient: supabaseAuthenticationClient,
       );
 
+      final searchRepository = SearchRepository(databaseClient: powerSyncDatabaseClient);
+
       final postRepository = PostsRepository(
         databaseClient: powerSyncDatabaseClient,
       );
@@ -51,7 +54,9 @@ void main() {
         userRepository: userRepository,
         postsRepository: postRepository,
         chatsRepository: chatsRepository,
+        searchRepository: searchRepository,
         firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
+        databaseClient: powerSyncDatabaseClient,
       );
     },
     appFlavor: AppFlavor.staging(),

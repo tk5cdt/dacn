@@ -43,7 +43,7 @@ class FeedPageState extends State<FeedPage> {
     _controller.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     print('Building FeedPage');
@@ -208,8 +208,6 @@ class FeedBody extends StatelessWidget {
         ],
       ),
     );
-
-    
   }
 
   Widget _buildBlock({

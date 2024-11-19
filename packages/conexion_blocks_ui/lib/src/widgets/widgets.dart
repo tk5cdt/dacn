@@ -10,6 +10,8 @@ export 'running_text.dart';
 export 'shimmer_placeholder.dart';
 export 'swipeable.dart';
 export 'time_ago.dart';
+export 'promo_floating_action.dart';
+export 'running_text.dart';
 export 'two_rotating_arc.dart';
 export 'user_comment.dart';
 export 'viewable.dart';

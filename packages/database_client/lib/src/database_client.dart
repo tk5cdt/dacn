@@ -46,6 +46,16 @@ abstract class UserBaseRepository {
     String? avatarUrl,
     String? pushToken,
   });
+
+  /// Looks up into a database a returns users associated with the provided
+  /// [query].
+  Future<List<User>> searchUsers({
+    required int limit,
+    required int offset,
+    required String? query,
+    String? userId,
+    String? excludeUserIds,
+  });
 }
 
 abstract class ChatsBaseRepository {
@@ -89,6 +99,20 @@ abstract class ChatsBaseRepository {
     required Message newMessage,
   });
 }
+
+// abstract class SearchBaseRepository {
+//   const SearchBaseRepository();
+
+//   /// Looks up into a database a returns users associated with the provided
+//   /// [query].
+//   Future<List<User>> searchUsers({
+//     required int limit,
+//     required int offset,
+//     required String? query,
+//     String? userId,
+//     String? excludeUserIds,
+//   });
+// }
 
 abstract class PostsBaseRepository {
   const PostsBaseRepository();
@@ -156,13 +180,17 @@ abstract class PostsBaseRepository {
 /// A Very Good Project created by Very Good CLI.
 /// {@endtemplate}
 abstract class DatabaseClient
-    implements UserBaseRepository, PostsBaseRepository, ChatsBaseRepository {
+    implements UserBaseRepository, PostsBaseRepository, ChatsBaseRepository
+// SearchBaseRepository,
+{
   /// {@macro database_client}
   const DatabaseClient();
 }
 
 class PowerSyncDatabaseClient
-    implements DatabaseClient, PostsBaseRepository, ChatsBaseRepository {
+    implements DatabaseClient, PostsBaseRepository, ChatsBaseRepository
+// SearchBaseRepository,
+{
   const PowerSyncDatabaseClient({
     required PowerSyncRepository powerSyncRepository,
   }) : _powerSyncRepository = powerSyncRepository;
@@ -418,7 +446,8 @@ class PowerSyncDatabaseClient
         print('Database insert result: $result');
 
         if (result.isEmpty) return null;
-        final row = Map<String, dynamic>.from((result.first as ResultSet).first);
+        final row =
+            Map<String, dynamic>.from((result.first as ResultSet).first);
         final author = User.fromJson(result.last as Row);
         return Post.fromJson(row).copyWith(author: author);
       } catch (insertError) {
@@ -1201,5 +1230,32 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             .toList(),
       );
     }
+  }
+
+  @override
+  Future<List<User>> searchUsers({
+    required int limit,
+    required int offset,
+    required String? query,
+    String? userId,
+    String? excludeUserIds,
+  }) async {
+    if (query == null || query.trim().isEmpty) return <User>[];
+    query = query.removeSpecialCharacters();
+    final excludeUserIdsStatement =
+        excludeUserIds == null ? '' : 'AND id NOT IN ($excludeUserIds)';
+
+    final result = await _powerSyncRepository.db().getAll(
+      '''
+SELECT id, avatar_url, full_name, username
+  FROM profiles
+WHERE (LOWER(username) LIKE LOWER('%$query%') OR LOWER(full_name) LIKE LOWER('%$query%'))
+  AND id <> ?1 $excludeUserIdsStatement 
+LIMIT ?2 OFFSET ?3
+''',
+      [currentUserId, limit, offset],
+    );
+
+    return result.safeMap(User.fromJson).toList(growable: false);
   }
 }
