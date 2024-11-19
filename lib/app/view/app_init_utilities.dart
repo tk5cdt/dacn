@@ -10,7 +10,7 @@ void initUtilities(BuildContext context, Locale locale) {
   if (isSameLocal) return;
 
   final l10n = context.l10n;
-  // final t = context.t;
+  final t = context.t;
 
   PickImage().init(
     tabsTexts: TabsTexts(

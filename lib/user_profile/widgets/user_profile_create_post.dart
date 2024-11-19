@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
+import 'package:conexion/app/routes/app_routes.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
@@ -110,8 +111,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     try {
       toggleLoadingIndeterminate();
-
       final postId = uuid.v4();
+      logD('Starting post creation with ID: $postId');
       unawaited(
         FeedPageController().processPostMedia(
           postId: postId,
@@ -121,7 +122,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
         ),
       );
       goHome.call();
-      toggleLoadingIndeterminate(enable: false);
     } catch (error, stackTrace) {
       toggleLoadingIndeterminate(enable: false);
       logE('Failed to create post', error: error, stackTrace: stackTrace);
