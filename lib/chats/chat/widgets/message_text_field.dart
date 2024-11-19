@@ -272,11 +272,6 @@ class _ChatMessageTextFieldInputState extends State<ChatMessageTextFieldInput>
     caseSensitive: false,
   );
 
-  final _validTLDs = {
-    'com', 'org', 'net', 'edu', 'gov', 'mil', 'io', 'co',
-    // Thêm các TLD khác nếu cần
-  };
-
   Future<void> _checkContainsUrl(String value) async {
     // Cancel the previous operation if it's still running
     await _enrichUrlOperation?.cancel();
@@ -288,8 +283,8 @@ class _ChatMessageTextFieldInputState extends State<ChatMessageTextFieldInput>
     final matchedUrls = _urlRegex.allMatches(value).where((it) {
       final parsedMatch = Uri.tryParse(it.group(0) ?? '')?.withScheme;
       if (parsedMatch == null) return false;
-      
-      return _validTLDs.contains(parsedMatch.host.split('.').last.toLowerCase());
+
+      return parsedMatch.host.split('.').last.isValidTLD();
     }).toList();
 
     if (matchedUrls.isEmpty) {

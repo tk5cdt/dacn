@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:conexion_blocks_ui/src/post_large/index.dart';
 import 'package:flutter/material.dart' show BoxFit;
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 
 const kDefaultVideoAspectRatio = 8 / 12;
 const kDefaultAspectRatio = 1.0;

@@ -3,7 +3,6 @@ import 'package:con_blocks/con_blocks.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:shared/shared.dart';
-import 'package:shared/src/models/media.dart';
 import 'package:shared/src/models/user_converter.dart';
 import 'package:user_repository/user_repository.dart';
 

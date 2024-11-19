@@ -78,9 +78,6 @@ class _$PostOptionsSettingsCopyWithImpl<$Res, $Val extends PostOptionsSettings>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of PostOptionsSettings
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -101,8 +98,6 @@ class __$$OwnerImplCopyWithImpl<$Res>
       _$OwnerImpl _value, $Res Function(_$OwnerImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PostOptionsSettings
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -152,9 +147,7 @@ class _$OwnerImpl extends Owner {
   @override
   int get hashCode => Object.hash(runtimeType, onPostDelete, onPostEdit);
 
-  /// Create a copy of PostOptionsSettings
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$OwnerImplCopyWith<_$OwnerImpl> get copyWith =>
@@ -237,10 +230,7 @@ abstract class Owner extends PostOptionsSettings {
 
   ValueSetter<String> get onPostDelete;
   ValueSetter<PostBlock> get onPostEdit;
-
-  /// Create a copy of PostOptionsSettings
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$OwnerImplCopyWith<_$OwnerImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -259,9 +249,6 @@ class __$$ViewerImplCopyWithImpl<$Res>
   __$$ViewerImplCopyWithImpl(
       _$ViewerImpl _value, $Res Function(_$ViewerImpl) _then)
       : super(_value, _then);
-
-  /// Create a copy of PostOptionsSettings
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc

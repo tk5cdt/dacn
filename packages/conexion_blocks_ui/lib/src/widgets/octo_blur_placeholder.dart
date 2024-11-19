@@ -1,5 +1,5 @@
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/src/blur_hash_image_placeholder.dart';
 import 'package:octo_image/octo_image.dart';
 
 class OctoBlurHashPlaceholder extends OctoSet {

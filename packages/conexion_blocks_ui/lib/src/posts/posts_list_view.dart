@@ -1,7 +1,7 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
-import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared/shared.dart';
 

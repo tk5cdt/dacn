@@ -5,9 +5,8 @@ import 'dart:typed_data';
 
 import 'package:cached_memory_image/cached_memory_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
-import 'package:conexion_blocks_ui/src/attachments/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:shared/shared.dart';
 
 /// {@template imageAttachmentThumbnail}

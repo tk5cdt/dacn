@@ -1,7 +1,7 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:sprung/sprung.dart';
 
 class LikesCount extends StatefulWidget {
