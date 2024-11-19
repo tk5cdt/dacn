@@ -5,10 +5,10 @@ import 'dart:isolate';
 
 import 'package:dio/dio.dart';
 import 'package:env/env.dart';
-import 'package:powersync/sqlite3_common.dart';
 import 'package:powersync_repository/powersync_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:powersync/sqlite3_common.dart';
 import 'package:con_blocks/con_blocks.dart';
 
 abstract class UserBaseRepository {
@@ -521,8 +521,6 @@ class PowerSyncDatabaseClient
 //       }
 //       return posts;
 //   }
-
-    print('user id: ${currentUserId}');
 
     final result = await _powerSyncRepository.db().computeWithDatabase(
       (db) async {

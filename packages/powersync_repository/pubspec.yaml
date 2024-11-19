@@ -21,6 +21,5 @@ dependencies:
   powersync: ^1.8.8
   shared:
     path: ../shared
-  sqlite3: ^2.4.7
   supabase: ^2.3.0
   supabase_flutter: ^2.6.0
