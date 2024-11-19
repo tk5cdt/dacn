@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_positional_boolean_parameters
 // ignore_for_file: use_setters_to_change_properties
 
-import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion_blocks_ui/src/post_large/index.dart';
 import 'package:flutter/material.dart';
+import 'package:con_blocks/con_blocks.dart';
+import 'package:conexion_blocks_ui/src/post_large/post_footer.dart';
+import 'package:conexion_blocks_ui/src/post_large/post_header.dart';
+import 'package:conexion_blocks_ui/src/post_large/post_media.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
 
@@ -104,7 +106,6 @@ class _PostLargeState extends State<PostLarge> {
   Widget build(BuildContext context) {
     final isSponsored = widget.block is PostSponsoredBlock;
 
-    //return Container();
     final postMedia = PostMedia(
       isLiked: widget.isLiked,
       media: widget.block.media,

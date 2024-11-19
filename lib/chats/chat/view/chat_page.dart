@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:chats_repository/chats_repository.dart';
+import 'package:conexion/chats/chat/widgets/swipeable_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -328,15 +329,15 @@ class _ChatMessagesListViewState extends State<ChatMessagesListView> {
                             ? const EdgeInsets.only(top: AppSpacing.md)
                             : null;
 
-                    return const Text('messageWidget');
-                    // return SwipeableMessage(
-                    //   id: message.id,
-                    //   onSwiped: (_) => settings.onReplyTap.call(message),
-                    //   child: Padding(
-                    //     padding: padding ?? EdgeInsets.zero,
-                    //     child: messageWidget,
-                    //   ),
-                    // );
+                    // return const Text('messageWidget');
+                    return SwipeableMessage(
+                      id: message.id,
+                      onSwiped: (_) => settings.onReplyTap.call(message),
+                      child: Padding(
+                        padding: padding ?? EdgeInsets.zero,
+                        child: messageWidget,
+                      ),
+                    );
                   },
                   separatorBuilder: (context, index) {
                     final isLast = messages.length - 1 - index == 1;

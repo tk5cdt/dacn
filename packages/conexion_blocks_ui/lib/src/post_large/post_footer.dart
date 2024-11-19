@@ -2,10 +2,14 @@ import 'package:app_ui/app_ui.dart';
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
-import 'package:conexion_blocks_ui/src/post_large/index.dart';
-import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/src/carousel_dot_indicator.dart';
+import 'package:conexion_blocks_ui/src/comments_count.dart';
+import 'package:conexion_blocks_ui/src/like_button.dart';
+import 'package:conexion_blocks_ui/src/likes_count.dart';
+import 'package:conexion_blocks_ui/src/post_large/post_caption.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
 

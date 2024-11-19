@@ -64,6 +64,7 @@ dependencies:
   timeago: ^3.7.0
   token_storage:
     path: packages/authentication_client/token_storage
+  url_launcher: ^6.3.1
   user_repository:
     path: packages/user_repository
   video_player_platform_interface_extra: ^5.0.1+1

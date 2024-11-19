@@ -1,8 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/src/attachments/index.dart';
 import 'package:shared/shared.dart';
-
-import '../attachments/widgets/widgets.dart';
 
 typedef ImageThumbnailBuilder = Widget Function(
   BuildContext context,

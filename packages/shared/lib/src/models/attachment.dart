@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:image_size_getter/file_input.dart';
 import 'package:image_size_getter/image_size_getter.dart' hide Size;
 import 'package:shared/shared.dart';
-import 'package:shared/src/models/og_attachment.dart';
 
 // Useful extensions on [Attachment].
 extension OriginalSizeX on Attachment {

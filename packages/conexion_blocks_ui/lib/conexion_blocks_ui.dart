@@ -2,7 +2,7 @@
 library;
 
 export 'src/better_stream_builder.dart';
-export 'src/conexion_blocks_ui.dart';
+// export 'src/conexion_blocks_ui.dart';
 export 'src/user_profile/user_profile_statistic.dart';
 export 'src/widgets/widgets.dart';
 export 'src/blocks_settings.dart';
@@ -19,3 +19,4 @@ export 'src/post_small/post_small.dart';
 export 'src/posts/index.dart';
 export 'src/attachments/widgets/widgets.dart';
 export 'src/user_profile/user_profile_avatar.dart';
+export 'src/attachments/index.dart';

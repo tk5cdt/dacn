@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:shared/shared.dart';
-import 'package:shared/src/models/media.dart';
 
 part 'video.g.dart';
 
