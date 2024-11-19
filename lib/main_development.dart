@@ -61,6 +61,7 @@ void main() {
         postsRepository: postRepository,
         searchRepository: searchRepository,
         firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
+        databaseClient: powerSyncDatabaseClient,
       );
     },
     appFlavor: AppFlavor.development(),

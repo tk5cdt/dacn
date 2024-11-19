@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:search_repository/search_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
+import 'package:provider/provider.dart';
+import 'package:database_client/database_client.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({this.withResult, super.key});
@@ -15,7 +17,12 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SearchView(withResult: withResult ?? false);
+    return Provider<SearchRepository>(
+      create: (_) => SearchRepository(
+        databaseClient: context.read<DatabaseClient>(),
+      ),
+      child: SearchView(withResult: withResult ?? false),
+    );
   }
 }
 
@@ -132,32 +139,32 @@ class _SearcAppBarState extends State<SearcAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => SearchBloc(
-        searchRepository: context.read<SearchRepository>(),
-      ),
-      child: _SearchAppBar(
-        onUsersSearch: widget.onUsersSearch,
-        focusNode: _focusNode,
-        searchController: _searchController,
-      ),
-    );
-
-    // return AppBar(
-    //   title: SearchInputField(
-    //     active: false,
-    //     readOnly: false,
+    // return BlocProvider(
+    //   create: (context) => SearchBloc(
+    //     searchRepository: context.read<SearchRepository>(),
+    //   ),
+    //   child: _SearchAppBar(
+    //     onUsersSearch: widget.onUsersSearch,
     //     focusNode: _focusNode,
-    //     textController: _searchController,
-    //     onChanged: (query) {
-    //       _debouncer.run(
-    //         () async => widget.onUsersSearch.call(
-    //           await context.read<SearchRepository>().searchUsers(query: query),
-    //         ),
-    //       );
-    //     },
+    //     searchController: _searchController,
     //   ),
     // );
+
+    return AppBar(
+      title: SearchInputField(
+        active: false,
+        readOnly: false,
+        focusNode: _focusNode,
+        textController: _searchController,
+        onChanged: (query) {
+          _debouncer.run(
+            () async => widget.onUsersSearch.call(
+              await context.read<SearchRepository>().searchUsers(query: query),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 

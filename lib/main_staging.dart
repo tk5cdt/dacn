@@ -56,6 +56,7 @@ void main() {
         chatsRepository: chatsRepository,
         searchRepository: searchRepository,
         firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
+        databaseClient: powerSyncDatabaseClient,
       );
     },
     appFlavor: AppFlavor.staging(),

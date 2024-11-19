@@ -46,7 +46,8 @@ void main() {
         databaseClient: powerSyncDatabaseClient,
         authenticationClient: supabaseAuthenticationClient,
       );
-      final searchRepository = SearchRepository(databaseClient: powerSyncDatabaseClient);
+      final searchRepository =
+          SearchRepository(databaseClient: powerSyncDatabaseClient);
       final postRepository = PostsRepository(
         databaseClient: powerSyncDatabaseClient,
       );
@@ -57,6 +58,7 @@ void main() {
         chatsRepository: chatsRepository,
         searchRepository: searchRepository,
         firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
+        databaseClient: powerSyncDatabaseClient,
       );
     },
     appFlavor: AppFlavor.production(),
