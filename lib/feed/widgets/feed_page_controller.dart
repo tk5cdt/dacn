@@ -63,6 +63,7 @@ class FeedPageController extends ChangeNotifier {
     final isReel =
         selectedFiles.length == 1 && selectedFiles.every((e) => !e.isThatImage);
     final navigateToReelPage = isReel;
+
     StatefulNavigationShell.of(_context)
         .goBranch(navigateToReelPage ? 3 : 0, initialLocation: true);
     if (pickVideo) {
@@ -71,14 +72,16 @@ class FeedPageController extends ChangeNotifier {
 
     final newPostId = uuid.v4();
 
-    void uploadPost({required List<Map<String, dynamic>> media}) =>
-        _context.read<FeedBloc>().add(
-              FeedPostCreateRequested(
-                postId: newPostId,
-                caption: caption,
-                media: media,
-              ),
-            );
+    void uploadPost({required List<Map<String, dynamic>> media}) {
+      if (!_context.mounted) return;
+      _context.read<FeedBloc>().add(
+            FeedPostCreateRequested(
+              postId: postId,
+              caption: caption,
+              media: media,
+            ),
+          );
+    }
 
     final storage = Supabase.instance.client.storage.from('posts');
 

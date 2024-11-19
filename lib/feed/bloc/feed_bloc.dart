@@ -199,11 +199,14 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin {
   ) async {
     emit(state.loading());
     try {
+      print('Creating post with ID: ${event.postId}, caption: ${event.caption}, media: ${event.media}');
       final newPost = await _postsRepository.createPost(
         id: event.postId,
         caption: event.caption,
         media: json.encode(event.media),
       );
+
+      print('Post created: $newPost');
       if (newPost != null) {
         add(
           FeedUpdateRequested(
@@ -221,6 +224,10 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin {
       );
     } catch (error, stackTrace) {
       addError(error, stackTrace);
+      print('Error in _onFeedPostCreateRequested: $error');
+      openSnackbar(
+        const SnackbarMessage.error(title: 'Failed to create post!'),
+      );
       emit(state.failure());
     }
   }

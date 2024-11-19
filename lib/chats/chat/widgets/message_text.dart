@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-// import 'package:conexion/chats/chat/widgets/parse_attachments.dart';
+//import 'package:conexion/chats/chat/widgets/parse_attachments.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
@@ -57,7 +57,7 @@ class MessageText extends StatelessWidget {
         if (onLinkTap != null) {
           onLinkTap!(link);
         } else {
-          // await launchURL(context, link);
+          //await launchURL(context, link);
         }
       },
       styleSheet: MarkdownStyleSheet.fromTheme(context.theme).copyWith(
