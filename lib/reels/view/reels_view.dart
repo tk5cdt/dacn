@@ -80,7 +80,19 @@ class _ReelsViewState extends State<ReelsView> {
                   );
             },
             builder: (context, state) {
+              if (state.status == FeedStatus.loading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (state.status == FeedStatus.failure) {
+                return Center(
+                  child: Text('Error loading reels: ${state.failure}'),
+                );
+              }
+
               final blocks = state.feed.reelsPage.blocks;
+
+              print('Reels blocks: ${blocks.length}');
 
               if (blocks.isEmpty) {
                 return const NoReelsFound();
@@ -141,8 +153,7 @@ class _ReelsViewState extends State<ReelsView> {
           right: AppSpacing.md,
           top: AppSpacing.md,
           child: Tappable.faded(
-            onTap: () =>
-                context.pushNamed('create_post', extra: true),
+            onTap: () => context.pushNamed('create_post', extra: true),
             child: Icon(
               Icons.camera_alt_outlined,
               size: AppSize.iconSize,
