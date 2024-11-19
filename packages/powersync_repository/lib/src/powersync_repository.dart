@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:env/env.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
-// import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:powersync/powersync.dart';
 import 'package:shared/shared.dart' as shared;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -204,9 +205,8 @@ class PowerSyncRepository {
       // On web, use a relative path
       dbPath = 'flutter-instagram-offline-first.db';
     } else if (Platform.isAndroid || Platform.isIOS) {
-      // For Android, use a relative path within the app's temporary directory
-      final directory = await Directory.systemTemp.createTemp();
-      dbPath = path.join(directory.path, 'flutter-instagram-offline-first.db');
+      final dir = await getApplicationSupportDirectory();
+      dbPath = path.join(dir.path, 'flutter-instagram-offline-first.db');
     } else {
       // Fallback for platforms like iOS or macOS (or future desktop platforms)
       final dir = Directory.current.path;
@@ -215,6 +215,12 @@ class PowerSyncRepository {
 
     return dbPath;
   }
+
+  //   /// Returns the relative directory of the local database.
+  // Future<String> getDatabasePath() async {
+  //   final dir = await getApplicationSupportDirectory();
+  //   return join(dir.path, 'flutter-instagram-offline-first.db');
+  // }
 
   /// Loads the Supabase client with the provided environment values.
   Future<void> _loadSupabase() async {

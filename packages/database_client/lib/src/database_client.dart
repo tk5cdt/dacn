@@ -387,33 +387,48 @@ class PowerSyncDatabaseClient
     required String caption,
     required String media,
   }) async {
-    if (currentUserId == null) return null;
-    final result = await Future.wait([
-      _powerSyncRepository.db().execute(
-        '''
-    INSERT INTO posts(id, user_id, caption, media, created_at)
+    try {
+      if (currentUserId == null) return null;
+      print('Inserting post data...');
+
+      try {
+        final result = await Future.wait([
+          _powerSyncRepository.db().execute(
+            '''
+      INSERT INTO posts(id, user_id, caption, media, created_at)
     VALUES(?, ?, ?, ?, ?)
     RETURNING *
     ''',
-        [
-          id,
-          currentUserId,
-          caption,
-          media,
-          DateTime.timestamp().toIso8601String(),
-        ],
-      ),
-      _powerSyncRepository.db().get(
-        '''
+            [
+              id,
+              currentUserId,
+              caption,
+              media,
+              DateTime.timestamp().toIso8601String(),
+            ],
+          ),
+          _powerSyncRepository.db().get(
+            '''
     SELECT * FROM profiles WHERE id = ?
     ''',
-        [currentUserId],
-      ),
-    ]);
-    if (result.isEmpty) return null;
-    final row = Map<String, dynamic>.from((result.first as ResultSet).first);
-    final author = User.fromJson(result.last as Row);
-    return Post.fromJson(row).copyWith(author: author);
+            [currentUserId],
+          ),
+        ]);
+
+        print('Database insert result: $result');
+
+        if (result.isEmpty) return null;
+        final row = Map<String, dynamic>.from((result.first as ResultSet).first);
+        final author = User.fromJson(result.last as Row);
+        return Post.fromJson(row).copyWith(author: author);
+      } catch (insertError) {
+        print('Insert/Update error: $insertError');
+        return null;
+      }
+    } catch (e) {
+      print('Error in createPost: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -982,7 +997,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         }
       });
 
-      @override
+  @override
   Stream<List<Message>> messagesOf({required String chatId}) =>
       _powerSyncRepository.db().watch(
         '''
@@ -1024,7 +1039,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         parameters: [chatId],
       ).map((event) => event.safeMap(Message.fromRow).toList(growable: false));
 
-      /// Sends notification in a background isolate.
+  /// Sends notification in a background isolate.
   Future<void> sendBackgroundNotification(List<dynamic> args) async {
     await sendNotification(
       reciever: args[1] as User,
@@ -1185,5 +1200,4 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       );
     }
   }
-
 }
