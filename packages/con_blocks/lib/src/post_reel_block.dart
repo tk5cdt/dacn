@@ -21,8 +21,14 @@ class PostReelBlock extends PostBlock {
   });
 
   /// Converts a `Map<String, dynamic>` into a [PostReelBlock] instance.
-  factory PostReelBlock.fromJson(Map<String, dynamic> json) =>
-      _$PostReelBlockFromJson(json);
+  factory PostReelBlock.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$PostReelBlockFromJson(json);
+    } catch (e) {
+      print('Error parsing PostReelBlock: $e');
+      rethrow;
+    }
+  }
 
   /// The large post block type identifier.
   static const identifier = '__post_reel__';
