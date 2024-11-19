@@ -410,7 +410,11 @@ class ReelAuthorListTile extends StatelessWidget {
         //   withAdaptiveBorder: false,
         //   enableInactiveBorder: false,
         // ),
-        UserProfileAvatar(userId: author.id),
+        UserProfileAvatar(
+          userId: author.id,
+          avatarUrl: author.avatarUrl,
+          isLarge: false,
+        ),
         Flexible(
           flex: 4,
           child: Text.rich(

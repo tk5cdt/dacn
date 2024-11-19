@@ -170,7 +170,7 @@ class MessageContentView extends StatelessWidget {
                     message: message,
                   ),
                 ),
-              if (hasAttachments) ParseAttachments(message: message),
+              // if (hasAttachments) ParseAttachments(message: message),
             ],
           ),
         ),

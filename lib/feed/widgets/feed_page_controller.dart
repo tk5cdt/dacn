@@ -69,22 +69,22 @@ class FeedPageController extends ChangeNotifier {
       VideoPlayerInheritedWidget.of(_context).videoPlayerState.playReels();
     }
 
-    late final postId = uuid.v4();
+    final newPostId = uuid.v4();
 
     void uploadPost({required List<Map<String, dynamic>> media}) =>
         _context.read<FeedBloc>().add(
               FeedPostCreateRequested(
-                postId: postId,
+                postId: newPostId,
                 caption: caption,
                 media: media,
               ),
             );
 
-    late final storage = Supabase.instance.client.storage.from('posts');
+    final storage = Supabase.instance.client.storage.from('posts');
 
     if (isReel) {
       try {
-        final mediaPath = '$postId/video_0';
+        final mediaPath = '$newPostId/video_0';
 
         final selectedFile = selectedFiles.first;
         final firstFrame = await VideoPlus.getVideoThumbnail(
@@ -118,7 +118,7 @@ class FeedPageController extends ChangeNotifier {
         final mediaUrl = storage.getPublicUrl(mediaPath);
         String? firstFrameUrl;
         if (firstFrame != null) {
-          late final firstFramePath = '$postId/video_first_frame_0';
+          final firstFramePath = '$newPostId/video_first_frame_0';
           await storage.uploadBinary(
             firstFramePath,
             firstFrame,
@@ -149,9 +149,9 @@ class FeedPageController extends ChangeNotifier {
     } else {
       final media = <Map<String, dynamic>>[];
       for (var i = 0; i < selectedFiles.length; i++) {
-        late final selectedByte = selectedFiles[i].selectedByte;
-        late final selectedFile = selectedFiles[i].selectedFile;
-        late final isVideo = selectedFile.isVideo;
+        final selectedByte = selectedFiles[i].selectedByte;
+        final selectedFile = selectedFiles[i].selectedFile;
+        final isVideo = selectedFile.isVideo;
         String blurHash;
         Uint8List? convertedBytes;
         if (isVideo) {
@@ -168,10 +168,9 @@ class FeedPageController extends ChangeNotifier {
             selectedByte,
           );
         }
-        late final mediaExtension =
-            selectedFile.path.split('.').last.toLowerCase();
+        final mediaExtension = selectedFile.path.split('.').last.toLowerCase();
 
-        late final mediaPath = '$postId/${!isVideo ? 'image_$i' : 'video_$i'}';
+        final mediaPath = '$newPostId/${!isVideo ? 'image_$i' : 'video_$i'}';
 
         Uint8List bytes;
         if (isVideo) {
@@ -204,7 +203,7 @@ class FeedPageController extends ChangeNotifier {
         final mediaUrl = storage.getPublicUrl(mediaPath);
         String? firstFrameUrl;
         if (convertedBytes != null) {
-          late final firstFramePath = '$postId/video_first_frame_$i';
+          final firstFramePath = '$newPostId/video_first_frame_$i';
           await storage.uploadBinary(
             firstFramePath,
             convertedBytes,

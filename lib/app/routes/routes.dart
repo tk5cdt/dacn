@@ -4,8 +4,10 @@ import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart' hide FeedPage, ReelsPage;
 import 'package:conexion/app/app.dart';
 import 'package:conexion/app/home/home.dart';
+import 'package:conexion/app/routes/app_routes.dart';
 import 'package:conexion/auth/view/auth_page.dart';
 import 'package:conexion/feed/feed.dart';
+import 'package:conexion/timeline/view/timeline_page.dart';
 import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion/user_profile/widgets/user_profile_create_post.dart';
 import 'package:conexion/user_profile/widgets/user_profile_statistics.dart';
@@ -31,52 +33,52 @@ GoRouter router(AppBloc appBloc) {
         builder: (context, state) => const AuthPage(),
       ),
       GoRoute(
-            path: '/users/:user_id',
-            name: 'user_profile',
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: (context, state) {
-              final userId = state.pathParameters['user_id']!;
-              final props = state.extra as UserProfileProps?;
+        path: '/users/:user_id',
+        name: 'user_profile',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final userId = state.pathParameters['user_id']!;
+          final props = state.extra as UserProfileProps?;
 
-              return CustomTransitionPage(
-                key: state.pageKey,
-                // child: BlocProvider(
-                //   create: (context) => CreateStoriesBloc(
-                //     storiesRepository: context.read<StoriesRepository>(),
-                //     firebaseRemoteConfigRepository:
-                //         context.read<FirebaseRemoteConfigRepository>(),
-                //   ),
-                //   child: UserProfilePage(
-                //     userId: userId,
-                //     props: props ?? const UserProfileProps.build(),
-                //   ),
-                // ),
-                child: UserProfilePage(
-                    userId: userId,
-                    props: props ?? const UserProfileProps.build(),
-                  ),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SharedAxisTransition(
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.horizontal,
-                    child: child,
-                  );
-                },
+          return CustomTransitionPage(
+            key: state.pageKey,
+            // child: BlocProvider(
+            //   create: (context) => CreateStoriesBloc(
+            //     storiesRepository: context.read<StoriesRepository>(),
+            //     firebaseRemoteConfigRepository:
+            //         context.read<FirebaseRemoteConfigRepository>(),
+            //   ),
+            //   child: UserProfilePage(
+            //     userId: userId,
+            //     props: props ?? const UserProfileProps.build(),
+            //   ),
+            // ),
+            child: UserProfilePage(
+              userId: userId,
+              props: props ?? const UserProfileProps.build(),
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SharedAxisTransition(
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: SharedAxisTransitionType.horizontal,
+                child: child,
               );
             },
-          ),
-          GoRoute(
-            path: '/posts/:post_id/edit',
-            name: 'post_edit',
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: (context, state) {
-              final post = state.extra! as PostBlock;
+          );
+        },
+      ),
+      GoRoute(
+        path: '/posts/:post_id/edit',
+        name: 'post_edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final post = state.extra! as PostBlock;
 
-              return NoTransitionPage(child: PostEditPage(post: post));
-            },
-          ),
+          return NoTransitionPage(child: PostEditPage(post: post));
+        },
+      ),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) {
@@ -107,28 +109,37 @@ GoRouter router(AppBloc appBloc) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/timeline',
+                path: AppRoutes.timeline.route,
                 pageBuilder: (context, state) {
                   return CustomTransitionPage(
-                    child: AppScaffold(
-                      body: Center(
-                        child: Text(
-                          'Timeline',
-                          style: context.headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
+                    key: state.pageKey,
+                    child: const TimelinePage(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       return FadeTransition(
-                        opacity: CurveTween(curve: Curves.easeInOut)
-                            .animate(animation),
+                        opacity: CurveTween(
+                          curve: Curves.easeInOut,
+                        ).animate(animation),
                         child: child,
                       );
                     },
                   );
                 },
+                // routes: [
+                //   GoRoute(
+                //     name: AppRoutes.search.name,
+                //     path: AppRoutes.search.name,
+                //     parentNavigatorKey: _rootNavigatorKey,
+                //     pageBuilder: (context, state) {
+                //       final withResult = state.extra as bool?;
+
+                //       return NoTransitionPage(
+                //         key: state.pageKey,
+                //         child: SearchPage(withResult: withResult),
+                //       );
+                //     },
+                //   ),
+                // ],
               ),
             ],
           ),
@@ -146,18 +157,18 @@ GoRouter router(AppBloc appBloc) {
                 path: '/reels',
                 pageBuilder: (context, state) {
                   return CustomTransitionPage(
-                        key: state.pageKey,
-                        child: const ReelsPage(),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          return FadeTransition(
-                            opacity: CurveTween(
-                              curve: Curves.easeInOut,
-                            ).animate(animation),
-                            child: child,
-                          );
-                        },
+                    key: state.pageKey,
+                    child: const ReelsPage(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: CurveTween(
+                          curve: Curves.easeInOut,
+                        ).animate(animation),
+                        child: child,
                       );
+                    },
+                  );
                 },
               ),
             ],
@@ -334,46 +345,43 @@ GoRouter router(AppBloc appBloc) {
                     ],
                   ),
                   GoRoute(
-                        path: 'posts',
-                        name: 'user_posts',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        pageBuilder: (context, state) {
-                          final userId = state.uri.queryParameters['user_id']!;
-                          final index = (state.uri.queryParameters['index']!)
-                              .parse
-                              .toInt();
+                    path: 'posts',
+                    name: 'user_posts',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      final userId = state.uri.queryParameters['user_id']!;
+                      final index =
+                          (state.uri.queryParameters['index']!).parse.toInt();
 
-                          return CustomTransitionPage(
-                            key: state.pageKey,
-                            child: BlocProvider(
-                              create: (context) => UserProfileBloc(
-                                userId: userId,
-                                userRepository: context.read<UserRepository>(),
-                                postsRepository:
-                                    context.read<PostsRepository>(),
-                              ),
-                              child: UserProfilePosts(
-                                userId: userId,
-                                index: index,
-                              ),
-                            ),
-                            transitionsBuilder: (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              child,
-                            ) {
-                              return SharedAxisTransition(
-                                animation: animation,
-                                secondaryAnimation: secondaryAnimation,
-                                transitionType:
-                                    SharedAxisTransitionType.horizontal,
-                                child: child,
-                              );
-                            },
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: BlocProvider(
+                          create: (context) => UserProfileBloc(
+                            userId: userId,
+                            userRepository: context.read<UserRepository>(),
+                            postsRepository: context.read<PostsRepository>(),
+                          ),
+                          child: UserProfilePosts(
+                            userId: userId,
+                            index: index,
+                          ),
+                        ),
+                        transitionsBuilder: (
+                          context,
+                          animation,
+                          secondaryAnimation,
+                          child,
+                        ) {
+                          return SharedAxisTransition(
+                            animation: animation,
+                            secondaryAnimation: secondaryAnimation,
+                            transitionType: SharedAxisTransitionType.horizontal,
+                            child: child,
                           );
                         },
-                      ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ],
