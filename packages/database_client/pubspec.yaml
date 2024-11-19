@@ -8,6 +8,8 @@ environment:
   flutter: ^3.24.0
 
 dependencies:
+  con_blocks:
+    path: ../con_blocks
   dio: ^5.7.0
   env:
     path: ../env

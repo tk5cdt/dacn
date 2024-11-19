@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:conexion_blocks_ui/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:powersync_repository/powersync_repository.dart';
 import 'package:shared/shared.dart';
 
@@ -14,6 +14,7 @@ typedef UserProfilePlaceholderBuilder = Widget Function(
 
 class UserProfileAvatar extends StatelessWidget {
   const UserProfileAvatar({
+    this.stories = const [],
     this.userId,
     super.key,
     this.avatarUrl,
@@ -38,6 +39,7 @@ class UserProfileAvatar extends StatelessWidget {
     this.withAdaptiveBorder = false,
   });
 
+  final List<Story> stories;
   final String? userId;
   final String? avatarUrl;
   final double? radius;
@@ -154,20 +156,23 @@ class UserProfileAvatar extends StatelessWidget {
                 : 18.0);
     late final height = radius * 2;
     late final width = radius * 2;
+    final hasStories = stories.isNotEmpty;
 
     BoxDecoration? border() {
+      if (!hasStories) return null;
       if (!enableInactiveBorder && !showStories) return null;
-      if (showStories) return _gradientBorderDecoration;
-      if (enableInactiveBorder && !showStories) {
+      if (showStories && hasStories) return _gradientBorderDecoration;
+      if (enableInactiveBorder && !showStories && hasStories) {
         return _greyBorderDecoration(context);
       }
       return null;
     }
 
     Gradient? gradient() {
+      if (!hasStories) return null;
       if (!enableInactiveBorder && !showStories) return null;
-      if (showStories) return _defaultGradient;
-      if (enableInactiveBorder && !showStories) {
+      if (showStories && hasStories) return _defaultGradient;
+      if (enableInactiveBorder && !showStories && hasStories) {
         return LinearGradient(
           colors: [Colors.grey.shade600, Colors.grey.shade600],
         );

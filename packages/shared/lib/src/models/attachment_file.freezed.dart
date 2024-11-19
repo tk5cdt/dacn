@@ -83,8 +83,6 @@ mixin _$UploadState {
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
-
-  /// Serializes this UploadState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 }
 
@@ -104,9 +102,6 @@ class _$UploadStateCopyWithImpl<$Res, $Val extends UploadState>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -123,9 +118,6 @@ class __$$PreparingImplCopyWithImpl<$Res>
   __$$PreparingImplCopyWithImpl(
       _$PreparingImpl _value, $Res Function(_$PreparingImpl) _then)
       : super(_value, _then);
-
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -152,7 +144,7 @@ class _$PreparingImpl extends Preparing {
         (other.runtimeType == runtimeType && other is _$PreparingImpl);
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -263,8 +255,6 @@ class __$$InProgressImplCopyWithImpl<$Res>
       _$InProgressImpl _value, $Res Function(_$InProgressImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -318,13 +308,11 @@ class _$InProgressImpl extends InProgress {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, uploaded, total);
 
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$InProgressImplCopyWith<_$InProgressImpl> get copyWith =>
@@ -423,10 +411,7 @@ abstract class InProgress extends UploadState {
 
   int get uploaded;
   int get total;
-
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$InProgressImplCopyWith<_$InProgressImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -445,9 +430,6 @@ class __$$SuccessImplCopyWithImpl<$Res>
   __$$SuccessImplCopyWithImpl(
       _$SuccessImpl _value, $Res Function(_$SuccessImpl) _then)
       : super(_value, _then);
-
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -474,7 +456,7 @@ class _$SuccessImpl extends Success {
         (other.runtimeType == runtimeType && other is _$SuccessImpl);
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => runtimeType.hashCode;
 
@@ -584,8 +566,6 @@ class __$$FailedImplCopyWithImpl<$Res>
       _$FailedImpl _value, $Res Function(_$FailedImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -629,13 +609,11 @@ class _$FailedImpl extends Failed {
             (identical(other.error, error) || other.error == error));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, error);
 
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$FailedImplCopyWith<_$FailedImpl> get copyWith =>
@@ -730,10 +708,7 @@ abstract class Failed extends UploadState {
   factory Failed.fromJson(Map<String, dynamic> json) = _$FailedImpl.fromJson;
 
   String get error;
-
-  /// Create a copy of UploadState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$FailedImplCopyWith<_$FailedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

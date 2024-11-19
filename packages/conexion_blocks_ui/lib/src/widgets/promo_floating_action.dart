@@ -1,8 +1,8 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion_blocks_ui/src/attachments/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart'
     hide NumDurationExtensions;
+import 'package:conexion_blocks_ui/src/attachments/index.dart';
 import 'package:shared/shared.dart';
 import 'package:sprung/sprung.dart';
 import 'package:url_launcher/url_launcher.dart';

@@ -1,10 +1,7 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion_blocks_ui/src/blocks_settings.dart';
-import 'package:conexion_blocks_ui/src/post_large/index.dart';
-import 'package:conexion_blocks_ui/src/user_profile/index.dart';
-import 'package:conexion_blocks_ui/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:con_blocks/con_blocks.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:shared/shared.dart';
 
 class PostHeader extends StatelessWidget {

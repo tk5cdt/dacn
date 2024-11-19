@@ -1,6 +1,6 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 
 class FollowButton extends StatelessWidget {
   const FollowButton({

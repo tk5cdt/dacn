@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
+import 'package:conexion_blocks_ui/src/blur_hash_image_placeholder.dart';
 import 'package:shared/shared.dart';
 import 'package:video_player/video_player.dart';
 

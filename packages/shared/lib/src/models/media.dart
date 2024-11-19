@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:shared/shared.dart';
-import 'package:shared/src/models/video.dart';
 
 /// Deserializes and serializes [Media] instances.
 class ListMediaConverterFromDb extends JsonConverter<List<Media>, String> {
