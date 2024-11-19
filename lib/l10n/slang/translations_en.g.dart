@@ -37,18 +37,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final Translations _root = this; // ignore: unused_field
 
 	// Translations
-  TextSpan likedBy(
-          {required InlineSpan name,
-          required InlineSpan and,
-          required InlineSpan others}) =>
-      TextSpan(children: [
-        const TextSpan(text: 'Liked by '),
-        name,
-        const TextSpan(text: ' '),
-        and,
-        const TextSpan(text: ' '),
-        others,
-      ]);
+	String likedBy_rich({required Object name, required Object and, required Object others}) => 'Liked by ${name} ${and} ${others}';
 }
 
 /// Flat map(s) containing all translations.

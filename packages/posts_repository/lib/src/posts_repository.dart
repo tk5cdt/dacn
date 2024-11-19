@@ -33,7 +33,7 @@ class PostsRepository extends PostsBaseRepository {
     required String id,
     bool post = true,
   }) =>
-      _databaseClient.like(id: id, post: post);    
+      _databaseClient.like(id: id, post: post);
 
   @override
   Future<Post?> createPost({
@@ -50,7 +50,7 @@ class PostsRepository extends PostsBaseRepository {
   @override
   Future<String?> deletePost({required String id}) =>
       _databaseClient.deletePost(id: id);
-      
+
   @override
   Stream<bool> isLiked({
     required String id,
@@ -77,10 +77,70 @@ class PostsRepository extends PostsBaseRepository {
     String? caption,
   }) =>
       _databaseClient.updatePost(id: id, caption: caption);
-      
+
   @override
   Stream<int> commentsAmountOf({required String postId}) =>
       _databaseClient.commentsAmountOf(postId: postId);
+
+  @override
+  Stream<List<Comment>> commentsOf({required String postId}) =>
+      _databaseClient.commentsOf(postId: postId);
+
+  @override
+  Future<void> createComment({
+    required String content,
+    required String postId,
+    required String userId,
+    String? repliedToCommentId,
+  }) =>
+      _databaseClient.createComment(
+        content: content,
+        postId: postId,
+        userId: userId,
+        repliedToCommentId: repliedToCommentId,
+      );
+
+  @override
+  Future<void> deleteComment({required String id}) =>
+      _databaseClient.deleteComment(id: id);
+
+  @override
+  Stream<List<Comment>> repliedCommentsOf({required String commentId}) =>
+      _databaseClient.repliedCommentsOf(commentId: commentId);
+
+  @override
+  Future<void> sharePost({
+    required String id,
+    required User sender,
+    required User receiver,
+    required Message sharedPostMessage,
+    Message? message,
+    PostAuthor? postAuthor,
+  }) =>
+      _databaseClient.sharePost(
+        id: id,
+        sender: sender,
+        sharedPostMessage: sharedPostMessage,
+        message: message,
+        receiver: receiver,
+        postAuthor: postAuthor,
+      );
+
+  @override
+  Future<Post?> getPostBy({required String id}) =>
+      _databaseClient.getPostBy(id: id);
+
+  @override
+  Future<List<User>> getPostLikers({
+    required String postId,
+    int limit = 30,
+    int offset = 0,
+  }) =>
+      _databaseClient.getPostLikers(
+        postId: postId,
+        limit: limit,
+        offset: offset,
+      );
 
   @override
   Future<List<User>> getPostLikersInFollowings({
@@ -94,7 +154,7 @@ class PostsRepository extends PostsBaseRepository {
         offset: offset,
       );
 
-    /// Returns a list of recommended posts.
+  /// Returns a list of recommended posts.
   static final recommendedPosts = <PostLargeBlock>[
     PostLargeBlock(
       id: uuid.v4(),
@@ -286,5 +346,5 @@ class PostsRepository extends PostsBaseRepository {
       ],
       caption: 'Hello world!',
     ),
-  ].withNavigateToPostAuthorAction;    
+  ].withNavigateToPostAuthorAction;
 }

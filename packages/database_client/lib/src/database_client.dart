@@ -174,6 +174,44 @@ abstract class PostsBaseRepository {
 
   /// Updates the post with provided [id] and optional parameters to update.
   Future<Post?> updatePost({required String id, String? caption});
+
+  /// Returns a stream of comments of the post identified by [postId].
+  Stream<List<Comment>> commentsOf({required String postId});
+
+  /// Returns a stream of replied comments of the comment identified by
+  /// [commentId].
+  Stream<List<Comment>> repliedCommentsOf({required String commentId});
+
+  /// Created a comment with provided details.
+  Future<void> createComment({
+    required String content,
+    required String postId,
+    required String userId,
+    String? repliedToCommentId,
+  });
+
+  /// Delete the comment by associated [id].
+  Future<void> deleteComment({required String id});
+
+  /// Shares the post with the user identified by [receiver].
+  Future<void> sharePost({
+    required String id,
+    required User sender,
+    required User receiver,
+    required Message sharedPostMessage,
+    Message? message,
+    PostAuthor? postAuthor,
+  });
+
+  /// Reads the associated post from the database by the [id].
+  Future<Post?> getPostBy({required String id});
+
+  /// Fetches the profiles of users who liked post, found by [postId].
+  Future<List<User>> getPostLikers({
+    required String postId,
+    int limit = 30,
+    int offset = 0,
+  });
 }
 
 /// {@template database_client}
@@ -1209,6 +1247,229 @@ LIMIT ?2 OFFSET ?3
       [currentUserId, limit, offset],
     );
 
+    return result.safeMap(User.fromJson).toList(growable: false);
+  }
+
+  @override
+  Stream<List<Comment>> commentsOf({required String postId}) =>
+      _powerSyncRepository.db().watch(
+        '''
+SELECT 
+  c1.*,
+  p.avatar_url as avatar_url,
+  p.username as username,
+  p.full_name as full_name,
+  COUNT(c2.id) AS replies
+FROM 
+  comments c1
+  INNER JOIN
+    profiles p ON p.id = c1.user_id
+  LEFT JOIN
+    comments c2 ON c1.id = c2.replied_to_comment_id
+WHERE
+  c1.post_id = ? AND c1.replied_to_comment_id IS NULL
+GROUP BY
+    c1.id, p.avatar_url, p.username, p.full_name
+ORDER BY created_at ASC
+''',
+        parameters: [postId],
+      ).map(
+        (result) => result.safeMap(Comment.fromRow).toList(growable: false),
+      );
+
+  @override
+  Future<void> createComment({
+    required String postId,
+    required String userId,
+    required String content,
+    String? repliedToCommentId,
+  }) =>
+      _powerSyncRepository.db().execute(
+        '''
+INSERT INTO
+  comments(id, post_id, user_id, content, created_at, replied_to_comment_id)
+VALUES(uuid(), ?, ?, ?, ?, ?)
+''',
+        [
+          postId,
+          userId,
+          content,
+          DateTime.timestamp().toIso8601String(),
+          repliedToCommentId,
+        ],
+      );
+
+  @override
+  Future<void> deleteComment({required String id}) =>
+      _powerSyncRepository.db().execute(
+        '''
+DELETE FROM comments
+WHERE id = ?
+''',
+        [id],
+      );
+
+  @override
+  Future<Post?> getPostBy({required String id}) async {
+    final row = await _powerSyncRepository.db().getOptional(
+      '''
+SELECT
+  posts.*,
+  p.id as user_id,
+  p.avatar_url as avatar_url,
+  p.username as username,
+  p.full_name as full_name
+FROM
+  posts
+  join profiles p on posts.user_id = p.id 
+WHERE posts.id = ?
+  ''',
+      [id],
+    );
+    if (row == null) return null;
+    return Post.fromJson(Map<String, dynamic>.from(row));
+  }
+
+  @override
+  Future<void> sharePost({
+    required String id,
+    required User sender,
+    required User receiver,
+    required Message sharedPostMessage,
+    Message? message,
+    PostAuthor? postAuthor,
+  }) async {
+    final exists = await _powerSyncRepository.db().execute(
+      '''
+SELECT 1 FROM posts WHERE id = ?
+''',
+      [id],
+    );
+    if (exists.isEmpty) return;
+    final conversation = await _powerSyncRepository.db().execute(
+      '''
+SELECT conversation_id
+  FROM participants
+WHERE user_id = ?
+  AND conversation_id IN (
+      SELECT conversation_id
+      FROM participants
+      WHERE user_id = ?
+    );
+''',
+      [sender.id, receiver.id],
+    );
+    if (conversation.isNotEmpty) {
+      final chatId = conversation.first['conversation_id'] as String;
+      await Future.wait([
+        sendMessage(
+          chatId: chatId,
+          sender: sender,
+          receiver: receiver,
+          message: sharedPostMessage,
+          postAuthor: postAuthor,
+        ),
+        if (message != null)
+          sendMessage(
+            chatId: chatId,
+            sender: sender,
+            receiver: receiver,
+            message: message,
+          ),
+      ]);
+      return;
+    }
+    final newChatId = uuid.v4();
+    final createdConversation = _powerSyncRepository.db().execute(
+      '''
+insert into
+  conversations (id, type, name, created_at, updated_at)
+values
+  (?, ?, '', ?, ?)
+''',
+      [newChatId, ChatType.oneOnOne.value, JiffyX.now(), JiffyX.now()],
+    );
+    final addParticipant1 = _powerSyncRepository.db().execute(
+      '''
+insert into
+  participants (id, user_id, conversation_id)
+  values
+  (?, ?, ?)
+  ''',
+      [uuid.v4(), sender.id, newChatId],
+    );
+    final addParticipant2 = _powerSyncRepository.db().execute(
+      '''
+insert into
+  participants (id, user_id, conversation_id)
+  values
+  (?, ?, ?)
+  ''',
+      [uuid.v4(), receiver.id, newChatId],
+    );
+    await createdConversation
+        .whenComplete(() => Future.wait([addParticipant1, addParticipant2]));
+
+    await Future.wait([
+      sendMessage(
+        chatId: newChatId,
+        sender: sender,
+        receiver: receiver,
+        message: sharedPostMessage,
+        postAuthor: postAuthor,
+      ),
+      if (message != null)
+        sendMessage(
+          chatId: newChatId,
+          sender: sender,
+          receiver: receiver,
+          message: message,
+        ),
+    ]);
+  }
+
+  @override
+  Stream<List<Comment>> repliedCommentsOf({required String commentId}) =>
+      _powerSyncRepository.db().watch(
+        '''
+SELECT 
+  c1.*,
+  p.avatar_url as avatar_url,
+  p.username as username,
+  p.full_name as full_name
+FROM 
+  comments c1
+  INNER JOIN
+    profiles p ON p.id = c1.user_id
+WHERE
+  c1.replied_to_comment_id = ? 
+GROUP BY
+    c1.id, p.avatar_url, p.username, p.full_name
+ORDER BY created_at ASC
+''',
+        parameters: [commentId],
+      ).map(
+        (result) => result.safeMap(Comment.fromRow).toList(growable: false),
+      );
+
+  @override
+  Future<List<User>> getPostLikers({
+    required String postId,
+    int limit = 30,
+    int offset = 0,
+  }) async {
+    final result = await _powerSyncRepository.db().getAll(
+      '''
+SELECT up.id, up.username, up.full_name, up.avatar_url
+FROM profiles up
+INNER JOIN likes l ON up.id = l.user_id
+INNER JOIN posts p ON l.post_id = p.id
+WHERE p.post_id ?
+LIMIT ? OFFSET ?
+''',
+      [postId, limit, offset],
+    );
+    if (result.isEmpty) return [];
     return result.safeMap(User.fromJson).toList(growable: false);
   }
 }
