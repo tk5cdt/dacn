@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion/feed/post/video/video.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/search/search.dart';
 import 'package:conexion/timeline/timeline.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart' hide VideoPlayer;
 import 'package:flutter/material.dart';
@@ -45,14 +46,14 @@ class TimelineView extends StatelessWidget {
               deltaTop < (0.5 * vpHeight) + 220.0 &&
               deltaBottom > (0.5 * vpHeight) - 220.0,
           slivers: [
-            // const SliverAppBar(
-            //   title: SearchInputField(
-            //     active: true,
-            //     readOnly: true,
-            //   ),
-            //   floating: true,
-            //   toolbarHeight: 64,
-            // ),
+            const SliverAppBar(
+              title: SearchInputField(
+                active: true,
+                readOnly: true,
+              ),
+              floating: true,
+              toolbarHeight: 64,
+            ),
             BlocBuilder<TimelineBloc, TimelineState>(
               buildWhen: (previous, current) {
                 if (previous.status == TimelineStatus.populated &&

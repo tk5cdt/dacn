@@ -7,6 +7,7 @@ import 'package:conexion/app/home/home.dart';
 import 'package:conexion/app/routes/app_routes.dart';
 import 'package:conexion/auth/view/auth_page.dart';
 import 'package:conexion/feed/feed.dart';
+import 'package:conexion/search/search.dart';
 import 'package:conexion/timeline/view/timeline_page.dart';
 import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion/user_profile/widgets/user_profile_create_post.dart';
@@ -125,21 +126,21 @@ GoRouter router(AppBloc appBloc) {
                     },
                   );
                 },
-                // routes: [
-                //   GoRoute(
-                //     name: AppRoutes.search.name,
-                //     path: AppRoutes.search.name,
-                //     parentNavigatorKey: _rootNavigatorKey,
-                //     pageBuilder: (context, state) {
-                //       final withResult = state.extra as bool?;
+                routes: [
+                  GoRoute(
+                    name: AppRoutes.search.name,
+                    path: AppRoutes.search.name,
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      final withResult = state.extra as bool?;
 
-                //       return NoTransitionPage(
-                //         key: state.pageKey,
-                //         child: SearchPage(withResult: withResult),
-                //       );
-                //     },
-                //   ),
-                // ],
+                      return NoTransitionPage(
+                        key: state.pageKey,
+                        child: SearchPage(withResult: withResult),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

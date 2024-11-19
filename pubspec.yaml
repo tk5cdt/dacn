@@ -62,12 +62,15 @@ dependencies:
   supabase_authentication_client:
     path: packages/authentication_client/supabase_authentication_client
   supabase_flutter: ^2.6.0
+  search_repository:
+    path: packages/search_repository
   timeago: ^3.7.0
   token_storage:
     path: packages/authentication_client/token_storage
   user_repository:
     path: packages/user_repository
   video_player_platform_interface_extra: ^5.0.1+1
+  provider: ^6.1.2
 description: A Very Good Project created by Very Good CLI.
 dev_dependencies:
   bloc_test: ^9.1.7
