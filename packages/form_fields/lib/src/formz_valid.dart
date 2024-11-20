@@ -11,7 +11,7 @@ class FormzValid with FormzMixin {
   final List<FormzInput<dynamic, dynamic>> _inputs;
 
   /// Returns `true` if all inputs are valid. Otherwise, returns `false`.
-  bool get isFormValid => isValid;
+  bool get isFormValid => status == FormzStatus.valid;
 
   @override
   List<FormzInput<dynamic, dynamic>> get inputs => _inputs;

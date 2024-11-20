@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:form_fields/form_fields.dart';
 import 'package:shared/shared.dart';
-import 'package:supabase_authentication_client/supabase_authentication_client.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:user_repository/user_repository.dart';
 
 part 'change_password_state.dart';
@@ -46,7 +42,7 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   void onOtpChanged(String newValue) {
     final previousScreenState = state;
     final previousOtpState = previousScreenState.otp;
-    final shouldValidate = previousOtpState.isValid;
+    final shouldValidate = previousOtpState.invalid;
     final newOtpState = shouldValidate
         ? Otp.dirty(
             newValue,
@@ -69,7 +65,7 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
     final previousPasswordState = previousScreenState.password;
     final previousPasswordValue = previousPasswordState.value;
 
-    final newPasswordState = Password.validated(
+    final newPasswordState = Password.dirty(
       previousPasswordValue,
     );
     final newScreenState = previousScreenState.copyWith(
@@ -82,12 +78,12 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   void onPasswordChanged(String newValue) {
     final previousScreenState = state;
     final previousPasswordState = previousScreenState.password;
-    final shouldValidate = previousPasswordState.isValid;
+    final shouldValidate = previousPasswordState.invalid;
     final newPasswordState = shouldValidate
-        ? Password.validated(
+        ? Password.dirty(
             newValue,
           )
-        : Password.unvalidated(
+        : Password.pure(
             newValue,
           );
 
@@ -99,9 +95,10 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
   }
 
   Future<void> onSubmit({required String email}) async {
-    final password = Password.validated(state.password.value);
+    final password = Password.dirty(state.password.value);
     final otp = Otp.dirty(state.otp.value);
     final isFormValid = FormzValid([password, otp]).isFormValid;
+
     final newState = state.copyWith(
       password: password,
       otp: otp,
@@ -118,23 +115,9 @@ class ChangePasswordCubit extends Cubit<ChangePasswordState> {
         token: state.otp.value,
         newPassword: state.password.value,
       );
-
-      emit(state.copyWith(status: ChangePasswordStatus.success));
     } catch (error, stackTrace) {
-      __errorFormatter(error, stackTrace);
+      addError(error, stackTrace);
+      emit(state.copyWith(status: ChangePasswordStatus.invalidOtp));
     }
-  }
-
-  void __errorFormatter(Object error, StackTrace stackTrace) {
-    addError(error, stackTrace);
-    final status = switch (error) {
-      ResetPasswordFailure(:final AuthException error) => switch (
-            error.statusCode?.parse) {
-          HttpStatus.unauthorized => ChangePasswordStatus.invalidOtp,
-          _ => ChangePasswordStatus.failure,
-        },
-      _ => ChangePasswordStatus.failure,
-    };
-    emit(state.copyWith(status: status));
   }
 }

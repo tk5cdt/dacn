@@ -1,7 +1,7 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:conexion/auth/forgot_password/view/forgot_password_page.dart';
 import 'package:conexion/l10n/l10n.dart';
-import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 
 class ForgotPasswordButton extends StatelessWidget {
@@ -9,7 +9,7 @@ class ForgotPasswordButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tappable(
+    return Tappable.faded(
       throttle: true,
       throttleDuration: 650.ms,
       onTap: () {

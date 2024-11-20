@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 /// Changes screen from forgot to change password or reversed.
 /// {@endtemplate}
 class ManagePasswordCubit extends Cubit<bool> {
+  /// {@macro manage_password_cubit}
   ManagePasswordCubit() : super(true);
 
   /// Defines method to change screen from forgot to change password or

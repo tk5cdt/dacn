@@ -1,7 +1,7 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:flutter/material.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared/shared.dart';
 
@@ -92,7 +92,9 @@ class _PostsItemControllerState extends State<_PostsItemController> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      widget.itemScrollController.jumpTo(index: widget.index);
+      if (widget.itemScrollController != null) {
+        widget.itemScrollController.jumpTo(index: widget.index);
+      }
     });
   }
 
@@ -129,29 +131,35 @@ class EmptyPosts extends StatelessWidget {
   final Widget? child;
   final bool isSliver;
 
-  Widget empty(BuildContext context) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox.square(
-            dimension: 92,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: context.adaptiveColor, width: 2),
-                shape: BoxShape.circle,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: FittedBox(child: Icon(icon)),
-              ),
+  Widget empty(BuildContext context) {
+    String noPostsText;
+    try {
+      noPostsText = BlockSettings().postTextDelegate.noPostsText;
+    } catch (e) {
+      noPostsText = 'Không có bài viết nào'; // Giá trị mặc định
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox.square(
+          dimension: 92,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(color: context.adaptiveColor, width: 2),
+              shape: BoxShape.circle,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: FittedBox(child: Icon(icon)),
             ),
           ),
-          Text(
-            text ?? BlockSettings().postTextDelegate.noPostsText,
-            style: context.headlineSmall,
-          ),
-          if (child != null) child!,
-        ].spacerBetween(height: AppSpacing.sm),
-      );
+        ),
+        Text(noPostsText, style: context.headlineSmall),
+        if (child != null) child!,
+      ].spacerBetween(height: AppSpacing.sm),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

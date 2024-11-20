@@ -1,17 +1,19 @@
 import 'package:equatable/equatable.dart' show EquatableMixin;
-import 'package:form_fields/form_fields.dart';
+import 'package:flutter/foundation.dart' show immutable;
+import 'package:form_fields/src/formz_validation_mixin.dart';
 import 'package:formz/formz.dart';
 
 /// {@template email}
 /// Formz input for email. It can be empty or invalid.
 /// {@endtemplate}
+@immutable
 class Email extends FormzInput<String, EmailValidationError>
     with EquatableMixin, FormzValidationMixin {
   /// {@macro email.pure}
-  const Email.unvalidated([super.value = '']) : super.pure();
+  const Email.pure([super.value = '']) : super.pure();
 
   /// {@macro email.dirty}
-  const Email.validated(super.value) : super.dirty();
+  const Email.dirty(super.value) : super.dirty();
 
   static final _emailRegex = RegExp(
     r'^(([\w-]+\.)+[\w-]+|([a-zA-Z]|[\w-]{2,}))@((([0-1]?'
@@ -30,17 +32,13 @@ class Email extends FormzInput<String, EmailValidationError>
   /// Email validation errors message
   @override
   Map<EmailValidationError?, String?> get validationErrorMessage => {
-        EmailValidationError.empty: '',
         EmailValidationError.empty: 'This field is required',
         EmailValidationError.invalid: 'Email is not correct',
         null: null,
       };
 
   @override
-  List<Object> get props => [isPure, value];
-
-  // ignore: public_member_api_docs
-  bool get invalid => validator(value) != null;
+  List<Object> get props => [pure, value];
 }
 
 /// Validation errors for [Email]. It can be empty, invalid or already

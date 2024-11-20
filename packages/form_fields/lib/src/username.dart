@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart' show EquatableMixin;
+import 'package:flutter/foundation.dart' show immutable;
 import 'package:form_fields/src/formz_validation_mixin.dart';
 import 'package:formz/formz.dart' show FormzInput;
 
@@ -6,13 +7,14 @@ import 'package:formz/formz.dart' show FormzInput;
 /// Form input for a name. It extends [FormzInput] and uses
 /// [UsernameValidationError] for its validation errors.
 /// {@endtemplate}
+@immutable
 class Username extends FormzInput<String, UsernameValidationError>
     with EquatableMixin, FormzValidationMixin {
   /// {@macro name.pure}
-  const Username.unvalidated([super.value = '']) : super.pure();
+  const Username.pure([super.value = '']) : super.pure();
 
   /// {@macro name.dirty}
-  const Username.validated(super.value) : super.dirty();
+  const Username.dirty(super.value) : super.dirty();
 
   static final _nameRegex = RegExp(r'^[a-zA-Z0-9_.]{3,16}$');
 
@@ -33,7 +35,7 @@ class Username extends FormzInput<String, UsernameValidationError>
       };
 
   @override
-  List<Object?> get props => [value, isPure];
+  List<Object?> get props => [value, pure];
 }
 
 /// Validation errors for [Username]. It can be empty or invalid.

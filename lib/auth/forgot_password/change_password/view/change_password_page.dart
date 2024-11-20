@@ -1,12 +1,12 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/auth/cubit/manage_password_cubit.dart';
-import 'package:conexion/auth/forgot_password/change_password/widgets/change_password_button.dart';
-import 'package:conexion/auth/forgot_password/change_password/widgets/change_password_form.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/auth/cubit/manage_password_cubit.dart';
+import 'package:conexion/auth/forgot_password/change_password/change_password.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:shared/shared.dart';
 
 class ChangePasswordView extends StatelessWidget {
   const ChangePasswordView({super.key});
@@ -40,19 +40,18 @@ class ChangePasswordView extends StatelessWidget {
         ),
         releaseFocus: true,
         resizeToAvoidBottomInset: true,
-        body: const AppConstrainedScrollView(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.xlg),
+        body: AppConstrainedScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xlg),
           child: Column(
             children: [
-              Gap.v(AppSpacing.xxxlg * 3),
+              const Gap.v(AppSpacing.xxxlg * 3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    ChangePasswordForm(),
-                    Gap.v(AppSpacing.xs * 3),
-                    Align(child: ChangePasswordButton()),
-                  ],
+                    const ChangePasswordForm(),
+                    const Align(child: ChangePasswordButton()),
+                  ].spacerBetween(height: AppSpacing.md),
                 ),
               ),
             ],
