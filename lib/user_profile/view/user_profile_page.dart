@@ -334,13 +334,15 @@ class _UserPostsPageState extends State<UserPostsPage>
           initialData: const <PostBlock>[],
           stream: bloc.userPosts(),
           errorBuilder: (context, error) {
-            print('Error loading posts: $error');
+            print('-------------------------------Error loading posts: $error');
             return const SizedBox.shrink();
           },
           comparator: const ListEquality<PostBlock>().equals,
           builder: (context, blocks) {
             if (blocks.isEmpty && widget.sponsoredPost == null) {
-              return const EmptyPosts();
+              return SliverToBoxAdapter(
+                child: EmptyPosts(isSliver: false),
+              );
             }
             return SliverGrid.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
