@@ -1,10 +1,10 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/app/view/app.dart';
-import 'package:conexion/auth/forgot_password/cubit/forgot_password_cubit.dart';
-import 'package:conexion/auth/forgot_password/widgets/forgot_password_email_field.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/auth/forgot_password/forgot_password.dart';
+import 'package:conexion/auth/forgot_password/widgets/widgets.dart';
+import 'package:conexion/l10n/l10n.dart';
 
 class ForgotPasswordForm extends StatelessWidget {
   const ForgotPasswordForm({super.key});
@@ -31,7 +31,7 @@ class ForgotPasswordForm extends StatelessWidget {
           );
         }
       },
-      listenWhen: (previous, current) => previous.status != current.status,
+      listenWhen: (p, c) => p.status != c.status,
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

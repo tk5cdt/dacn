@@ -1,67 +1,89 @@
 import 'package:chats_repository/chats_repository.dart';
-import 'package:conexion/app/app.dart';
-import 'package:conexion/app/di/di.dart';
-import 'package:conexion/bootstrap.dart';
-import 'package:conexion/firebase_options_prod.dart';
 import 'package:database_client/database_client.dart';
 import 'package:env/env.dart';
+import 'package:firebase_notifications_client/firebase_notifications_client.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/bootstrap.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:notifications_repository/notifications_repository.dart';
+import 'package:persistent_storage/persistent_storage.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:search_repository/search_repository.dart';
 import 'package:shared/shared.dart';
+// import 'package:stories_repository/stories_repository.dart';
 import 'package:supabase_authentication_client/supabase_authentication_client.dart';
 import 'package:token_storage/token_storage.dart';
 import 'package:user_repository/user_repository.dart';
 
 void main() {
   bootstrap(
+    appFlavor: AppFlavor.production(),
     (
       powerSyncRepository,
+      firebaseMessaging,
+      sharedPreferences,
       firebaseRemoteConfigRepository,
     ) async {
+      final firebaseNotificationsClient =
+          FirebaseNotificationsClient(firebaseMessaging: firebaseMessaging);
+
+      final notificationsRepository = NotificationsRepository(
+        notificationsClient: firebaseNotificationsClient,
+      );
+
       final tokenStorage = InMemoryTokenStorage();
 
-      final iOSClientId = getIt<AppFlavor>().getEnv(Env.iOSClientId);
-      final webClientId = getIt<AppFlavor>().getEnv(Env.webClientId);
+      final appFlavor = AppFlavor.production();
+      final iosClientId = appFlavor.getEnv(Env.iOSClientId);
+      final webClientId = appFlavor.getEnv(Env.webClientId);
+      final googleSignIn =
+          GoogleSignIn(clientId: iosClientId, serverClientId: webClientId);
 
-      final googleSignIn = GoogleSignIn(
-        clientId: iOSClientId,
-        serverClientId: webClientId,
-      );
-      final supabaseAuthenticationClient = SupabaseAuthenticationClient(
+      final authenticationClient = SupabaseAuthenticationClient(
         powerSyncRepository: powerSyncRepository,
         tokenStorage: tokenStorage,
         googleSignIn: googleSignIn,
       );
 
+      final databaseClient =
+          PowerSyncDatabaseClient(powerSyncRepository: powerSyncRepository);
+
+      final persistentStorage =
+          PersistentStorage(sharedPreferences: sharedPreferences);
+
+      // final storiesStorage = StoriesStorage(storage: persistentStorage);
+
+      final userRepository = UserRepository(
+        databaseClient: databaseClient,
+        authenticationClient: authenticationClient,
+      );
+
+      final searchRepository = SearchRepository(databaseClient: databaseClient);
+
+      final postsRepository = PostsRepository(databaseClient: databaseClient);
+
+      final chatsRepository = ChatsRepository(databaseClient: databaseClient);
+
+      // final storiesRepository = StoriesRepository(
+      //   databaseClient: databaseClient,
+      //   storage: storiesStorage,
+      // );
+
       final powerSyncDatabaseClient = PowerSyncDatabaseClient(
         powerSyncRepository: powerSyncRepository,
       );
 
-      final chatsRepository = ChatsRepository(
-        databaseClient: powerSyncDatabaseClient,
-      );
-
-      final userRepository = UserRepository(
-        databaseClient: powerSyncDatabaseClient,
-        authenticationClient: supabaseAuthenticationClient,
-      );
-      final searchRepository =
-          SearchRepository(databaseClient: powerSyncDatabaseClient);
-      final postRepository = PostsRepository(
-        databaseClient: powerSyncDatabaseClient,
-      );
       return App(
-        user: await userRepository.user.first,
         userRepository: userRepository,
-        postsRepository: postRepository,
+        postsRepository: postsRepository,
         chatsRepository: chatsRepository,
+        // storiesRepository: storiesRepository,
         searchRepository: searchRepository,
+        notificationsRepository: notificationsRepository,
         firebaseRemoteConfigRepository: firebaseRemoteConfigRepository,
+        user: await userRepository.user.first,
         databaseClient: powerSyncDatabaseClient,
       );
     },
-    appFlavor: AppFlavor.production(),
-    firebaseOptions: DefaultFirebaseOptions.currentPlatform,
   );
 }

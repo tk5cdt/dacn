@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart' show EquatableMixin;
+import 'package:flutter/foundation.dart' show immutable;
 import 'package:form_fields/src/formz_validation_mixin.dart';
 import 'package:formz/formz.dart' show FormzInput;
 
@@ -6,13 +7,14 @@ import 'package:formz/formz.dart' show FormzInput;
 /// Form input for a full name. It extends [FormzInput] and uses
 /// [FullNameValidationError] for its validation errors.
 /// {@endtemplate}
+@immutable
 class FullName extends FormzInput<String, FullNameValidationError>
     with EquatableMixin, FormzValidationMixin {
   /// {@macro full_name.pure}
-  const FullName.unvalidated([super.value = '']) : super.pure();
+  const FullName.pure([super.value = '']) : super.pure();
 
   /// {@macro full_name.dirty}
-  const FullName.validated(super.value) : super.dirty();
+  const FullName.dirty(super.value) : super.dirty();
 
   // static final _nameRegex = RegExp(r'^[A-Z][a-zA-Z]*(?: [A-Z][a-zA-Z]*)?$');
 
@@ -31,7 +33,7 @@ class FullName extends FormzInput<String, FullNameValidationError>
       };
 
   @override
-  List<Object?> get props => [value, isPure];
+  List<Object?> get props => [value, pure];
 }
 
 /// Validation errors for [FullName]. It can be empty or invalid.

@@ -10,7 +10,7 @@ import 'package:formz/formz.dart';
 /// - [validationErrorMessage] map that contains error messages for each [E]
 mixin FormzValidationMixin<T, E> on FormzInput<T, E> {
   /// Returns the validation error if the input is invalid.
-  E? get validationError => isValid ? error : null;
+  E? get validationError => invalid ? error : null;
 
   /// Returns email error text based on [E].
   String? get errorMessage => validationErrorMessage[validationError];

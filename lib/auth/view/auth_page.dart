@@ -1,10 +1,9 @@
 import 'package:animations/animations.dart';
-import 'package:app_ui/app_ui.dart';
-import 'package:conexion/auth/cubit/auth_cubit.dart';
-import 'package:conexion/auth/login/view/login_page.dart';
-import 'package:conexion/auth/signup/view/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/auth/cubit/auth_cubit.dart';
+import 'package:conexion/auth/login/login.dart';
+import 'package:conexion/auth/sign_up/sign_up.dart';
 
 /// {@template auth_page}
 /// Auth page. Shows login or signup page depending on the state of `AuthCubit`.

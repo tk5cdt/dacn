@@ -1,15 +1,34 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/app/view/app.dart';
-import 'package:conexion/auth/forgot_password/change_password/view/change_password_page.dart';
-import 'package:conexion/auth/login/cubit/login_cubit.dart';
-import 'package:conexion/auth/login/widgets/email_form_field.dart';
-import 'package:conexion/auth/login/widgets/password_form_field.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/auth/login/cubit/login_cubit.dart';
+import 'package:conexion/auth/login/widgets/widgets.dart';
+import 'package:shared/shared.dart';
 
-class LoginForm extends StatelessWidget {
+/// {@template login_form}
+/// Login form that contains email and password fields.
+/// {@endtemplate}
+class LoginForm extends StatefulWidget {
+  /// {@macro login_form}
   const LoginForm({super.key});
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<LoginCubit>().resetState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<LoginCubit>().resetState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +37,7 @@ class LoginForm extends StatelessWidget {
         if (state.status.isError) {
           openSnackbar(
             SnackbarMessage.error(
-              title: loginSubmissionStatusMessage[state.status]?.title ??
-              state.message ??
-              context.l10n.somethingWentWrongText,
+              title: loginSubmissionStatusMessage[state.status]!.title,
               description:
                   loginSubmissionStatusMessage[state.status]?.description,
             ),
@@ -28,13 +45,13 @@ class LoginForm extends StatelessWidget {
           );
         }
       },
-      listenWhen: (previous, curent) => previous.status != curent.status,
-      child: const Column(
+      listenWhen: (p, c) => p.status != c.status,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EmailFormField(),
-          PasswordFormField(),
-        ],
+          const EmailTextField(),
+          const PasswordTextField(),
+        ].spacerBetween(height: AppSpacing.md),
       ),
     );
   }

@@ -21,7 +21,7 @@ class ForgotPasswordState extends Equatable {
   const ForgotPasswordState.initial()
       : this._(
           status: ForgotPasswordStatus.initial,
-          email: const Email.unvalidated(),
+          email: const Email.pure(),
         );
 
   final ForgotPasswordStatus status;

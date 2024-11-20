@@ -254,7 +254,7 @@ class PowerSyncDatabaseClient
   Stream<User> profile({required String userId}) =>
       _powerSyncRepository.db().watch(
         '''
-        select * from profile where id = ?
+        select * from profiles where id = ?
       ''',
         parameters: [userId],
       ).map(

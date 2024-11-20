@@ -1,4 +1,3 @@
-// import 'package:equatable/equatable.dart';
 part of 'login_cubit.dart';
 
 /// [LoginErrorMessage] is a type alias for [String] that is used to indicate
@@ -48,9 +47,7 @@ enum LogInSubmissionStatus {
   /// [LogInSubmissionStatus.googleLogInFailure] indicates that some went
   /// wrong during google login process.
   googleLogInFailure;
-}
 
-extension SubmissionStatusX on LogInSubmissionStatus {
   bool get isSuccess => this == LogInSubmissionStatus.success;
   bool get isLoading => this == LogInSubmissionStatus.loading;
   bool get isGoogleAuthInProgress =>
@@ -72,7 +69,7 @@ extension SubmissionStatusX on LogInSubmissionStatus {
 /// [LoginState] holds all the information related to user login process.
 /// It is used to determine current state of user login process.
 /// {@endtemplate}
-class LoginState extends Equatable {
+class LoginState {
   /// {@macro login_state}
   const LoginState._({
     required this.status,
@@ -88,15 +85,15 @@ class LoginState extends Equatable {
           status: LogInSubmissionStatus.idle,
           message: '',
           showPassword: false,
-          email: const Email.unvalidated(),
-          password: const Password.unvalidated(),
+          email: const Email.pure(),
+          password: const Password.pure(),
         );
 
   final LogInSubmissionStatus status;
   final Email email;
   final Password password;
   final bool showPassword;
-  final LoginErrorMessage? message;
+  final LoginErrorMessage message;
 
   LoginState copyWith({
     LogInSubmissionStatus? status,
@@ -113,9 +110,6 @@ class LoginState extends Equatable {
       password: password ?? this.password,
     );
   }
-
-  @override
-  List<Object?> get props => [status, email, password, showPassword, message];
 }
 
 final loginSubmissionStatusMessage =
