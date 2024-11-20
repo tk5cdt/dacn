@@ -25,7 +25,7 @@ class ChatInboxTile extends StatelessWidget {
       onTap: () => context.pushNamed(
         'chat',
         pathParameters: {'chat_id': chat.id},
-        queryParameters: {'chat': chat.toJson()},
+        extra: ChatProps(chat: chat)
       ),
       onLongPress: () => context.confirmAction(
         title: context.l10n.deleteChatText,

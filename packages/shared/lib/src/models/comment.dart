@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
-import 'package:shared/shared.dart';
 
 part 'comment.g.dart';
 
