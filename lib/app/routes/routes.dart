@@ -6,6 +6,7 @@ import 'package:conexion/app/app.dart';
 import 'package:conexion/app/home/home.dart';
 import 'package:conexion/app/routes/app_routes.dart';
 import 'package:conexion/auth/view/auth_page.dart';
+import 'package:conexion/chats/chat/chat.dart';
 import 'package:conexion/feed/feed.dart';
 import 'package:conexion/search/search.dart';
 import 'package:conexion/timeline/view/timeline_page.dart';
@@ -58,6 +59,29 @@ GoRouter router(AppBloc appBloc) {
               userId: userId,
               props: props ?? const UserProfileProps.build(),
             ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SharedAxisTransition(
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: SharedAxisTransitionType.horizontal,
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.chat.path!,
+        name: AppRoutes.chat.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final chatId = state.pathParameters['chat_id']!;
+          final props = state.extra! as ChatProps;
+
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: ChatPage(chatId: chatId, chat: props.chat),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               return SharedAxisTransition(
