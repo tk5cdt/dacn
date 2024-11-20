@@ -1,6 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion/app/app.dart';
+import 'package:conexion/comments/comments.dart';
 import 'package:conexion/feed/post/bloc/post_bloc.dart';
 import 'package:conexion/feed/post/video/video.dart';
 import 'package:conexion/user_profile/user_profile.dart';
@@ -120,86 +121,87 @@ class PostLargeView extends StatelessWidget {
         context.select((PostBloc bloc) => bloc.state.likersInFollowings);
 
     return PostLarge(
-      block: block,
-      isOwner: isOwner,
-      isLiked: isLiked,
-      likePost: () => bloc.add(const PostLikeRequested()),
-      likesCount: likesCount,
-      isFollowed: isOwner || (isFollowed ?? true),
-      follow: () =>
-          bloc.add(PostAuthorFollowRequested(authorId: block.author.id)),
-      enableFollowButton: true,
-      commentsCount: commentsCount,
-      postIndex: postIndex,
-      withInViewNotifier: withInViewNotifier,
-      likersInFollowings: likersInFollowings,
-      // postAuthorAvatarBuilder: (context, author, onAvatarTap) {
-      //   return UserStoriesAvatar(
-      //     resizeHeight: 108,
-      //     author: author.toUser,
-      //     onAvatarTap: onAvatarTap,
-      //     enableInactiveBorder: false,
-      //     withAdaptiveBorder: false,
-      //   );
-      // },
-      postOptionsSettings: isOwner
-          ? PostOptionsSettings.owner(
-              onPostEdit: (block) => context.pushNamed(
-                'post_edit',
-                pathParameters: {'post_id': block.id},
-                extra: block,
-              ),
-              onPostDelete: (_) {
-                bloc.add(const PostDeleteRequested());
-                context.read<FeedBloc>().add(
-                      FeedUpdateRequested(
-                        update: FeedPageUpdate(
-                          newPost: block.toPost,
-                          type: PageUpdateType.delete,
+        block: block,
+        isOwner: isOwner,
+        isLiked: isLiked,
+        likePost: () => bloc.add(const PostLikeRequested()),
+        likesCount: likesCount,
+        isFollowed: isOwner || (isFollowed ?? true),
+        follow: () =>
+            bloc.add(PostAuthorFollowRequested(authorId: block.author.id)),
+        enableFollowButton: true,
+        commentsCount: commentsCount,
+        postIndex: postIndex,
+        withInViewNotifier: withInViewNotifier,
+        likersInFollowings: likersInFollowings,
+        // postAuthorAvatarBuilder: (context, author, onAvatarTap) {
+        //   return UserStoriesAvatar(
+        //     resizeHeight: 108,
+        //     author: author.toUser,
+        //     onAvatarTap: onAvatarTap,
+        //     enableInactiveBorder: false,
+        //     withAdaptiveBorder: false,
+        //   );
+        // },
+        postOptionsSettings: isOwner
+            ? PostOptionsSettings.owner(
+                onPostEdit: (block) => context.pushNamed(
+                  'post_edit',
+                  pathParameters: {'post_id': block.id},
+                  extra: block,
+                ),
+                onPostDelete: (_) {
+                  bloc.add(const PostDeleteRequested());
+                  context.read<FeedBloc>().add(
+                        FeedUpdateRequested(
+                          update: FeedPageUpdate(
+                            newPost: block.toPost,
+                            type: PageUpdateType.delete,
+                          ),
                         ),
-                      ),
-                    );
-              },
-            )
-          : const PostOptionsSettings.viewer(),
-      onCommentsTap: (showFullSized) {
+                      );
+                },
+              )
+            : const PostOptionsSettings.viewer(),
+        onCommentsTap: (showFullSized) => context.showScrollableModal(
+              showFullSized: showFullSized,
+              pageBuilder: (scrollController, draggableScrollController) =>
+                  CommentsPage(
+                post: block,
+                scrollController: scrollController,
+                draggableScrollController: draggableScrollController,
+              ),
+            ),
+        onUserTap: (userId) => _navigateToPostAuthor(context, id: userId),
+        onPressed: (action) => _handleOnPostTap(context, action: action),
+        onPostShareTap: (postId, author) {},
+        videoPlayerBuilder: !withCustomVideoPlayer
+            ? null
+            : (_, media, aspectRatio, isInView) {
+                final videoPlayerState =
+                    VideoPlayerInheritedWidget.of(context).videoPlayerState;
 
-      },
-      onUserTap: (userId) => _navigateToPostAuthor(context, id: userId),
-      onPressed: (action) => _handleOnPostTap(context, action: action),
-      onPostShareTap: (postId, author) {
-
-      },
-      videoPlayerBuilder: !withCustomVideoPlayer
-          ? null
-          : (_, media, aspectRatio, isInView) {
-              final videoPlayerState = VideoPlayerInheritedWidget.of(context).videoPlayerState;
-
-              return VideoPlayerInViewNotifierWidget(
-                type: videoPlayerType, 
-                builder: (context, shouldPlay, child){
-                  final play = shouldPlay && isInView;
-                  return ValueListenableBuilder(
-                    valueListenable: videoPlayerState.withSound, 
-                    builder: (context, withSound, child){
-                      return InlineVideo(
-                        key: ValueKey(media.id),
-                        videoSettings: VideoSettings.build(
-                          videoUrl: media.url,
-                          shouldPlay: play,
-                          aspectRatio: aspectRatio,
-                          blurHash: media.blurHash,
-                          withSound: withSound,
-                          onSoundToggled: ({required enable}) => {
-                            videoPlayerState.withSound.value = enable,
-                          }
-                          )
-                        );
-                    }
-                    );
-                }
-                );
-          }
-    );
+                return VideoPlayerInViewNotifierWidget(
+                    type: videoPlayerType,
+                    builder: (context, shouldPlay, child) {
+                      final play = shouldPlay && isInView;
+                      return ValueListenableBuilder(
+                          valueListenable: videoPlayerState.withSound,
+                          builder: (context, withSound, child) {
+                            return InlineVideo(
+                                key: ValueKey(media.id),
+                                videoSettings: VideoSettings.build(
+                                    videoUrl: media.url,
+                                    shouldPlay: play,
+                                    aspectRatio: aspectRatio,
+                                    blurHash: media.blurHash,
+                                    withSound: withSound,
+                                    onSoundToggled: ({required enable}) => {
+                                          videoPlayerState.withSound.value =
+                                              enable,
+                                        }));
+                          });
+                    });
+              });
   }
 }
