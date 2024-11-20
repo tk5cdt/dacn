@@ -1,4 +1,3 @@
 export 'cubit/auth_cubit.dart';
-export 'login/login.dart';
-export 'signup/signup.dart' hide EmailFormField, PasswordFormField;
+export 'cubit/manage_password_cubit.dart';
 export 'view/auth_page.dart';

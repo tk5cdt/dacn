@@ -1,8 +1,8 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/auth/forgot_password/cubit/forgot_password_cubit.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/auth/forgot_password/forgot_password.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:shared/shared.dart';
 
 class ForgotPasswordEmailField extends StatefulWidget {
@@ -29,18 +29,9 @@ class _ForgotPasswordEmailFieldState extends State<ForgotPasswordEmailField> {
     });
   }
 
-  void _forcusNodeListener() {
-    if (!_focusNode.hasFocus) {
-      context.read<ForgotPasswordCubit>().onEmailUnfocused();
-    }
-  }
-
   @override
   void dispose() {
     _debouncer.dispose();
-    _focusNode
-      ..removeListener(_forcusNodeListener)
-      ..dispose();
     super.dispose();
   }
 
@@ -66,6 +57,5 @@ class _ForgotPasswordEmailFieldState extends State<ForgotPasswordEmailField> {
       ),
       errorText: emailError,
     );
-    
   }
 }

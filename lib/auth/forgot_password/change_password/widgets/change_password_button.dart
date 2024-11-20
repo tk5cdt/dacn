@@ -1,9 +1,9 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/auth/forgot_password/change_password/cubit/change_password_cubit.dart';
-import 'package:conexion/auth/forgot_password/cubit/forgot_password_cubit.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/auth/forgot_password/change_password/change_password.dart';
+import 'package:conexion/auth/forgot_password/forgot_password.dart';
+import 'package:conexion/l10n/l10n.dart';
 
 class ChangePasswordButton extends StatelessWidget {
   const ChangePasswordButton({super.key});
@@ -34,7 +34,6 @@ class ChangePasswordButton extends StatelessWidget {
           > 600 => context.screenWidth * .6,
           _ => context.screenWidth,
         },
-        minHeight: 48,
       ),
       child: child,
     );

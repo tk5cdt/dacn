@@ -1,8 +1,8 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/auth/login/cubit/login_cubit.dart';
-import 'package:conexion/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/auth/login/cubit/login_cubit.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:shared/shared.dart';
 
 class AuthProviderSignInButton extends StatelessWidget {
@@ -40,10 +40,11 @@ class AuthProviderSignInButton extends StatelessWidget {
         },
       ),
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Tappable(
+      child: Tappable.faded(
         throttle: true,
         throttleDuration: 650.ms,
-        borderRadius: BorderRadius.circular(10),
+        backgroundColor: context.theme.focusColor,
+        borderRadius: BorderRadius.circular(4),
         onTap: isInProgress ? null : onPressed,
         child: isInProgress
             ? Center(child: AppCircularProgress(context.adaptiveColor))
@@ -61,7 +62,7 @@ class AuthProviderSignInButton extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
+                  ].spacerBetween(width: AppSpacing.sm),
                 ),
               ),
       ),

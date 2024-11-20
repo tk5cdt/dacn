@@ -24,7 +24,7 @@ class ChangePasswordState extends Equatable {
   const ChangePasswordState.initial()
       : this._(
           status: ChangePasswordStatus.initial,
-          password: const Password.unvalidated(),
+          password: const Password.pure(),
           otp: const Otp.pure(),
           showPassword: false,
         );
@@ -35,7 +35,7 @@ class ChangePasswordState extends Equatable {
   final bool showPassword;
 
   @override
-  List<Object?> get props => [status, password, showPassword];
+  List<Object?> get props => [status, password, otp, showPassword];
 
   ChangePasswordState copyWith({
     ChangePasswordStatus? status,

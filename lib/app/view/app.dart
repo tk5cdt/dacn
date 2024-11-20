@@ -1,30 +1,34 @@
-import 'dart:math';
-
 import 'package:app_ui/app_ui.dart';
 import 'package:chats_repository/chats_repository.dart';
-import 'package:conexion/app/app.dart';
-import 'package:conexion/feed/feed.dart';
 import 'package:database_client/database_client.dart';
 import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/feed/feed.dart';
+import 'package:conexion/selector/selector.dart';
+import 'package:notifications_repository/notifications_repository.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:search_repository/search_repository.dart';
+// import 'package:stories_repository/stories_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
-import '../../selector/selector.dart';
-
+/// Key to access the [AppSnackbarState] from the [BuildContext].
 final snackbarKey = GlobalKey<AppSnackbarState>();
 
+/// Key to access the [AppLoadingIndeterminateState] from the
+/// [BuildContext].
 final loadingIndeterminateKey = GlobalKey<AppLoadingIndeterminateState>();
 
 class App extends StatelessWidget {
   const App({
     required this.user,
     required this.userRepository,
-    required this.chatsRepository,
     required this.postsRepository,
+    required this.chatsRepository,
+    // required this.storiesRepository,
     required this.searchRepository,
+    required this.notificationsRepository,
     required this.firebaseRemoteConfigRepository,
     required this.databaseClient,
     super.key,
@@ -32,9 +36,11 @@ class App extends StatelessWidget {
 
   final User user;
   final UserRepository userRepository;
-  final ChatsRepository chatsRepository;
   final PostsRepository postsRepository;
+  final ChatsRepository chatsRepository;
+  // final StoriesRepository storiesRepository;
   final SearchRepository searchRepository;
+  final NotificationsRepository notificationsRepository;
   final FirebaseRemoteConfigRepository firebaseRemoteConfigRepository;
   final DatabaseClient databaseClient;
 
@@ -42,18 +48,13 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(
-          value: databaseClient,
-        ),
-        RepositoryProvider.value(
-          value: userRepository,
-        ),
-        RepositoryProvider.value(
-          value: chatsRepository,
-        ),
-        RepositoryProvider.value(
-          value: postsRepository,
-        ),
+        RepositoryProvider.value(value: databaseClient),
+        RepositoryProvider.value(value: userRepository),
+        RepositoryProvider.value(value: postsRepository),
+        RepositoryProvider.value(value: chatsRepository),
+        // RepositoryProvider.value(value: storiesRepository),
+        RepositoryProvider.value(value: searchRepository),
+        RepositoryProvider.value(value: notificationsRepository),
         RepositoryProvider.value(value: firebaseRemoteConfigRepository),
       ],
       child: MultiBlocProvider(
@@ -62,6 +63,7 @@ class App extends StatelessWidget {
             create: (context) => AppBloc(
               user: user,
               userRepository: userRepository,
+              notificationsRepository: notificationsRepository,
             ),
           ),
           BlocProvider(create: (_) => LocaleBloc()),
@@ -80,10 +82,6 @@ class App extends StatelessWidget {
   }
 }
 
-void toggleLoadingIndeterminate({bool enable = true, bool autoHide = false}) =>
-    loadingIndeterminateKey.currentState
-        ?.setVisibility(visible: enable, autoHide: autoHide);
-
 /// Snack bar to show messages to the user.
 void openSnackbar(
   SnackbarMessage message, {
@@ -94,7 +92,20 @@ void openSnackbar(
       ?.post(message, clearIfQueue: clearIfQueue, undismissable: undismissable);
 }
 
-// closes the snackbar
-void closeSnackbar() {
-  snackbarKey.currentState?.closeAll();
-}
+void toggleLoadingIndeterminate({bool enable = true, bool autoHide = false}) =>
+    loadingIndeterminateKey.currentState
+        ?.setVisibility(visible: enable, autoHide: autoHide);
+
+/// Closes all snack bars.
+void closeSnackbars() => snackbarKey.currentState?.closeAll();
+
+void showCurrentlyUnavailableFeature({bool clearIfQueue = true}) =>
+    openSnackbar(
+      const SnackbarMessage.error(
+        title: 'Feature is not available!',
+        description:
+            'We are trying our best to implement it as fast as possible.',
+        icon: Icons.error_outline,
+      ),
+      clearIfQueue: clearIfQueue,
+    );
