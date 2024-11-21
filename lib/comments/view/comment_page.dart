@@ -3,6 +3,7 @@ import 'package:con_blocks/con_blocks.dart';
 import 'package:conexion/comments/bloc/comments_bloc.dart';
 import 'package:conexion/comments/comment/comment.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:posts_repository/posts_repository.dart';
@@ -73,6 +74,36 @@ class _CommentsPageState extends State<CommentsPage> {
 
   @override
   Widget build(BuildContext context) {
+final l10n = context.l10n;
+    BlockSettings().init(
+      postDelegate: PostTextDelegate(
+        cancelText: l10n.cancelText,
+        editText: l10n.editText,
+        deleteText: l10n.deleteText,
+        deletePostText: l10n.deletePostText,
+        deletePostConfirmationText: l10n.deletePostConfirmationText,
+        notShowAgainText: l10n.notShowAgainText,
+        blockAuthorConfirmationText: l10n.blockAuthorConfirmationText,
+        blockAuthorText: l10n.blockAuthorText,
+        blockPostAuthorText: l10n.blockPostAuthorText,
+        blockText: l10n.blockText,
+        noPostsText: l10n.noPostsText,
+        visitSponsoredInstagramProfileText: l10n.visitSponsoredInstagramProfile,
+        sponsoredPostText: l10n.sponsoredPostText,
+        likesCountText: l10n.likesCountText,
+        likesCountShortText: l10n.likesCountTextShort,
+        likedByText: (count, name, onUsernameTap) => TextSpan(text: name),
+      ),
+      commentDelegate: CommentTextDelegate(
+        seeAllCommentsText: l10n.seeAllComments,
+        replyText: l10n.replyText,
+      ),
+      followDelegate: FollowTextDelegate(
+        followText: l10n.followUser,
+        followingText: l10n.followingUser,
+      ),
+    );
+
     return BlocProvider(
       create: (context) => CommentsBloc(
         postId: widget.post.id,
