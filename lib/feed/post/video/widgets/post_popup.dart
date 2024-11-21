@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/comments/comments.dart';
 import 'package:conexion/feed/post/bloc/post_bloc.dart';
 import 'package:conexion/feed/post/video/widgets/post_popup_dialog.dart';
 import 'package:conexion/l10n/l10n.dart';
@@ -153,7 +155,7 @@ class _PostPopupState extends State<PopupModal>
       if (_commentOrViewProfileVisibility.value) {
         await showCommentsOrViewProfile();
       }
-      //if (_sharePostVisibility.value) await sharePost();
+      // if (_sharePostVisibility.value) await sharePost();
     }
   }
 
@@ -188,7 +190,7 @@ class _PostPopupState extends State<PopupModal>
           key: ValueKey(widget.block.id + widget.block.createdAt.toString()),
           enableFeedback: false,
           onTap: () => context.pushNamed(
-            'user_posts',
+            AppRoutes.userPosts.name,
             queryParameters: {
               'user_id': widget.block.author.id,
               'index': widget.index.toString(),
@@ -299,18 +301,18 @@ class _PostPopupState extends State<PopupModal>
 
   Future<void> showCommentsOrViewProfile() async {
     if (widget.showComments) {
-      // await context.showScrollableModal(
-      //   showFullSized: true,
-      //   pageBuilder: (scrollController, draggableScrollController) =>
-      //       CommentsPage(
-      //     post: widget.block,
-      //     scrollController: scrollController,
-      //     draggableScrollController: draggableScrollController,
-      //   ),
-      // );
+      await context.showScrollableModal(
+        showFullSized: true,
+        pageBuilder: (scrollController, draggableScrollController) =>
+            CommentsPage(
+          post: widget.block,
+          scrollController: scrollController,
+          draggableScrollController: draggableScrollController,
+        ),
+      );
     } else {
       await context.pushNamed(
-        'user_profile',
+        AppRoutes.userProfile.name,
         pathParameters: {'user_id': widget.block.author.id},
       );
     }

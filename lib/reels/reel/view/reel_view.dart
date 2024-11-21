@@ -274,17 +274,16 @@ import 'package:user_repository/user_repository.dart';
 //         context.select((PostBloc bloc) => bloc.state.commentsCount);
 //     final isOwner = context.select((PostBloc bloc) => bloc.state.isOwner);
 
-//     // Future<void> onCommentsTap(PostReelBlock block) =>
-//     //     context.showScrollableModal(
-//     //       pageBuilder: (scrollController, draggableScrollController) =>
-//     //           CommentsPage(
-//     //         post: block,
-//     //         scrollController: scrollController,
-//     //         draggableScrollController: draggableScrollController,
-//     //       ),
-//     //     );
+//     Future<void> onCommentsTap(PostReelBlock block) =>
+//         context.showScrollableModal(
+//           pageBuilder: (scrollController, draggableScrollController) =>
+//               CommentsPage(
+//             post: block,
+//             scrollController: scrollController,
+//             draggableScrollController: draggableScrollController,
+//           ),
+//         );
 
-//     Future<void> onCommentsTap(PostReelBlock block) async {}
 //     return Padding(
 //       padding:
 //           const EdgeInsets.only(right: AppSpacing.md, bottom: AppSpacing.md),
@@ -315,14 +314,6 @@ import 'package:user_repository/user_repository.dart';
 //             ),
 //             VerticalGroup(
 //               icon: Icons.near_me_outlined,
-//               // onButtonTap: () => context.showScrollableModal(
-//               //   pageBuilder: (scrollController, draggableScrollController) =>
-//               //       SharePost(
-//               //     block: block,
-//               //     scrollController: scrollController,
-//               //     draggableScrollController: draggableScrollController,
-//               //   ),
-//               // ),
 //               onButtonTap: () {},
 //               size: AppSize.iconSize,
 //               withStatistic: false,
@@ -877,14 +868,6 @@ class VerticalButtons extends StatelessWidget {
             ),
             VerticalGroup(
               icon: Icons.near_me_outlined,
-              // onButtonTap: () => context.showScrollableModal(
-              //   pageBuilder: (scrollController, draggableScrollController) =>
-              //       SharePost(
-              //     block: block,
-              //     scrollController: scrollController,
-              //     draggableScrollController: draggableScrollController,
-              //   ),
-              // ),
               onButtonTap: () {},
               size: AppSize.iconSize,
               withStatistic: false,
