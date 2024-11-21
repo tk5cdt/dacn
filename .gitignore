@@ -112,3 +112,4 @@ app.*.map.json
 !.idea/runConfigurations/
 
 .fake
+packages/database_client/lib/src/access_token.dart
