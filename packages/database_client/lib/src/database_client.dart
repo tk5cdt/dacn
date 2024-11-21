@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:database_client/database_client.dart';
 import 'package:dio/dio.dart';
 import 'package:env/env.dart';
 import 'package:powersync_repository/powersync_repository.dart';
@@ -10,6 +11,9 @@ import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:powersync/sqlite3_common.dart';
 import 'package:con_blocks/con_blocks.dart';
+import 'package:http/http.dart' as http;
+import 'package:googleapis_auth/auth_io.dart' as auth;
+import 'package:googleapis/servicecontrol/v1.dart' as servicecontrol;
 
 abstract class UserBaseRepository {
   const UserBaseRepository();
@@ -936,14 +940,57 @@ where
   }
 
   @override
+  Stream<List<Message>> messagesOf({required String chatId}) =>
+      _powerSyncRepository.db().watch(
+        '''
+        SELECT
+          m.*,
+          m_sender.full_name as full_name,
+          m_sender.username as username,
+          m_sender.avatar_url as avatar_url,
+          a.id as attachment_id,
+          a.title as attachment_title,
+          a.text as attachment_text,
+          a.title_link as attachment_title_link,
+          a.image_url as attachment_image_url,
+          a.thumb_url as attachment_thumb_url,
+          a.author_name as attachment_author_name,
+          a.author_link as attachment_author_link,
+          a.asset_url as attachment_asset_url,
+          a.og_scrape_url as attachment_og_scrape_url,
+          a.type as attachment_type,
+          r.message as replied_message_message,
+          p.caption as shared_post_caption,
+          p.created_at as shared_post_created_at,
+          p.media as shared_post_media,
+          p_author.id as shared_post_author_id,
+          p_author.username as shared_post_author_username,
+          p_author.full_name as shared_post_author_full_name,
+          p_author.avatar_url as shared_post_author_avatar_url
+        FROm
+          messages m
+          left join attachments a on m.id = a.message_id
+          left join messages r on m.reply_message_id = r.id
+          left join posts p on m.shared_post_id = p.id
+          join profiles m_sender on m.from_id = m_sender.id
+          left join profiles p_author on p.user_id = p_author.id
+        where
+          m.conversation_id = ?   
+        order by created_at asc
+        ''',
+        parameters: [chatId],
+      ).map((event) => event.safeMap(Message.fromRow).toList(growable: false));
+
+
+  @override
   Future<void> sendMessage({
     required String chatId,
     required User sender,
     required User receiver,
     required Message message,
     PostAuthor? postAuthor,
-  }) =>
-      _powerSyncRepository.db().writeTransaction((sqlContext) async {
+  }) async {
+      await _powerSyncRepository.db().writeTransaction((sqlContext) async {
         await sqlContext.execute(
           '''
           insert into
@@ -998,18 +1045,21 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               )
               .toList(),
         );
-
-        try {
+        
+      });
+      try {
           final receivePort = ReceivePort();
-
-          await Isolate.spawn(sendBackgroundNotification, [
+          final List<dynamic> args = [
             receivePort.sendPort,
-            receiver,
-            sender,
-            message,
-            postAuthor,
+            receiver.displayUsername,
+            sender.displayUsername,
+            message.message,
+            postAuthor?.username,
             chatId,
-          ]);
+            receiver.pushToken,
+          ];
+
+          await Isolate.spawn(sendBackgroundNotification, args);
         } catch (error, stackTrace) {
           logE(
             'Error send notification.',
@@ -1017,99 +1067,89 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             stackTrace: stackTrace,
           );
         }
-      });
-
-  @override
-  Stream<List<Message>> messagesOf({required String chatId}) =>
-      _powerSyncRepository.db().watch(
-        '''
-        SELECT
-          m.*,
-          m_sender.full_name as full_name,
-          m_sender.username as username,
-          m_sender.avatar_url as avatar_url,
-          a.id as attachment_id,
-          a.title as attachment_title,
-          a.text as attachment_text,
-          a.title_link as attachment_title_link,
-          a.image_url as attachment_image_url,
-          a.thumb_url as attachment_thumb_url,
-          a.author_name as attachment_author_name,
-          a.author_link as attachment_author_link,
-          a.asset_url as attachment_asset_url,
-          a.og_scrape_url as attachment_og_scrape_url,
-          a.type as attachment_type,
-          r.message as replied_message_message,
-          p.caption as shared_post_caption,
-          p.created_at as shared_post_created_at,
-          p.media as shared_post_media,
-          p_author.id as shared_post_author_id,
-          p_author.username as shared_post_author_username,
-          p_author.full_name as shared_post_author_full_name,
-          p_author.avatar_url as shared_post_author_avatar_url
-        FROm
-          messages m
-          left join attachments a on m.id = a.message_id
-          left join messages r on m.reply_message_id = r.id
-          left join posts p on m.shared_post_id = p.id
-          join profiles m_sender on m.from_id = m_sender.id
-          left join profiles p_author on p.user_id = p_author.id
-        where
-          m.conversation_id = ?   
-        order by created_at asc
-        ''',
-        parameters: [chatId],
-      ).map((event) => event.safeMap(Message.fromRow).toList(growable: false));
+  }
 
   /// Sends notification in a background isolate.
   Future<void> sendBackgroundNotification(List<dynamic> args) async {
+    
+    logD('Sending notification in background isolate...');
     await sendNotification(
-      reciever: args[1] as User,
-      sender: args[2] as User,
-      message: args[3] as Message,
-      postAuthor: args[4] as PostAuthor?,
+      reciever: args[1] as String,
+      sender: args[2] as String,
+      message: args[3] as String,
+      postAuthor: args[4] as String,
       chatId: args[5] as String,
+      pushToken: args[6] as String,
     );
     Isolate.exit(args[0] as SendPort, args);
   }
 
+  static Future<String> getAccessToken() async {
+    final serviceAccountJson = FCMToken.fcm.value;
+
+    List<String> scopes = [
+      'https://www.googleapis.com/auth/firebase.messaging',
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/firebase.database',
+      'https://www.googleapis.com/auth/userinfo.email',
+    ];
+
+    final http.Client client = await auth.clientViaServiceAccount(
+      auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
+      scopes,
+    );
+
+    //get access token
+    final auth.AccessCredentials credentials =
+        await auth.obtainAccessCredentialsViaServiceAccount(
+            auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
+            scopes,
+            client,
+          );
+    
+    client.close();
+
+    return credentials.accessToken.data;
+  }
+
   /// Sends notification using Google APIs to user.
   Future<void> sendNotification({
-    required User reciever,
-    required User sender,
+    required String reciever,
+    required String sender,
+    required String pushToken,
     String? chatId,
-    Message? message,
-    PostAuthor? postAuthor,
+    String? message,
+    String? postAuthor,
   }) async {
+    final String serverKey = await getAccessToken();
     final notificationMessage = postAuthor != null
-        ? 'Sent post by ${postAuthor.username}'
-        : message?.message;
+        ? 'Sent post by ${postAuthor}'
+        : message ?? 'Sent a message';
     final notificationBody =
-        '(${reciever.displayUsername}): ${sender.displayUsername}: '
+        '($reciever): $sender: '
         '$notificationMessage';
-
-    final data = {
-      'to': reciever.pushToken,
-      'content_available': true,
-      'priority': 10,
-      'notification': {
-        'title': 'Instagram',
-        'body': notificationBody,
-        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-      },
-      'data': {
-        if (chatId != null) 'chat_id': chatId,
-      },
-    };
 
     final headers = {
       HttpHeaders.contentTypeHeader: 'application/json',
-      // HttpHeaders.authorizationHeader: 'key=${EnvProd.fcmServerKey}',
+      HttpHeaders.authorizationHeader: 'Bearer $serverKey',
+    };
+
+    final messagePayload = {
+      "message": {
+        "token": pushToken,
+        "notification": {
+          "title": 'Instagram',
+          "body": notificationBody,
+        },
+        "data": {
+          if (chatId != null) 'chat_id': chatId,
+        },
+      },
     };
 
     final res = await Dio().post<String>(
-      'https://fcm.googleapis.com/fcm/send',
-      data: jsonEncode(data),
+      'https://fcm.googleapis.com/v1/projects/dacn-dev/messages:send',
+      data: jsonEncode(messagePayload),
       options: Options(headers: headers),
     );
     logD('Response: $res, \n status code: ${res.statusCode}');

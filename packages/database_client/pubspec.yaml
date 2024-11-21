@@ -15,6 +15,9 @@ dependencies:
     path: ../env
   flutter:
     sdk: flutter
+  googleapis: ^13.2.0
+  googleapis_auth: ^1.6.0
+  http: ^1.2.2
   jiffy: ^6.3.1
   powersync_repository:
     path: ../powersync_repository
