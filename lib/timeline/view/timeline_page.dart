@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app_ui/app_ui.dart';
 import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
+import 'package:conexion/feed/post/post.dart';
 import 'package:conexion/feed/post/video/video.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/search/search.dart';

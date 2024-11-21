@@ -2,17 +2,16 @@ import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/app/app.dart';
-import 'package:conexion/comments/comments.dart';
-import 'package:conexion/feed/post/bloc/post_bloc.dart';
-import 'package:conexion/feed/post/video/widgets/post_popup_dialog.dart';
-import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/comments/comments.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart' hide NumDurationExtension;
 import 'package:user_repository/user_repository.dart';
@@ -155,7 +154,7 @@ class _PostPopupState extends State<PopupModal>
       if (_commentOrViewProfileVisibility.value) {
         await showCommentsOrViewProfile();
       }
-      // if (_sharePostVisibility.value) await sharePost();
+      if (_sharePostVisibility.value) await sharePost();
     }
   }
 
@@ -318,13 +317,13 @@ class _PostPopupState extends State<PopupModal>
     }
   }
 
-  // Future<void> sharePost() => context.showScrollableModal(
-  //       pageBuilder: (scrollController, draggableScrollController) => SharePost(
-  //         block: widget.block,
-  //         scrollController: scrollController,
-  //         draggableScrollController: draggableScrollController,
-  //       ),
-  //     );
+  Future<void> sharePost() => context.showScrollableModal(
+        pageBuilder: (scrollController, draggableScrollController) => SharePost(
+          block: widget.block,
+          scrollController: scrollController,
+          draggableScrollController: draggableScrollController,
+        ),
+      );
 
   PositionDimension _getOffset(GlobalKey key) {
     final box = key.currentContext?.findRenderObject() as RenderBox?;

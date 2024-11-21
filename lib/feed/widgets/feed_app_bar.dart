@@ -1,6 +1,6 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion/home/home.dart';
 
 class FeedAppBar extends StatelessWidget {
   const FeedAppBar({required this.innerBoxIsScrolled, super.key});

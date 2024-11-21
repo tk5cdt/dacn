@@ -3,17 +3,16 @@
 import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/app/routes/app_routes.dart';
-import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/feed/feed.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion/feed/post/widgets/widgets.dart';
+import 'package:conexion/home/home.dart';
+import 'package:conexion/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:shared/shared.dart';
-
-import '../../app/view/app.dart';
-import '../../feed/post/widgets/post_edit.dart';
-import '../../feed/widgets/feed_page_controller.dart';
-import '../../home/provider/home_provider.dart';
 
 class UserProfileCreatePost extends StatelessWidget {
   const UserProfileCreatePost({
@@ -47,7 +46,7 @@ class UserProfileCreatePost extends StatelessWidget {
         multiSelection: !pickVideo,
         wantKeepAlive: wantKeepAlive,
         onMediaPicked: (details) => context.pushNamed(
-          'publish_post',
+          AppRoutes.publishPost.name,
           extra: CreatePostProps(details: details, pickVideo: pickVideo),
         ),
         onBackButtonTap:
@@ -111,8 +110,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     try {
       toggleLoadingIndeterminate();
+
       final postId = uuid.v4();
-      logD('Starting post creation with ID: $postId');
       unawaited(
         FeedPageController().processPostMedia(
           postId: postId,

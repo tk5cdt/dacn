@@ -173,10 +173,10 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
   /// `PostLargeBlock`.
   /// If the post is not found, it returns `null`.
   ///
-  // Future<PostBlock?> getPostBy(String id) async {
-  //   final post = await postsRepository.getPostBy(id: id);
-  //   return post?.toPostLargeBlock;
-  // }
+  Future<PostBlock?> getPostBy(String id) async {
+    final post = await postsRepository.getPostBy(id: id);
+    return post?.toPostLargeBlock;
+  }
 
   /// Fetches a paginated feed page.
   ///
@@ -207,16 +207,15 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
       offset: currentPage * feedPageLimit,
       limit: feedPageLimit,
     );
-    print("Fetched posts: ${posts.length}");
     final newPage = currentPage + 1;
     final hasMore = posts.length >= feedPageLimit;
 
-    final conBlocks = mapper?.call(posts) ?? postsToLargeBlocksMapper(posts);
+    final ConBlocks = mapper?.call(posts) ?? postsToLargeBlocksMapper(posts);
     if (!withSponsoredBlocks) {
-      return (newPage: newPage, hasMore: hasMore, blocks: conBlocks);
+      return (newPage: newPage, hasMore: hasMore, blocks: ConBlocks);
     }
     final blocks =
-        await insertSponsoredBlocks(hasMore: hasMore, blocks: conBlocks);
+        await insertSponsoredBlocks(hasMore: hasMore, blocks: ConBlocks);
     return (newPage: newPage, hasMore: hasMore, blocks: blocks);
   }
 
@@ -226,21 +225,21 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
   /// The function iterates over the given list of [posts] and filters out the
   /// posts that have media of type "reel".
   /// For each filtered post, it creates an [ConBlock] object representing
-  /// the reel block and adds it to the `instaBlocks` list.
+  /// the reel block and adds it to the `ConBlocks` list.
   /// Finally, it returns the list of [ConBlock] objects.
   ///
   /// Example usage:
   /// ```dart
   /// List<Post> posts = [...];
-  /// List<InstaBlock> instaBlocks = postsToReelBlockMapper(posts);
+  /// List<ConBlock> ConBlocks = postsToReelBlockMapper(posts);
   /// ```
   List<ConBlock> postsToReelBlockMapper(List<Post> posts) {
-    final conBlocks = <ConBlock>[];
+    final ConBlocks = <ConBlock>[];
     for (final post in posts.where((post) => post.media.isReel)) {
       final reel = post.toPostReelBlock;
-      conBlocks.add(reel);
+      ConBlocks.add(reel);
     }
-    return conBlocks;
+    return ConBlocks;
   }
 
   /// Converts a list of [Post] objects.
@@ -248,7 +247,7 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
   /// Example usage:
   /// ```dart
   /// List<Post> posts = [...];
-  /// List<InstaBlock> instaBlocks = postsToLargeBlocksMapper(posts);
+  /// List<ConBlock> ConBlocks = postsToLargeBlocksMapper(posts);
   /// ```
   List<ConBlock> postsToLargeBlocksMapper(List<Post> posts) =>
       posts.map<ConBlock>((post) => post.toPostLargeBlock).toList();
@@ -267,7 +266,7 @@ mixin FeedBlocMixin on Bloc<FeedEvent, FeedState> {
   /// Example usage:
   /// ```dart
   /// final hasMore = true;
-  /// final blocks = [...]; // List of InstaBlock
+  /// final blocks = [...]; // List of ConBlock
   /// final insertedBlocks = await insertSponsoredBlocks(
   ///  hasMore: hasMore,
   ///  blocks: blocks,

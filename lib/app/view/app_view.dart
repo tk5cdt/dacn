@@ -1,14 +1,10 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/app/app.dart';
-import 'package:conexion/app/bloc/app_bloc.dart';
 import 'package:conexion/app/routes/routes.dart';
-import 'package:conexion/auth/view/auth_page.dart';
-import 'package:conexion/l10n/arb/app_localizations.dart';
-import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/auth/login/login.dart';
-import 'package:conexion/selector/selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/selector/selector.dart';
 import 'package:shared/shared.dart';
 
 class AppView extends StatelessWidget {
@@ -16,7 +12,7 @@ class AppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final routeConfig = router(context.read<AppBloc>());
+    final routerConfig = AppRouter(context.read<AppBloc>()).router;
 
     return BlocBuilder<LocaleBloc, Locale>(
       builder: (context, locale) {
@@ -25,23 +21,21 @@ class AppView extends StatelessWidget {
         );
         return BlocBuilder<ThemeModeBloc, ThemeMode>(
           builder: (context, themeMode) {
-            WidgetsBinding.instance
-                .addPostFrameCallback((_) => initUtilities(context, locale));
             return AnimatedSwitcher(
-              duration: 300.ms,
+              duration: 350.ms,
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                   textScaler: TextScaler.noScaling,
                 ),
                 child: MaterialApp.router(
                   debugShowCheckedModeBanner: false,
-                  themeMode: themeMode,
-                  theme: const AppTheme().theme,
-                  darkTheme: const AppDarkTheme().theme,
-                  localizationsDelegates:
-                      AppLocalizations.localizationsDelegates,
-                  supportedLocales: AppLocalizations.supportedLocales,
+                  title: 'Instagram',
+                  routerConfig: routerConfig,
                   builder: (context, child) {
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) => initUtilities(context, locale),
+                    );
+
                     return Stack(
                       children: [
                         child!,
@@ -50,8 +44,13 @@ class AppView extends StatelessWidget {
                       ],
                     );
                   },
-                  routerConfig: routeConfig,
+                  themeMode: themeMode,
+                  theme: const AppTheme().theme,
+                  darkTheme: const AppDarkTheme().theme,
                   locale: locale,
+                  localizationsDelegates:
+                      AppLocalizations.localizationsDelegates,
+                  supportedLocales: AppLocalizations.supportedLocales,
                 ),
               ),
             );
@@ -59,14 +58,5 @@ class AppView extends StatelessWidget {
         );
       },
     );
-    // return MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   themeMode: ThemeMode.dark,
-    //   theme: const AppTheme().theme,
-    //   darkTheme: const AppDarkTheme().theme,
-    //   localizationsDelegates: AppLocalizations.localizationsDelegates,
-    //   supportedLocales: AppLocalizations.supportedLocales,
-    //   home: const AuthPage(),
-    // );
   }
 }

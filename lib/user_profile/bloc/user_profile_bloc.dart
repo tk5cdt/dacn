@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
@@ -18,41 +19,40 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
         _postsRepository = postsRepository,
         _userId = userId ?? userRepository.currentUserId ?? '',
         super(const UserProfileState.initial()) {
-    on<UserProfileSubscriptionRequested>(_onUserProfileSubscriptionRequested);
+    on<UserProfileSubscriptionRequested>(
+      _onUserProfileSubscriptionRequested,
+      transformer: throttleDroppable(),
+    );
     on<UserProfilePostsCountSubscriptionRequested>(
       _onUserProfilePostsCountSubscriptionRequested,
+      transformer: throttleDroppable(),
     );
     on<UserProfileFollowingsCountSubscriptionRequested>(
       _onUserProfileFollowingsCountSubscriptionRequested,
+      transformer: throttleDroppable(),
     );
     on<UserProfileFollowersCountSubscriptionRequested>(
       _onUserProfileFollowersCountSubscriptionRequested,
+      transformer: throttleDroppable(),
     );
-    on<UserProfileFetchFollowersRequested>(
-      _onFollowersFetch,
-    );
-    on<UserProfileFetchFollowingsRequested>(
-      _onFollowingsFetch,
-    );
+    on<UserProfileUpdateRequested>(_onUserProfileUpdateRequested);
+    on<UserProfileFetchFollowersRequested>(_onFollowersFetch);
+    on<UserProfileFetchFollowingsRequested>(_onFollowingsFetch);
     on<UserProfileFollowersSubscriptionRequested>(
       _onFollowersSubscriptionRequested,
+      transformer: throttleDroppable(),
     );
-    on<UserProfileFollowUserRequested>(
-      _onUserProfileFollowUserRequested,
-    );
-
+    on<UserProfileFollowUserRequested>(_onFollowUser);
     on<UserProfileRemoveFollowerRequested>(
       _onUserProfileRemoveFollowerRequested,
     );
-    on<UserProfileUpdateRequested>(
-      _onUserProfileUpdateRequested,
-    );
   }
+
   final String _userId;
   final UserRepository _userRepository;
   final PostsRepository _postsRepository;
 
-  bool get isOwner => _userRepository.currentUserId == _userId;
+  bool get isOwner => _userId == _userRepository.currentUserId;
 
   Stream<List<PostBlock>> userPosts({bool small = true}) {
     if (small) {
@@ -64,12 +64,6 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
         .postsOf(userId: _userId)
         .map((posts) => posts.map((e) => e.toPostLargeBlock).toList());
   }
-  
-  Stream<bool> followingStatus({String? followerId}) => _userRepository
-      .followingStatus(
-        userId: _userId,
-      )
-      .asBroadcastStream();
 
   Future<void> _onUserProfileSubscriptionRequested(
     UserProfileSubscriptionRequested event,
@@ -77,7 +71,8 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     await emit.forEach(
       isOwner ? _userRepository.user : _userRepository.profile(userId: _userId),
-      onData: (user) => state.copyWith(user: user),
+      onData: (user) =>
+          state.copyWith(user: user, status: UserProfileStatus.userUpdated),
     );
   }
 
@@ -108,23 +103,30 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     await emit.forEach(
       _userRepository.followersCountOf(userId: _userId),
-      onData: (followersCount) {
-        print('Followers count in bloc: $followersCount');
-        return state.copyWith(followersCount: followersCount);
-      },
-      // onData: (followersCount) =>
-      //     state.copyWith(followersCount: followersCount),
+      onData: (followersCount) =>
+          state.copyWith(followersCount: followersCount),
     );
   }
 
-  Future<void> _onUserProfileFollowUserRequested(
-    UserProfileFollowUserRequested event,
+  Stream<bool> followingStatus({String? followerId}) =>
+      _userRepository.followingStatus(userId: _userId).asBroadcastStream();
+
+  Future<void> _onUserProfileUpdateRequested(
+    UserProfileUpdateRequested event,
     Emitter<UserProfileState> emit,
   ) async {
     try {
-      await _userRepository.follow(followToId: event.userId ?? _userId);
+      await _userRepository.updateUser(
+        email: event.email,
+        username: event.username,
+        avatarUrl: event.avatarUrl,
+        fullName: event.fullName,
+        pushToken: event.pushToken,
+      );
+      emit(state.copyWith(status: UserProfileStatus.userUpdated));
     } catch (error, stackTrace) {
       addError(error, stackTrace);
+      emit(state.copyWith(status: UserProfileStatus.userUpdateFailed));
     }
   }
 
@@ -162,6 +164,17 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     );
   }
 
+  Future<void> _onFollowUser(
+    UserProfileFollowUserRequested event,
+    Emitter<UserProfileState> emit,
+  ) async {
+    try {
+      await _userRepository.follow(followToId: event.userId ?? _userId);
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+    }
+  }
+
   Future<void> _onUserProfileRemoveFollowerRequested(
     UserProfileRemoveFollowerRequested event,
     Emitter<UserProfileState> emit,
@@ -170,25 +183,6 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
       await _userRepository.removeFollower(id: event.userId ?? _userId);
     } catch (error, stackTrace) {
       addError(error, stackTrace);
-    }
-  }
-
-  Future<void> _onUserProfileUpdateRequested(
-    UserProfileUpdateRequested event,
-    Emitter<UserProfileState> emit,
-  ) async {
-    try {
-      await _userRepository.updateUser(
-        email: event.email,
-        username: event.username,
-        fullName: event.fullName,
-        avatarUrl: event.avatarUrl,
-        pushToken: event.pushToken,
-      );
-      emit(state.copyWith(status: UserProfileStatus.userUpdated));
-    } catch (error, stackTrace) {
-      addError(error, stackTrace);
-      emit(state.copyWith(status: UserProfileStatus.userUpdateFailed));
     }
   }
 }

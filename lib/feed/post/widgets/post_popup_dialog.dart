@@ -2,12 +2,12 @@ import 'dart:ui';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/feed/post/bloc/post_bloc.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:shared/shared.dart' hide NumDurationExtension;
 import 'package:sprung/sprung.dart';
 

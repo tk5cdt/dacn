@@ -1,10 +1,8 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
-import 'package:conexion/user_profile/widgets/user_profile_followers.dart';
-import 'package:conexion/user_profile/widgets/user_profile_followings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 
 class UserProfileStatistics extends StatefulWidget {
   const UserProfileStatistics({
@@ -66,8 +64,10 @@ class UserProfileStatisticsAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final followers = context.select((UserProfileBloc b) => b.state.followersCount);
-    final followings = context.select((UserProfileBloc b) => b.state.followingsCount);
+    final followers =
+        context.select((UserProfileBloc b) => b.state.followersCount);
+    final followings =
+        context.select((UserProfileBloc b) => b.state.followingsCount);
     final user = context.select((UserProfileBloc b) => b.state.user);
 
     return SliverAppBar(

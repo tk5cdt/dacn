@@ -1,7 +1,6 @@
-import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
-import 'package:conexion/user_profile/widgets/user_profile_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 
 class UserProfileFollowers extends StatefulWidget {
   const UserProfileFollowers({super.key});

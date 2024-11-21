@@ -1,11 +1,15 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/feed/post/view/post_view.dart';
+import 'package:conexion/feed/post/post.dart';
 import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/user_profile/user_profile.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared/shared.dart';
@@ -43,7 +47,7 @@ class _UserProfilePostsState extends State<UserProfilePosts> {
   Widget build(BuildContext context) {
     return AppScaffold(
       body: InViewNotifierCustomScrollView(
-        //cacheExtent: 2760,
+        // cacheExtent: 2760,
         initialInViewIds: [widget.index.toString()],
         isInViewPortCondition: (deltaTop, deltaBottom, vpHeight) {
           return deltaTop < (0.5 * vpHeight) + 80.0 &&
