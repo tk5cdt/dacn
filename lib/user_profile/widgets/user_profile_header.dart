@@ -1,37 +1,44 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/user_profile/user_profile.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
-import 'package:conexion_blocks_ui/src/user_profile/user_profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/stories/stories.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared/shared.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
+import 'package:shared/shared.dart' hide Switch;
 import 'package:user_repository/user_repository.dart';
 
 class UserProfileHeader extends StatelessWidget {
-  const UserProfileHeader({required this.userId, this.sponsoredPost, super.key});
+  const UserProfileHeader({
+    required this.userId,
+    this.sponsoredPost,
+    super.key,
+  });
 
   final String userId;
   final PostSponsoredBlock? sponsoredPost;
 
   void _pushToUserStatistics(BuildContext context, {required int tabIndex}) =>
       context.pushNamed(
-        'user_statistics',
+        AppRoutes.userStatistics.name,
         extra: tabIndex,
         queryParameters: {'user_id': userId},
       );
 
   @override
   Widget build(BuildContext context) {
-    final isOwner = context.select((UserProfileBloc bloc) => bloc.isOwner);
+    final isOwner = context.select((UserProfileBloc b) => b.isOwner);
     final user$ = context.select((UserProfileBloc b) => b.state.user);
     final user = sponsoredPost == null
         ? user$
         : user$.isAnonymous
             ? sponsoredPost!.author.toUser
             : user$;
+    // final canCreateStories =
+    //     context.select((CreateStoriesBloc bloc) => bloc.state.isAvailable);
 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(
@@ -43,10 +50,6 @@ class UserProfileHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                // CircleAvatar(
-                //   backgroundImage: NetworkImage(user.avatarUrl ?? ''),
-                //   radius: 32,
-                // ),
                 UserProfileAvatar(
                   avatarUrl: user.avatarUrl,
                   onLongPress: (avatarUrl) => avatarUrl == null
@@ -58,6 +61,58 @@ class UserProfileHeader extends StatelessWidget {
                     if (isOwner) {}
                   },
                 ),
+                // UserStoriesAvatar(
+                //   resizeHeight: 252,
+                //   author: user,
+                //   onLongPress: (avatarUrl) => avatarUrl == null
+                //       ? null
+                //       : context.showImagePreview(avatarUrl),
+                //   onAvatarTap: (imageUrl) {
+                //     if (imageUrl == null) return;
+                //     if (!isOwner) context.showImagePreview(imageUrl);
+                //     if (isOwner) {
+                //       if (!canCreateStories) return;
+                //       context.pushNamed(
+                //         AppRoutes.createStories.name,
+                //         extra: (String path) {
+                //           context.read<CreateStoriesBloc>().add(
+                //                 CreateStoriesStoryCreateRequested(
+                //                   author: user,
+                //                   contentType: StoryContentType.image,
+                //                   filePath: path,
+                //                   onError: (_, __) {
+                //                     toggleLoadingIndeterminate(enable: false);
+                //                     openSnackbar(
+                //                       SnackbarMessage.error(
+                //                         title:
+                //                             context.l10n.somethingWentWrongText,
+                //                         description: context
+                //                             .l10n.failedToCreateStoryText,
+                //                       ),
+                //                     );
+                //                   },
+                //                   onLoading: toggleLoadingIndeterminate,
+                //                   onStoryCreated: () {
+                //                     toggleLoadingIndeterminate(enable: false);
+                //                     openSnackbar(
+                //                       SnackbarMessage.success(
+                //                         title: context
+                //                             .l10n.successfullyCreatedStoryText,
+                //                       ),
+                //                       clearIfQueue: true,
+                //                     );
+                //                   },
+                //                 ),
+                //               );
+                //           context.pop();
+                //         },
+                //       );
+                //     }
+                //   },
+                //   isLarge: true,
+                //   tappableVariant: TappableVariant.scaled,
+                //   showWhenSeen: true,
+                // ),
                 const Gap.h(AppSpacing.md),
                 Expanded(
                   child: UserProfileStatisticsCounts(
@@ -141,7 +196,7 @@ class UserProfileStatisticsCounts extends StatelessWidget {
             onTap: () => onStatisticTap.call(1),
           ),
         ),
-      ],
+      ].spacerBetween(width: AppSpacing.sm),
     );
   }
 }
@@ -153,7 +208,7 @@ class EditProfileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return UserProfileButton(
       label: context.l10n.editProfileText,
-      onTap: () => context.pushNamed('edit_profile'),
+      onTap: () => context.pushNamed(AppRoutes.editProfile.name),
     );
   }
 }

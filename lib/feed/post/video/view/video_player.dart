@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_positional_boolean_parameters
 
-import 'package:conexion/feed/post/video/video.dart';
 import 'package:flutter/material.dart';
+import 'package:conexion/feed/post/video/video.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 
 enum VideoPlayerType { feed, timeline, reels }

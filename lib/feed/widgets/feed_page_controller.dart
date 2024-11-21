@@ -2,12 +2,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/feed/feed.dart';
+import 'package:conexion/feed/post/video/video.dart';
 import 'package:go_router/go_router.dart';
 import 'package:powersync_repository/powersync_repository.dart';
 import 'package:shared/shared.dart';
-
-import '../feed.dart';
-import '../post/video/video.dart';
 
 class FeedPageController extends ChangeNotifier {
   factory FeedPageController() => _internal;
@@ -63,31 +62,28 @@ class FeedPageController extends ChangeNotifier {
     final isReel =
         selectedFiles.length == 1 && selectedFiles.every((e) => !e.isThatImage);
     final navigateToReelPage = isReel;
-
     StatefulNavigationShell.of(_context)
         .goBranch(navigateToReelPage ? 3 : 0, initialLocation: true);
     if (pickVideo) {
       VideoPlayerInheritedWidget.of(_context).videoPlayerState.playReels();
     }
 
-    final newPostId = uuid.v4();
+    late final postId = uuid.v4();
 
-    void uploadPost({required List<Map<String, dynamic>> media}) {
-      if (!_context.mounted) return;
-      _context.read<FeedBloc>().add(
-            FeedPostCreateRequested(
-              postId: postId,
-              caption: caption,
-              media: media,
-            ),
-          );
-    }
+    void uploadPost({required List<Map<String, dynamic>> media}) =>
+        _context.read<FeedBloc>().add(
+              FeedPostCreateRequested(
+                postId: postId,
+                caption: caption,
+                media: media,
+              ),
+            );
 
-    final storage = Supabase.instance.client.storage.from('posts');
+    late final storage = Supabase.instance.client.storage.from('posts');
 
     if (isReel) {
       try {
-        final mediaPath = '$newPostId/video_0';
+        final mediaPath = '$postId/video_0';
 
         final selectedFile = selectedFiles.first;
         final firstFrame = await VideoPlus.getVideoThumbnail(
@@ -121,7 +117,7 @@ class FeedPageController extends ChangeNotifier {
         final mediaUrl = storage.getPublicUrl(mediaPath);
         String? firstFrameUrl;
         if (firstFrame != null) {
-          final firstFramePath = '$newPostId/video_first_frame_0';
+          late final firstFramePath = '$postId/video_first_frame_0';
           await storage.uploadBinary(
             firstFramePath,
             firstFrame,
@@ -152,9 +148,9 @@ class FeedPageController extends ChangeNotifier {
     } else {
       final media = <Map<String, dynamic>>[];
       for (var i = 0; i < selectedFiles.length; i++) {
-        final selectedByte = selectedFiles[i].selectedByte;
-        final selectedFile = selectedFiles[i].selectedFile;
-        final isVideo = selectedFile.isVideo;
+        late final selectedByte = selectedFiles[i].selectedByte;
+        late final selectedFile = selectedFiles[i].selectedFile;
+        late final isVideo = selectedFile.isVideo;
         String blurHash;
         Uint8List? convertedBytes;
         if (isVideo) {
@@ -171,9 +167,10 @@ class FeedPageController extends ChangeNotifier {
             selectedByte,
           );
         }
-        final mediaExtension = selectedFile.path.split('.').last.toLowerCase();
+        late final mediaExtension =
+            selectedFile.path.split('.').last.toLowerCase();
 
-        final mediaPath = '$newPostId/${!isVideo ? 'image_$i' : 'video_$i'}';
+        late final mediaPath = '$postId/${!isVideo ? 'image_$i' : 'video_$i'}';
 
         Uint8List bytes;
         if (isVideo) {
@@ -206,7 +203,7 @@ class FeedPageController extends ChangeNotifier {
         final mediaUrl = storage.getPublicUrl(mediaPath);
         String? firstFrameUrl;
         if (convertedBytes != null) {
-          final firstFramePath = '$newPostId/video_first_frame_$i';
+          late final firstFramePath = '$postId/video_first_frame_$i';
           await storage.uploadBinary(
             firstFramePath,
             convertedBytes,

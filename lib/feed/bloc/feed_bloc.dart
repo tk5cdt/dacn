@@ -5,16 +5,14 @@ import 'dart:math';
 
 import 'package:app_ui/app_ui.dart';
 import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/app/view/app.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'package:conexion/app/app.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
-import 'package:user_repository/user_repository.dart';
 
 part 'feed_bloc_mixin.dart';
 part 'feed_event.dart';
@@ -199,14 +197,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin {
   ) async {
     emit(state.loading());
     try {
-      print('Creating post with ID: ${event.postId}, caption: ${event.caption}, media: ${event.media}');
       final newPost = await _postsRepository.createPost(
         id: event.postId,
         caption: event.caption,
         media: json.encode(event.media),
       );
-
-      print('Post created: $newPost');
       if (newPost != null) {
         add(
           FeedUpdateRequested(
@@ -224,10 +219,6 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin {
       );
     } catch (error, stackTrace) {
       addError(error, stackTrace);
-      print('Error in _onFeedPostCreateRequested: $error');
-      openSnackbar(
-        const SnackbarMessage.error(title: 'Failed to create post!'),
-      );
       emit(state.failure());
     }
   }

@@ -1,13 +1,11 @@
-import 'package:bloc/bloc.dart';
 import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:posts_repository/posts_repository.dart';
-import 'package:user_repository/user_repository.dart';
 import 'package:shared/shared.dart';
-import 'package:flutter/material.dart';
+import 'package:user_repository/user_repository.dart';
 
 part 'post_bloc.g.dart';
 part 'post_event.dart';
@@ -18,36 +16,36 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
     required String postId,
     required PostsRepository postsRepository,
     required UserRepository userRepository,
-  }) :  _postId = postId,
+  })  : _postId = postId,
         _postsRepository = postsRepository,
         _userRepository = userRepository,
-        super(PostState.initial()) {
+        super(const PostState.initial()) {
     on<PostLikesCountSubscriptionRequested>(
       _onPostLikesCountSubscriptionRequested,
-    );
-    on<PostIsLikedSubscriptionRequested>(
-      _onPostIsLikedSubscriptionRequested
-    );
-    on<PostAuthorFollowingStatusSubscriptionRequested>(
-      _onPostAuthorFollowingStatusSubscriptionRequested,
     );
     on<PostCommentsCountSubscriptionRequested>(
       _onPostCommentsCountSubscriptionRequested,
     );
-    on<PostLikeRequested>(
-      _onPostLikeRequested
+    on<PostIsLikedSubscriptionRequested>(_onPostIsLikedSubscriptionRequested);
+    on<PostAuthorFollowingStatusSubscriptionRequested>(
+      _onPostAuthorFollowingStatusSubscriptionRequested,
     );
-    on<PostAuthorFollowRequested>(
-      _onPostAuthorFollowRequested
-    );
+    on<PostLikersPageRequested>(_onPostLikersPageRequested);
+    on<PostUpdateRequested>(_onPostUpdateRequested);
+    on<PostLikeRequested>(_onPostLikeRequested);
+    on<PostAuthorFollowRequested>(_onPostAuthorFollowRequested);
+    on<PostDeleteRequested>(_onPostDeleteRequested);
+    on<PostShareRequested>(_onPostShareRequested);
     on<PostLikersInFollowingsFetchRequested>(
       _onPostLikersInFollowingsFetchRequested,
     );
-    on<PostUpdateRequested>(_onPostUpdateRequested);
-    on<PostDeleteRequested>(_onPostDeleteRequested);
   }
+
+  static const _usersLimit = 100;
+
   final UserRepository _userRepository;
   final PostsRepository _postsRepository;
+
   final String _postId;
 
   @override
@@ -60,6 +58,20 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
     await emit.forEach(
       _postsRepository.likesOf(id: id),
       onData: (likesCount) => state.copyWith(likes: likesCount),
+      onError: (error, stackTrace) {
+        addError(error, stackTrace);
+        return state.copyWith(status: PostStatus.failure);
+      },
+    );
+  }
+
+  Future<void> _onPostCommentsCountSubscriptionRequested(
+    PostCommentsCountSubscriptionRequested event,
+    Emitter<PostState> emit,
+  ) async {
+    await emit.forEach(
+      _postsRepository.commentsAmountOf(postId: id),
+      onData: (commentsCount) => state.copyWith(commentsCount: commentsCount),
       onError: (error, stackTrace) {
         addError(error, stackTrace);
         return state.copyWith(status: PostStatus.failure);
@@ -100,18 +112,41 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
     );
   }
 
-  Future<void> _onPostCommentsCountSubscriptionRequested(
-    PostCommentsCountSubscriptionRequested event,
+  Future<void> _onPostLikersPageRequested(
+    PostLikersPageRequested event,
     Emitter<PostState> emit,
   ) async {
-    await emit.forEach(
-      _postsRepository.commentsAmountOf(postId: id),
-      onData: (commentsCount) => state.copyWith(commentsCount: commentsCount),
-      onError: (error, stackTrace) {
-        addError(error, stackTrace);
-        return state.copyWith(status: PostStatus.failure);
-      },
-    );
+    final page = event.page;
+    emit(state.copyWith(status: PostStatus.loading));
+    try {
+      final users = await _postsRepository.getPostLikers(
+        postId: id,
+        offset: page * _usersLimit,
+        limit: _usersLimit,
+      );
+      emit(state.copyWith(status: PostStatus.success, likers: users));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: PostStatus.failure));
+    }
+  }
+
+  Future<void> _onPostUpdateRequested(
+    PostUpdateRequested event,
+    Emitter<PostState> emit,
+  ) async {
+    try {
+      final post =
+          await _postsRepository.updatePost(id: id, caption: event.caption);
+
+      if (post != null) {
+        event.onPostUpdated?.call(post.toPostLargeBlock);
+      }
+      emit(state.copyWith(status: PostStatus.success));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: PostStatus.failure));
+    }
   }
 
   Future<void> _onPostLikeRequested(
@@ -141,6 +176,39 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
     }
   }
 
+  Future<void> _onPostDeleteRequested(
+    PostDeleteRequested event,
+    Emitter<PostState> emit,
+  ) async {
+    try {
+      await _postsRepository.deletePost(id: id);
+      emit(state.copyWith(status: PostStatus.success));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: PostStatus.failure));
+    }
+  }
+
+  Future<void> _onPostShareRequested(
+    PostShareRequested event,
+    Emitter<PostState> emit,
+  ) async {
+    try {
+      await _postsRepository.sharePost(
+        id: id,
+        sender: event.sender,
+        receiver: event.receiver,
+        sharedPostMessage: event.sharedPostMessage.copyWith(sharedPostId: id),
+        message: event.message,
+        postAuthor: event.postAuthor,
+      );
+      emit(state.copyWith(status: PostStatus.success));
+    } catch (error, stackTrace) {
+      addError(error, stackTrace);
+      emit(state.copyWith(status: PostStatus.failure));
+    }
+  }
+
   Future<void> _onPostLikersInFollowingsFetchRequested(
     PostLikersInFollowingsFetchRequested event,
     Emitter<PostState> emit,
@@ -155,42 +223,9 @@ class PostBloc extends HydratedBloc<PostEvent, PostState> {
     }
   }
 
-  Future<void> _onPostUpdateRequested(
-    PostUpdateRequested event,
-    Emitter<PostState> emit,
-  ) async {
-    try {
-      final post =
-          await _postsRepository.updatePost(id: id, caption: event.caption);
-
-      if (post != null) {
-        event.onPostUpdated?.call(post.toPostLargeBlock);
-      }
-      emit(state.copyWith(status: PostStatus.success));
-    } catch (error, stackTrace) {
-      addError(error, stackTrace);
-      emit(state.copyWith(status: PostStatus.failure));
-    }
-  }
-
-  Future<void> _onPostDeleteRequested(
-    PostDeleteRequested event,
-    Emitter<PostState> emit,
-  ) async {
-    try {
-      await _postsRepository.deletePost(id: id);
-      emit(state.copyWith(status: PostStatus.success));
-    } catch (error, stackTrace) {
-      addError(error, stackTrace);
-      emit(state.copyWith(status: PostStatus.failure));
-    }
-  }
-
   @override
   PostState? fromJson(Map<String, dynamic> json) => PostState.fromJson(json);
 
   @override
   Map<String, dynamic>? toJson(PostState state) => state.toJson();
 }
-
-  

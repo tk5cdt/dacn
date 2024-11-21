@@ -1,14 +1,14 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/user_profile/user_profile.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
-import 'package:conexion_blocks_ui/src/user_profile/user_profile_avatar.dart';
 
 class UserProfileEdit extends StatelessWidget {
   const UserProfileEdit({super.key});
@@ -193,7 +193,7 @@ class _ProfileInfoInputState extends State<ProfileInfoInput> {
       onTap: !widget.readOnly
           ? null
           : () => context.pushNamed(
-                'edit_profile_info',
+                AppRoutes.editProfileInfo.name,
                 pathParameters: {'label': widget.label},
                 queryParameters: {
                   'title': widget.label,

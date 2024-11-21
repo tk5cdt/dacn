@@ -1,20 +1,19 @@
-import 'dart:math';
-
 import 'package:app_ui/app_ui.dart';
 import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/feed/bloc/feed_bloc.dart';
+import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:conexion/feed/feed.dart';
 import 'package:conexion/feed/post/post.dart';
 import 'package:conexion/l10n/l10n.dart';
 import 'package:conexion/network_error/network_error.dart';
+import 'package:conexion/stories/stories.dart';
 import 'package:conexion/user_profile/user_profile.dart';
-import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
+// import 'package:stories_repository/stories_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
 class FeedPage extends StatefulWidget {
@@ -26,7 +25,7 @@ class FeedPage extends StatefulWidget {
   State<FeedPage> createState() => FeedPageState();
 }
 
-class FeedPageState extends State<FeedPage> {
+class FeedPageState extends State<FeedPage> with RouteAware {
   late PageController _controller;
 
   @override
@@ -46,13 +45,23 @@ class FeedPageState extends State<FeedPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('Building FeedPage');
-    return Scaffold(
-      body: const FeedView(),
+    return BlocProvider(
+      // create: (context) => StoriesBloc(
+      //   storiesRepository: context.read<StoriesRepository>(),
+      //   userRepository: context.read<UserRepository>(),
+      // )..add(const StoriesFetchUserFollowingsStories()),
+      create: (context) => FeedBloc(
+        postsRepository: context.read<PostsRepository>(),
+        firebaseRemoteConfigRepository: context.read<FirebaseRemoteConfigRepository>(),
+      ),
+      child: const FeedView(),
     );
   }
 }
 
+/// {@template feed_view}
+/// The main FeedView widget that builds the UI for the feed screen.
+/// {@endtemplate}
 class FeedView extends StatefulWidget {
   const FeedView({super.key});
 
@@ -83,47 +92,6 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    // final feed = List.generate(
-    //   10,
-    //   (index) => PostLargeBlock(
-    //     id: uuid.v4(),
-    //     author: PostAuthor.randomConfirmed(),
-    //     createdAt:
-    //         DateTime.now().subtract(Duration(days: Random().nextInt(365))),
-    //     media: [
-    //       ImageMedia(
-    //         id: uuid.v4(),
-    //         url:
-    //             'https://antimatter.vn/wp-content/uploads/2022/04/anh-meo-khoc-thet-meme.jpg',
-    //       )
-    //     ],
-    //     caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ',
-    //   ),
-    // );
-
-    // return AppScaffold(
-    //   body: Column(
-    //     children: [
-    //       Text.rich(
-    //         t.likedBy(
-    //           name: const TextSpan(text: 'John Doe'),
-    //           and: const TextSpan(text: ' and '),
-    //           others: const TextSpan(text: 'others'),
-    //         ),
-    //       ),
-    //       Expanded(
-    //         child: ListView.builder(
-    //           itemCount: feed.length,
-    //           itemBuilder: (context, index) {
-    //             final post = feed[index];
-    //             return Image.network(post.firstMediaUrl!);
-    //           },
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
-
     return AppScaffold(
       releaseFocus: true,
       body: NestedScrollView(
@@ -156,10 +124,10 @@ class FeedBody extends StatelessWidget {
         // context
         //     .read<StoriesBloc>()
         //     .add(const StoriesFetchUserFollowingsStories());
-        // FeedPageController().markAnimationAsUnseen();
+        FeedPageController().markAnimationAsUnseen();
       },
       child: InViewNotifierCustomScrollView(
-        //cacheExtent: 2760,
+        // cacheExtent: 2760,
         initialInViewIds: const ['0'],
         isInViewPortCondition: (deltaTop, deltaBottom, vpHeight) {
           return deltaTop < (0.5 * vpHeight) + 80.0 &&
@@ -169,7 +137,7 @@ class FeedBody extends StatelessWidget {
           SliverOverlapInjector(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
-          //const StoriesCarousel(),
+          // const StoriesCarousel(),
           const AppSliverDivider(),
           BlocBuilder<FeedBloc, FeedState>(
             buildWhen: (previous, current) {

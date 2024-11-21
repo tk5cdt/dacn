@@ -1,19 +1,19 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/app/app.dart';
-import 'package:conexion/comments/comments.dart';
-import 'package:conexion/feed/post/bloc/post_bloc.dart';
-import 'package:conexion/feed/post/video/video.dart';
-import 'package:conexion/user_profile/user_profile.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/comments/comments.dart';
+import 'package:conexion/feed/feed.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion/feed/post/video/video.dart';
+import 'package:conexion/stories/stories.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 import 'package:go_router/go_router.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart' hide VideoPlayer;
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:user_repository/user_repository.dart';
-
-import '../../feed.dart';
 
 class PostView extends StatelessWidget {
   const PostView({
@@ -87,7 +87,7 @@ class PostLargeView extends StatelessWidget {
     UserProfileProps? props,
   }) =>
       context.pushNamed(
-        'user_profile',
+        AppRoutes.userProfile.name,
         pathParameters: {'user_id': id},
         extra: props,
       );
@@ -121,87 +121,74 @@ class PostLargeView extends StatelessWidget {
         context.select((PostBloc bloc) => bloc.state.likersInFollowings);
 
     return PostLarge(
-        block: block,
-        isOwner: isOwner,
-        isLiked: isLiked,
-        likePost: () => bloc.add(const PostLikeRequested()),
-        likesCount: likesCount,
-        isFollowed: isOwner || (isFollowed ?? true),
-        follow: () =>
-            bloc.add(PostAuthorFollowRequested(authorId: block.author.id)),
-        enableFollowButton: true,
-        commentsCount: commentsCount,
-        postIndex: postIndex,
-        withInViewNotifier: withInViewNotifier,
-        likersInFollowings: likersInFollowings,
-        // postAuthorAvatarBuilder: (context, author, onAvatarTap) {
-        //   return UserStoriesAvatar(
-        //     resizeHeight: 108,
-        //     author: author.toUser,
-        //     onAvatarTap: onAvatarTap,
-        //     enableInactiveBorder: false,
-        //     withAdaptiveBorder: false,
-        //   );
-        // },
-        postOptionsSettings: isOwner
-            ? PostOptionsSettings.owner(
-                onPostEdit: (block) => context.pushNamed(
-                  'post_edit',
-                  pathParameters: {'post_id': block.id},
-                  extra: block,
-                ),
-                onPostDelete: (_) {
-                  bloc.add(const PostDeleteRequested());
-                  context.read<FeedBloc>().add(
-                        FeedUpdateRequested(
-                          update: FeedPageUpdate(
-                            newPost: block.toPost,
-                            type: PageUpdateType.delete,
-                          ),
-                        ),
-                      );
-                },
-              )
-            : const PostOptionsSettings.viewer(),
-        onCommentsTap: (showFullSized) => context.showScrollableModal(
-              showFullSized: showFullSized,
-              pageBuilder: (scrollController, draggableScrollController) =>
-                  CommentsPage(
-                post: block,
-                scrollController: scrollController,
-                draggableScrollController: draggableScrollController,
+      block: block,
+      isOwner: isOwner,
+      isLiked: isLiked,
+      likePost: () => bloc.add(const PostLikeRequested()),
+      likesCount: likesCount,
+      isFollowed: isOwner || (isFollowed ?? true),
+      follow: () =>
+          bloc.add(PostAuthorFollowRequested(authorId: block.author.id)),
+      enableFollowButton: true,
+      commentsCount: commentsCount,
+      postIndex: postIndex,
+      withInViewNotifier: withInViewNotifier,
+      likersInFollowings: likersInFollowings,
+      // postAuthorAvatarBuilder: (context, author, onAvatarTap) {
+      //   return UserStoriesAvatar(
+      //     resizeHeight: 108,
+      //     author: author.toUser,
+      //     onAvatarTap: onAvatarTap,
+      //     enableInactiveBorder: false,
+      //     withAdaptiveBorder: false,
+      //   );
+      // },
+      postOptionsSettings: isOwner
+          ? PostOptionsSettings.owner(
+              onPostEdit: (block) => context.pushNamed(
+                AppRoutes.postEdit.name,
+                pathParameters: {'post_id': block.id},
+                extra: block,
               ),
-            ),
-        onUserTap: (userId) => _navigateToPostAuthor(context, id: userId),
-        onPressed: (action) => _handleOnPostTap(context, action: action),
-        onPostShareTap: (postId, author) {},
-        videoPlayerBuilder: !withCustomVideoPlayer
-            ? null
-            : (_, media, aspectRatio, isInView) {
-                final videoPlayerState =
-                    VideoPlayerInheritedWidget.of(context).videoPlayerState;
-
-                return VideoPlayerInViewNotifierWidget(
-                    type: videoPlayerType,
-                    builder: (context, shouldPlay, child) {
-                      final play = shouldPlay && isInView;
-                      return ValueListenableBuilder(
-                          valueListenable: videoPlayerState.withSound,
-                          builder: (context, withSound, child) {
-                            return InlineVideo(
-                                key: ValueKey(media.id),
-                                videoSettings: VideoSettings.build(
-                                    videoUrl: media.url,
-                                    shouldPlay: play,
-                                    aspectRatio: aspectRatio,
-                                    blurHash: media.blurHash,
-                                    withSound: withSound,
-                                    onSoundToggled: ({required enable}) => {
-                                          videoPlayerState.withSound.value =
-                                              enable,
-                                        }));
-                          });
-                    });
-              });
+              onPostDelete: (_) {
+                bloc.add(const PostDeleteRequested());
+                context.read<FeedBloc>().add(
+                      FeedUpdateRequested(
+                        update: FeedPageUpdate(
+                          newPost: block.toPost,
+                          type: PageUpdateType.delete,
+                        ),
+                      ),
+                    );
+              },
+            )
+          : const PostOptionsSettings.viewer(),
+      onCommentsTap: (showFullSized) => context.showScrollableModal(
+        showFullSized: showFullSized,
+        pageBuilder: (scrollController, draggableScrollController) =>
+            CommentsPage(
+          post: block,
+          scrollController: scrollController,
+          draggableScrollController: draggableScrollController,
+        ),
+      ),
+      onUserTap: (userId) => _navigateToPostAuthor(context, id: userId),
+      onPressed: (action) => _handleOnPostTap(context, action: action),
+      onPostShareTap: (postId, author) => context.showScrollableModal(
+        pageBuilder: (scrollController, draggableScrollController) => SharePost(
+          block: block,
+          scrollController: scrollController,
+          draggableScrollController: draggableScrollController,
+        ),
+      ),
+      videoPlayerBuilder: !withCustomVideoPlayer
+          ? null
+          : (_, media, aspectRatio, isInView) => PostVideoPlayer(
+                videoPlayerType: videoPlayerType,
+                media: media,
+                aspectRatio: aspectRatio,
+                isInView: isInView,
+              ),
+    );
   }
 }

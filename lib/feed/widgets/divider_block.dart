@@ -1,10 +1,11 @@
 import 'package:app_ui/app_ui.dart';
-import 'package:conexion/feed/feed.dart';
-import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart'
     hide NumDurationExtensions;
+import 'package:conexion/feed/feed.dart';
+import 'package:conexion/feed/widgets/feed_page_controller.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared/shared.dart';
 

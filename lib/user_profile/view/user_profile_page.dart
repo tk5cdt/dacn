@@ -1,22 +1,24 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:math';
+
 import 'package:app_ui/app_ui.dart';
-import 'package:collection/equality.dart';
+import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
-import 'package:conexion/app/bloc/app_bloc.dart';
-import 'package:conexion/feed/post/video/widgets/post_popup.dart';
-import 'package:conexion/l10n/l10n.dart';
-import 'package:conexion/user_profile/bloc/user_profile_bloc.dart';
-import 'package:conexion/user_profile/widgets/widgets.dart';
-import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:conexion/app/app.dart';
+import 'package:conexion/feed/post/post.dart';
+import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/selector/selector.dart';
+import 'package:conexion/stories/stories.dart';
+import 'package:conexion/user_profile/user_profile.dart';
 import 'package:go_router/go_router.dart';
+import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:user_repository/user_repository.dart';
-
-import '../../selector/selector.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({
@@ -30,26 +32,31 @@ class UserProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => UserProfileBloc(
-        userId: userId,
-        postsRepository: context.read<PostsRepository>(),
-        userRepository: context.read<UserRepository>(),
-      )
-        ..add(const UserProfileSubscriptionRequested())
-        ..add(const UserProfilePostsCountSubscriptionRequested())
-        ..add(const UserProfileFollowingsCountSubscriptionRequested())
-        ..add(const UserProfileFollowersCountSubscriptionRequested()),
-      child: UserProfileView(
-        userId: userId,
-        props: props
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => UserProfileBloc(
+            userId: userId,
+            postsRepository: context.read<PostsRepository>(),
+            userRepository: context.read<UserRepository>(),
+          )
+            ..add(const UserProfileSubscriptionRequested())
+            ..add(const UserProfilePostsCountSubscriptionRequested())
+            ..add(const UserProfileFollowingsCountSubscriptionRequested())
+            ..add(const UserProfileFollowersCountSubscriptionRequested()),
+        ),
+      ],
+      child: UserProfileView(userId: userId, props: props),
     );
   }
 }
 
 class UserProfileView extends StatefulWidget {
-  const UserProfileView({required this.userId, required this.props, super.key});
+  const UserProfileView({
+    required this.props,
+    required this.userId,
+    super.key,
+  });
 
   final String userId;
   final UserProfileProps props;
@@ -58,15 +65,16 @@ class UserProfileView extends StatefulWidget {
   State<UserProfileView> createState() => _UserProfileViewState();
 }
 
-class _UserProfileViewState extends State<UserProfileView> {
-  late ScrollController _nestedScrollController;
-  
+class _UserProfileViewState extends State<UserProfileView>
+    with SingleTickerProviderStateMixin {
+  late ScrollController _controller;
+
   UserProfileProps get props => widget.props;
-  
+
   @override
   void initState() {
     super.initState();
-    _nestedScrollController = ScrollController();
+    _controller = ScrollController();
   }
 
   @override
@@ -88,7 +96,8 @@ class _UserProfileViewState extends State<UserProfileView> {
       body: DefaultTabController(
         length: 2,
         child: NestedScrollView(
-          controller: _nestedScrollController,
+          floatHeaderSlivers: true,
+          controller: _controller,
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverOverlapAbsorber(
@@ -106,8 +115,8 @@ class _UserProfileViewState extends State<UserProfileView> {
                       ),
                       SliverPersistentHeader(
                         pinned: !ModalRoute.of(context)!.isFirst,
-                        delegate: const _UserProfileTabBarDelegate(
-                          TabBar(
+                        delegate: _SliverAppBarDelegate(
+                          const TabBar(
                             indicatorSize: TabBarIndicatorSize.tab,
                             padding: EdgeInsets.zero,
                             labelPadding: EdgeInsets.zero,
@@ -133,19 +142,26 @@ class _UserProfileViewState extends State<UserProfileView> {
           },
           body: TabBarView(
             children: [
-              UserPostsPage(sponsoredPost: props.sponsoredPost),
+              PostsPage(sponsoredPost: props.sponsoredPost),
               const UserProfileMentionedPostsPage(),
-          ]),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _UserProfileTabBarDelegate extends SliverPersistentHeaderDelegate {
-  const _UserProfileTabBarDelegate(this.tabBar);
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this.tabBar);
 
   final TabBar tabBar;
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
 
   @override
   Widget build(
@@ -160,170 +176,30 @@ class _UserProfileTabBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => tabBar.preferredSize.height;
-
-  @override
-  double get minExtent => tabBar.preferredSize.height;
-
-  @override
-  bool shouldRebuild(_UserProfileTabBarDelegate oldDelegate) {
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return tabBar != oldDelegate.tabBar;
   }
 }
 
-class UserProfileAppBar extends StatelessWidget {
-  const UserProfileAppBar({this.sponsoredPost, super.key});
+class PostsPage extends StatefulWidget {
+  const PostsPage({this.sponsoredPost, super.key});
 
   final PostSponsoredBlock? sponsoredPost;
 
   @override
-  Widget build(BuildContext context) {
-    final isOwner = context.select((UserProfileBloc bloc) => bloc.isOwner);
-    final user$ = context.select((UserProfileBloc b) => b.state.user);
-    final user = sponsoredPost == null
-        ? user$
-        : user$.isAnonymous
-            ? sponsoredPost!.author.toUser
-            : user$;
-
-    return SliverPadding(
-      padding: const EdgeInsets.only(right: AppSpacing.md),
-      sliver: SliverAppBar(
-        centerTitle: false,
-        pinned: !ModalRoute.of(context)!.isFirst,
-        floating: ModalRoute.of(context)!.isFirst,
-        title: Row(
-          children: [
-            Flexible(
-                flex: 12,
-                child: Text(
-                  '${user.displayFullName} ',
-                  style:
-                      context.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                )),
-            Flexible(
-              child: Assets.icons.verifiedUser.svg(
-                width: AppSize.iconSizeSmall,
-                height: AppSize.iconSizeSmall,
-              ),
-            )
-          ],
-        ),
-        actions: [
-          if (!isOwner)
-            const UserProfileActions()
-          else ...[
-            const UserProfileAddMediaButton(),
-            if (ModalRoute.of(context)?.isFirst ?? false) ...const [
-              Gap.h(AppSpacing.md),
-              UserProfileSettingsButton(),
-            ],
-          ],
-        ],
-      ),
-    );
-  }
+  State<PostsPage> createState() => _PostsPageState();
 }
 
-class UserProfileActions extends StatelessWidget {
-  const UserProfileActions({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Tappable(
-      onTap: () {},
-      child: Icon(Icons.adaptive.more_outlined, size: AppSize.iconSize),
-    );
-  }
-}
-
-class UserProfileSettingsButton extends StatelessWidget {
-  const UserProfileSettingsButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Tappable(
-      onTap: () => context.showListOptionsModal(
-        options: [
-          ModalOption(child: const LocaleModalOption()),
-          ModalOption(child: const ThemeSelectorModalOption()),
-          ModalOption(child: const LogoutModalOption()),
-        ],
-      ).then((option) {
-        if (option == null) return;
-        option.onTap(context);
-      }),
-      child: Assets.icons.setting.svg(
-        height: AppSize.iconSize,
-        width: AppSize.iconSize,
-        colorFilter: ColorFilter.mode(
-          context.adaptiveColor,
-          BlendMode.srcIn,
-        ),
-      ),
-    );
-  }
-}
-
-class UserProfileAddMediaButton extends StatelessWidget {
-  const UserProfileAddMediaButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Tappable(
-      onTap: () => context.showListOptionsModal(
-        title: context.l10n.createText,
-        options: createMediaModalOptions(
-          reelLabel: context.l10n.reelText,
-          postLabel: context.l10n.postText,
-          storyLabel: context.l10n.storyText,
-          context: context,
-          goTo: (route, {extra}) =>
-              context.pushNamed(route, extra: extra),
-          onCreateReelTap: () => PickImage().pickVideo(
-            context, 
-            onMediaPicked: (context, details) => context.pushNamed(
-              'publish_post',
-              extra: CreatePostProps(details: details, pickVideo: true,),
-            ),
-          ),
-          enableStory: true,
-          
-        ),
-      ).then((option) {
-        if (option == null) return;
-        option.onTap(context);
-      }),
-      child: const Icon(
-        Icons.add_box_outlined,
-        size: AppSize.iconSize,
-      ),
-    );
-  }
-}
-
-class UserPostsPage extends StatefulWidget {
-  const UserPostsPage({this.sponsoredPost, super.key});
-
-  final PostSponsoredBlock? sponsoredPost;
-
-  @override
-  State<UserPostsPage> createState() => _UserPostsPageState();
-}
-
-class _UserPostsPageState extends State<UserPostsPage>
+class _PostsPageState extends State<PostsPage>
     with AutomaticKeepAliveClientMixin {
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-  
+
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     final bloc = context.read<UserProfileBloc>();
 
+    super.build(context);
     return CustomScrollView(
       cacheExtent: 2760,
       slivers: [
@@ -333,16 +209,10 @@ class _UserPostsPageState extends State<UserPostsPage>
         BetterStreamBuilder<List<PostBlock>>(
           initialData: const <PostBlock>[],
           stream: bloc.userPosts(),
-          errorBuilder: (context, error) {
-            print('-------------------------------Error loading posts: $error');
-            return const SizedBox.shrink();
-          },
           comparator: const ListEquality<PostBlock>().equals,
           builder: (context, blocks) {
             if (blocks.isEmpty && widget.sponsoredPost == null) {
-              return SliverToBoxAdapter(
-                child: EmptyPosts(isSliver: false),
-              );
+              return const EmptyPosts();
             }
             return SliverGrid.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -413,6 +283,104 @@ class UserProfileMentionedPostsPage extends StatelessWidget {
   }
 }
 
+class UserProfileAppBar extends StatelessWidget {
+  const UserProfileAppBar({this.sponsoredPost, super.key});
+
+  final PostSponsoredBlock? sponsoredPost;
+
+  @override
+  Widget build(BuildContext context) {
+    final isOwner = context.select((UserProfileBloc bloc) => bloc.isOwner);
+    final user$ = context.select((UserProfileBloc b) => b.state.user);
+    final user = sponsoredPost == null
+        ? user$
+        : user$.isAnonymous
+            ? sponsoredPost!.author.toUser
+            : user$;
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(right: AppSpacing.md),
+      sliver: SliverAppBar(
+        centerTitle: false,
+        pinned: !ModalRoute.of(context)!.isFirst,
+        floating: ModalRoute.of(context)!.isFirst,
+        title: Row(
+          children: [
+            Flexible(
+              flex: 12,
+              child: Text(
+                '${user.displayUsername} ',
+                style: context.titleLarge?.copyWith(
+                  fontWeight: AppFontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Flexible(
+              child: Assets.icons.verifiedUser.svg(
+                width: AppSize.iconSizeSmall,
+                height: AppSize.iconSizeSmall,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          if (!isOwner)
+            const UserProfileActions()
+          else ...[
+            const UserProfileAddMediaButton(),
+            if (ModalRoute.of(context)?.isFirst ?? false) ...const [
+              Gap.h(AppSpacing.md),
+              UserProfileSettingsButton(),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class UserProfileActions extends StatelessWidget {
+  const UserProfileActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tappable.faded(
+      onTap: () {},
+      child: Icon(Icons.adaptive.more_outlined, size: AppSize.iconSize),
+    );
+  }
+}
+
+class UserProfileSettingsButton extends StatelessWidget {
+  const UserProfileSettingsButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tappable.faded(
+      onTap: () => context.showListOptionsModal(
+        options: [
+          ModalOption(child: const LocaleModalOption()),
+          ModalOption(child: const ThemeSelectorModalOption()),
+          ModalOption(child: const LogoutModalOption()),
+        ],
+      ).then((option) {
+        if (option == null) return;
+        void onTap() => option.onTap(context);
+        onTap.call();
+      }),
+      child: Assets.icons.setting.svg(
+        height: AppSize.iconSize,
+        width: AppSize.iconSize,
+        colorFilter: ColorFilter.mode(
+          context.adaptiveColor,
+          BlendMode.srcIn,
+        ),
+      ),
+    );
+  }
+}
+
 class LogoutModalOption extends StatelessWidget {
   const LogoutModalOption({super.key});
 
@@ -435,6 +403,71 @@ class LogoutModalOption extends StatelessWidget {
           style: context.bodyLarge?.apply(color: AppColors.red),
         ),
         leading: const Icon(Icons.logout, color: AppColors.red),
+      ),
+    );
+  }
+}
+
+class UserProfileAddMediaButton extends StatelessWidget {
+  const UserProfileAddMediaButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final user = context.select((AppBloc bloc) => bloc.state.user);
+    // final enableStory =
+    //     context.select((CreateStoriesBloc bloc) => bloc.state.isAvailable);
+
+    return Tappable.faded(
+      onTap: () => context
+          .showListOptionsModal(
+        title: l10n.createText,
+        options: createMediaModalOptions(
+          context: context,
+          reelLabel: l10n.reelText,
+          postLabel: l10n.postText,
+          storyLabel: l10n.storyText,
+          enableStory: true,
+          goTo: (route, {extra}) => context.pushNamed(route, extra: extra),
+          // onStoryCreated: (path) {
+          //   context.read<CreateStoriesBloc>().add(
+          //         CreateStoriesStoryCreateRequested(
+          //           author: user,
+          //           contentType: StoryContentType.image,
+          //           filePath: path,
+          //           onError: (_, __) {
+          //             toggleLoadingIndeterminate(enable: false);
+          //             openSnackbar(
+          //               SnackbarMessage.error(
+          //                 title: l10n.somethingWentWrongText,
+          //                 description: l10n.failedToCreateStoryText,
+          //               ),
+          //             );
+          //           },
+          //           onLoading: toggleLoadingIndeterminate,
+          //           onStoryCreated: () {
+          //             toggleLoadingIndeterminate(enable: false);
+          //             openSnackbar(
+          //               SnackbarMessage.success(
+          //                 title: l10n.successfullyCreatedStoryText,
+          //               ),
+          //               clearIfQueue: true,
+          //             );
+          //           },
+          //         ),
+          //       );
+          //   context.pop();
+          // },
+        ),
+      )
+          .then((option) {
+        if (option == null) return;
+        void onTap() => option.onTap(context);
+        onTap.call();
+      }),
+      child: const Icon(
+        Icons.add_box_outlined,
+        size: AppSize.iconSize,
       ),
     );
   }
