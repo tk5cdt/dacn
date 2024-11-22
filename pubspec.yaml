@@ -70,6 +70,8 @@ dependencies:
   slang_build_runner: ^4.1.0
   slang_flutter: ^4.1.0
   sliver_tools: ^0.2.12
+  stories_editor: 
+    path: packages/stories_editor
   supabase_authentication_client:
     path: packages/authentication_client/supabase_authentication_client
   supabase_flutter: ^2.6.0

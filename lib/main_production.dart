@@ -48,8 +48,8 @@ void main() {
       final databaseClient =
           PowerSyncDatabaseClient(powerSyncRepository: powerSyncRepository);
 
-      final persistentStorage =
-          PersistentStorage(sharedPreferences: sharedPreferences);
+      // final persistentStorage =
+      //     PersistentStorage(sharedPreferences: sharedPreferences);
 
       // final storiesStorage = StoriesStorage(storage: persistentStorage);
 
