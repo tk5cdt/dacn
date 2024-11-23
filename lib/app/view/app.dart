@@ -10,7 +10,7 @@ import 'package:conexion/selector/selector.dart';
 import 'package:notifications_repository/notifications_repository.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:search_repository/search_repository.dart';
-// import 'package:stories_repository/stories_repository.dart';
+import 'package:stories_repository/stories_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
 /// Key to access the [AppSnackbarState] from the [BuildContext].
@@ -26,7 +26,7 @@ class App extends StatelessWidget {
     required this.userRepository,
     required this.postsRepository,
     required this.chatsRepository,
-    // required this.storiesRepository,
+    required this.storiesRepository,
     required this.searchRepository,
     required this.notificationsRepository,
     required this.firebaseRemoteConfigRepository,
@@ -38,7 +38,7 @@ class App extends StatelessWidget {
   final UserRepository userRepository;
   final PostsRepository postsRepository;
   final ChatsRepository chatsRepository;
-  // final StoriesRepository storiesRepository;
+  final StoriesRepository storiesRepository;
   final SearchRepository searchRepository;
   final NotificationsRepository notificationsRepository;
   final FirebaseRemoteConfigRepository firebaseRemoteConfigRepository;
@@ -52,7 +52,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: userRepository),
         RepositoryProvider.value(value: postsRepository),
         RepositoryProvider.value(value: chatsRepository),
-        // RepositoryProvider.value(value: storiesRepository),
+        RepositoryProvider.value(value: storiesRepository),
         RepositoryProvider.value(value: searchRepository),
         RepositoryProvider.value(value: notificationsRepository),
         RepositoryProvider.value(value: firebaseRemoteConfigRepository),

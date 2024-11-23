@@ -13,6 +13,7 @@ import 'package:conexion/user_profile/user_profile.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
+import 'package:stories_repository/stories_repository.dart';
 // import 'package:stories_repository/stories_repository.dart';
 import 'package:user_repository/user_repository.dart';
 
@@ -32,9 +33,9 @@ class FeedPageState extends State<FeedPage> with RouteAware {
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage);
-    // context
-    //     .read<UserProfileBloc>()
-    //     .add(const UserProfileFetchFollowingsRequested());
+    context
+        .read<UserProfileBloc>()
+        .add(const UserProfileFetchFollowingsRequested());
   }
 
   @override
@@ -46,14 +47,10 @@ class FeedPageState extends State<FeedPage> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // create: (context) => StoriesBloc(
-      //   storiesRepository: context.read<StoriesRepository>(),
-      //   userRepository: context.read<UserRepository>(),
-      // )..add(const StoriesFetchUserFollowingsStories()),
-      create: (context) => FeedBloc(
-        postsRepository: context.read<PostsRepository>(),
-        firebaseRemoteConfigRepository: context.read<FirebaseRemoteConfigRepository>(),
-      ),
+      create: (context) => StoriesBloc(
+        storiesRepository: context.read<StoriesRepository>(),
+        userRepository: context.read<UserRepository>(),
+      )..add(const StoriesFetchUserFollowingsStories()),
       child: const FeedView(),
     );
   }
@@ -121,9 +118,9 @@ class FeedBody extends StatelessWidget {
     return RefreshIndicator.adaptive(
       onRefresh: () async {
         context.read<FeedBloc>().add(const FeedRefreshRequested());
-        // context
-        //     .read<StoriesBloc>()
-        //     .add(const StoriesFetchUserFollowingsStories());
+        context
+            .read<StoriesBloc>()
+            .add(const StoriesFetchUserFollowingsStories());
         FeedPageController().markAnimationAsUnseen();
       },
       child: InViewNotifierCustomScrollView(
@@ -137,7 +134,7 @@ class FeedBody extends StatelessWidget {
           SliverOverlapInjector(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
-          // const StoriesCarousel(),
+          const StoriesCarousel(),
           const AppSliverDivider(),
           BlocBuilder<FeedBloc, FeedState>(
             buildWhen: (previous, current) {

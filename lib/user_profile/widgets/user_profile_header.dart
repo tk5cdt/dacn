@@ -37,8 +37,8 @@ class UserProfileHeader extends StatelessWidget {
         : user$.isAnonymous
             ? sponsoredPost!.author.toUser
             : user$;
-    // final canCreateStories =
-    //     context.select((CreateStoriesBloc bloc) => bloc.state.isAvailable);
+    final canCreateStories =
+        context.select((CreateStoriesBloc bloc) => bloc.state.isAvailable);
 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(
@@ -50,69 +50,58 @@ class UserProfileHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                UserProfileAvatar(
-                  avatarUrl: user.avatarUrl,
+                UserStoriesAvatar(
+                  resizeHeight: 252,
+                  author: user,
                   onLongPress: (avatarUrl) => avatarUrl == null
                       ? null
                       : context.showImagePreview(avatarUrl),
-                  onTap: (imageUrl) {
+                  onAvatarTap: (imageUrl) {
                     if (imageUrl == null) return;
                     if (!isOwner) context.showImagePreview(imageUrl);
-                    if (isOwner) {}
+                    if (isOwner) {
+                      if (!canCreateStories) return;
+                      context.pushNamed(
+                        AppRoutes.createStories.name,
+                        extra: (String path) {
+                          context.read<CreateStoriesBloc>().add(
+                                CreateStoriesStoryCreateRequested(
+                                  author: user,
+                                  contentType: StoryContentType.image,
+                                  filePath: path,
+                                  onError: (_, __) {
+                                    toggleLoadingIndeterminate(enable: false);
+                                    openSnackbar(
+                                      SnackbarMessage.error(
+                                        title:
+                                            context.l10n.somethingWentWrongText,
+                                        description: context
+                                            .l10n.failedToCreateStoryText,
+                                      ),
+                                    );
+                                  },
+                                  onLoading: toggleLoadingIndeterminate,
+                                  onStoryCreated: () {
+                                    toggleLoadingIndeterminate(enable: false);
+                                    openSnackbar(
+                                      SnackbarMessage.success(
+                                        title: context
+                                            .l10n.successfullyCreatedStoryText,
+                                      ),
+                                      clearIfQueue: true,
+                                    );
+                                  },
+                                ),
+                              );
+                          context.pop();
+                        },
+                      );
+                    }
                   },
+                  isLarge: true,
+                  tappableVariant: TappableVariant.scaled,
+                  showWhenSeen: true,
                 ),
-                // UserStoriesAvatar(
-                //   resizeHeight: 252,
-                //   author: user,
-                //   onLongPress: (avatarUrl) => avatarUrl == null
-                //       ? null
-                //       : context.showImagePreview(avatarUrl),
-                //   onAvatarTap: (imageUrl) {
-                //     if (imageUrl == null) return;
-                //     if (!isOwner) context.showImagePreview(imageUrl);
-                //     if (isOwner) {
-                //       if (!canCreateStories) return;
-                //       context.pushNamed(
-                //         AppRoutes.createStories.name,
-                //         extra: (String path) {
-                //           context.read<CreateStoriesBloc>().add(
-                //                 CreateStoriesStoryCreateRequested(
-                //                   author: user,
-                //                   contentType: StoryContentType.image,
-                //                   filePath: path,
-                //                   onError: (_, __) {
-                //                     toggleLoadingIndeterminate(enable: false);
-                //                     openSnackbar(
-                //                       SnackbarMessage.error(
-                //                         title:
-                //                             context.l10n.somethingWentWrongText,
-                //                         description: context
-                //                             .l10n.failedToCreateStoryText,
-                //                       ),
-                //                     );
-                //                   },
-                //                   onLoading: toggleLoadingIndeterminate,
-                //                   onStoryCreated: () {
-                //                     toggleLoadingIndeterminate(enable: false);
-                //                     openSnackbar(
-                //                       SnackbarMessage.success(
-                //                         title: context
-                //                             .l10n.successfullyCreatedStoryText,
-                //                       ),
-                //                       clearIfQueue: true,
-                //                     );
-                //                   },
-                //                 ),
-                //               );
-                //           context.pop();
-                //         },
-                //       );
-                //     }
-                //   },
-                //   isLarge: true,
-                //   tappableVariant: TappableVariant.scaled,
-                //   showWhenSeen: true,
-                // ),
                 const Gap.h(AppSpacing.md),
                 Expanded(
                   child: UserProfileStatisticsCounts(

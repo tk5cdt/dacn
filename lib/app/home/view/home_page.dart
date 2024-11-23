@@ -2,26 +2,50 @@ import 'package:app_ui/app_ui.dart';
 import 'package:conexion/chats/chats.dart';
 import 'package:conexion/feed/post/video/video.dart';
 import 'package:conexion/navigation/view/bottom_nav_bar.dart';
+import 'package:conexion/stories/stories.dart';
 import 'package:conexion/user_profile/user_profile.dart';
+import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:posts_repository/posts_repository.dart';
+import 'package:stories_repository/stories_repository.dart';
+import 'package:user_repository/user_repository.dart';
 
 import '../../../home/home.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({required this.navigationShell, super.key});
+  const HomePage({
+    required this.navigationShell,
+    super.key,
+  });
 
   final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
-    return HomeView(navigationShell: navigationShell);
+    return BlocProvider(
+      create: (context) => UserProfileBloc(
+        userRepository: context.read<UserRepository>(),
+        postsRepository: context.read<PostsRepository>(),
+      ),
+      lazy: false,
+      child: HomeView(navigationShell: navigationShell),
+    );
   }
 }
 
+/// {@template home_view}
+/// Main view of the application. It contains the [navigationShell] that will
+/// handle the navigation between the different bottom navigation bars.
+/// {@endtemplate}
 class HomeView extends StatefulWidget {
-  const HomeView({required this.navigationShell, super.key});
+  /// {@macro home_view}
+  const HomeView({required this.navigationShell, Key? key})
+      : super(key: key ?? const ValueKey<String>('ScaffoldWithNavBar'));
 
+  /// Navigation shell that will handle the navigation between the different
+  /// bottom navigation bars.
   final StatefulNavigationShell navigationShell;
 
   @override
@@ -35,9 +59,10 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _videoPlayerState = VideoPlayerState();
+
     _pageController = PageController(initialPage: 1)
       ..addListener(_onPageScroll);
+    _videoPlayerState = VideoPlayerState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       HomeProvider().setPageController(_pageController);
@@ -88,24 +113,30 @@ class _HomeViewState extends State<HomeView> {
     _pageController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    return VideoPlayerInheritedWidget(
-      videoPlayerState: _videoPlayerState, 
-      child: ListenableBuilder(
-        listenable: HomeProvider(), 
-        builder: (context, child){
-          return PageView.builder(
+    return BlocProvider(
+      create: (context) => CreateStoriesBloc(
+        storiesRepository: context.read<StoriesRepository>(),
+        firebaseRemoteConfigRepository:
+            context.read<FirebaseRemoteConfigRepository>(),
+      )..add(const CreateStoriesIsFeatureAvailableSubscriptionRequested()),
+      child: VideoPlayerInheritedWidget(
+        videoPlayerState: _videoPlayerState,
+        child: ListenableBuilder(
+          listenable: HomeProvider(),
+          builder: (context, child) {
+            return PageView.builder(
               itemCount: 3,
               controller: _pageController,
               physics: HomeProvider().enablePageView
                   ? null
                   : const NeverScrollableScrollPhysics(),
               onPageChanged: (page) {
-                // if (page != 0 && page != 2 && page == 1) {
-                //   customImagePickerKey.currentState?.resetAll();
-                // }
+                if (page != 0 && page != 2 && page == 1) {
+                  // customImagePickerKey.currentState?.resetAll();
+                }
                 if (page == 1 && widget.navigationShell.currentIndex != 0) {
                   HomeProvider().togglePageView(enable: false);
                 }
@@ -114,19 +145,22 @@ class _HomeViewState extends State<HomeView> {
                 return switch (index) {
                   0 => UserProfileCreatePost(
                       canPop: false,
-                      //imagePickerKey: customImagePickerKey,
+                      // imagePickerKey: customImagePickerKey,
                       onPopInvoked: () => HomeProvider().animateToPage(1),
                       onBackButtonTap: () => HomeProvider().animateToPage(1),
                     ),
                   2 => const ChatsPage(),
                   _ => AppScaffold(
-                    body: widget.navigationShell,
-                    bottomNavigationBar: BottomNavBar(navigationShell: widget.navigationShell),
+                      body: widget.navigationShell,
+                      bottomNavigationBar:
+                          BottomNavBar(navigationShell: widget.navigationShell),
                     ),
                 };
               },
             );
-        }),
+          },
+        ),
+      ),
     );
   }
 }

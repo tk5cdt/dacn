@@ -20,6 +20,7 @@ dependencies:
   env:
     path: packages/env
   equatable: ^2.0.5
+  fast_immutable_collections: ^11.0.0
   firebase_core: ^3.4.0
   firebase_messaging: ^15.1.5
   firebase_notifications_client:
@@ -70,6 +71,11 @@ dependencies:
   slang_build_runner: ^4.1.0
   slang_flutter: ^4.1.0
   sliver_tools: ^0.2.12
+  stories_editor:
+    path: packages/stories_editor
+  stories_repository:
+    path: packages/stories_repository
+  palette_generator: ^0.3.3
   supabase_authentication_client:
     path: packages/authentication_client/supabase_authentication_client
   supabase_flutter: ^2.6.0

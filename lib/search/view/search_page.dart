@@ -1,6 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:conexion/app/app.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/stories/stories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -77,13 +78,13 @@ class UserListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      // leading: UserStoriesAvatar(
-      //   resizeHeight: 156,
-      //   author: user,
-      //   withAdaptiveBorder: false,
-      //   enableInactiveBorder: false,
-      //   radius: 26,
-      // ),
+      leading: UserStoriesAvatar(
+        resizeHeight: 156,
+        author: user,
+        withAdaptiveBorder: false,
+        enableInactiveBorder: false,
+        radius: 26,
+      ),
       title: Text(user.displayUsername),
       subtitle: Text(
         user.displayFullName,
@@ -139,17 +140,6 @@ class _SearcAppBarState extends State<SearcAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    // return BlocProvider(
-    //   create: (context) => SearchBloc(
-    //     searchRepository: context.read<SearchRepository>(),
-    //   ),
-    //   child: _SearchAppBar(
-    //     onUsersSearch: widget.onUsersSearch,
-    //     focusNode: _focusNode,
-    //     searchController: _searchController,
-    //   ),
-    // );
-
     return AppBar(
       title: SearchInputField(
         active: false,

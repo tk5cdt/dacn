@@ -134,15 +134,15 @@ class PostLargeView extends StatelessWidget {
       postIndex: postIndex,
       withInViewNotifier: withInViewNotifier,
       likersInFollowings: likersInFollowings,
-      // postAuthorAvatarBuilder: (context, author, onAvatarTap) {
-      //   return UserStoriesAvatar(
-      //     resizeHeight: 108,
-      //     author: author.toUser,
-      //     onAvatarTap: onAvatarTap,
-      //     enableInactiveBorder: false,
-      //     withAdaptiveBorder: false,
-      //   );
-      // },
+      postAuthorAvatarBuilder: (context, author, onAvatarTap) {
+        return UserStoriesAvatar(
+          resizeHeight: 108,
+          author: author.toUser,
+          onAvatarTap: onAvatarTap,
+          enableInactiveBorder: false,
+          withAdaptiveBorder: false,
+        );
+      },
       postOptionsSettings: isOwner
           ? PostOptionsSettings.owner(
               onPostEdit: (block) => context.pushNamed(

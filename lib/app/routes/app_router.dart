@@ -12,13 +12,17 @@ import 'package:conexion/feed/feed.dart';
 import 'package:conexion/feed/post/post.dart';
 import 'package:conexion/reels/reels.dart';
 import 'package:conexion/search/search.dart';
+import 'package:conexion/stories/stories.dart';
 import 'package:conexion/timeline/timeline.dart';
 import 'package:conexion/user_profile/user_profile.dart';
+import 'package:firebase_remote_config_repository/firebase_remote_config_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
+import 'package:stories_editor/stories_editor.dart';
+import 'package:stories_repository/stories_repository.dart';
 // import 'package:stories_editor/stories_editor.dart';
 // import 'package:stories_repository/stories_repository.dart';
 import 'package:user_repository/user_repository.dart';
@@ -39,39 +43,6 @@ class AppRouter {
             name: AppRoutes.auth.name,
             builder: (context, state) => const AuthPage(),
           ),
-          // GoRoute(
-          //   path: AppRoutes.userProfile.path!,
-          //   name: AppRoutes.userProfile.name,
-          //   parentNavigatorKey: _rootNavigatorKey,
-          //   pageBuilder: (context, state) {
-          //     final userId = state.pathParameters['user_id']!;
-          //     final props = state.extra as UserProfileProps?;
-
-          //     return CustomTransitionPage(
-          //       key: state.pageKey,
-          //       child: BlocProvider(
-          //         create: (context) => CreateStoriesBloc(
-          //           storiesRepository: context.read<StoriesRepository>(),
-          //           firebaseRemoteConfigRepository:
-          //               context.read<FirebaseRemoteConfigRepository>(),
-          //         ),
-          //         child: UserProfilePage(
-          //           userId: userId,
-          //           props: props ?? const UserProfileProps.build(),
-          //         ),
-          //       ),
-          //       transitionsBuilder:
-          //           (context, animation, secondaryAnimation, child) {
-          //         return SharedAxisTransition(
-          //           animation: animation,
-          //           secondaryAnimation: secondaryAnimation,
-          //           transitionType: SharedAxisTransitionType.horizontal,
-          //           child: child,
-          //         );
-          //       },
-          //     );
-          //   },
-          // ),
           GoRoute(
             path: AppRoutes.userProfile.path!,
             name: AppRoutes.userProfile.name,
@@ -82,20 +53,16 @@ class AppRouter {
 
               return CustomTransitionPage(
                 key: state.pageKey,
-                // child: BlocProvider(
-                //   create: (context) => CreateStoriesBloc(
-                //     storiesRepository: context.read<StoriesRepository>(),
-                //     firebaseRemoteConfigRepository:
-                //         context.read<FirebaseRemoteConfigRepository>(),
-                //   ),
-                //   child: UserProfilePage(
-                //     userId: userId,
-                //     props: props ?? const UserProfileProps.build(),
-                //   ),
-                // ),
-                child: UserProfilePage(
-                  userId: userId,
-                  props: props ?? const UserProfileProps.build(),
+                child: BlocProvider(
+                  create: (context) => CreateStoriesBloc(
+                    storiesRepository: context.read<StoriesRepository>(),
+                    firebaseRemoteConfigRepository:
+                        context.read<FirebaseRemoteConfigRepository>(),
+                  ),
+                  child: UserProfilePage(
+                    userId: userId,
+                    props: props ?? const UserProfileProps.build(),
+                  ),
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
@@ -109,6 +76,44 @@ class AppRouter {
               );
             },
           ),
+
+          // GoRoute(
+          //   path: AppRoutes.userProfile.path!,
+          //   name: AppRoutes.userProfile.name,
+          //   parentNavigatorKey: _rootNavigatorKey,
+          //   pageBuilder: (context, state) {
+          //     final userId = state.pathParameters['user_id']!;
+          //     final props = state.extra as UserProfileProps?;
+
+          //     return CustomTransitionPage(
+          //       key: state.pageKey,
+          //       // child: BlocProvider(
+          //       //   create: (context) => CreateStoriesBloc(
+          //       //     storiesRepository: context.read<StoriesRepository>(),
+          //       //     firebaseRemoteConfigRepository:
+          //       //         context.read<FirebaseRemoteConfigRepository>(),
+          //       //   ),
+          //       //   child: UserProfilePage(
+          //       //     userId: userId,
+          //       //     props: props ?? const UserProfileProps.build(),
+          //       //   ),
+          //       // ),
+          //       child: UserProfilePage(
+          //         userId: userId,
+          //         props: props ?? const UserProfileProps.build(),
+          //       ),
+          //       transitionsBuilder:
+          //           (context, animation, secondaryAnimation, child) {
+          //         return SharedAxisTransition(
+          //           animation: animation,
+          //           secondaryAnimation: secondaryAnimation,
+          //           transitionType: SharedAxisTransitionType.horizontal,
+          //           child: child,
+          //         );
+          //       },
+          //     );
+          //   },
+          // ),
           GoRoute(
             path: AppRoutes.chat.path!,
             name: AppRoutes.chat.name,
@@ -164,28 +169,28 @@ class AppRouter {
               return NoTransitionPage(child: PostEditPage(post: post));
             },
           ),
-          // GoRoute(
-          //   path: AppRoutes.stories.path!,
-          //   name: AppRoutes.stories.name,
-          //   parentNavigatorKey: _rootNavigatorKey,
-          //   pageBuilder: (context, state) {
-          //     final props = state.extra! as StoriesProps;
+          GoRoute(
+            path: AppRoutes.stories.path!,
+            name: AppRoutes.stories.name,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: (context, state) {
+              final props = state.extra! as StoriesProps;
 
-          //     return CustomTransitionPage(
-          //       key: state.pageKey,
-          //       child: StoriesPage(props: props),
-          //       transitionsBuilder:
-          //           (context, animation, secondaryAnimation, child) {
-          //         return SharedAxisTransition(
-          //           animation: animation,
-          //           secondaryAnimation: secondaryAnimation,
-          //           transitionType: SharedAxisTransitionType.scaled,
-          //           child: child,
-          //         );
-          //       },
-          //     );
-          //   },
-          // ),
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: StoriesPage(props: props),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.scaled,
+                    child: child,
+                  );
+                },
+              );
+            },
+          ),
           StatefulShellRoute.indexedStack(
             parentNavigatorKey: _rootNavigatorKey,
             builder: (context, state, navigationShell) {
@@ -367,38 +372,38 @@ class AppRouter {
                           ),
                         ],
                       ),
-                      // GoRoute(
-                      //   path: AppRoutes.createStories.name,
-                      //   name: AppRoutes.createStories.name,
-                      //   parentNavigatorKey: _rootNavigatorKey,
-                      //   pageBuilder: (context, state) {
-                      //     final onDone =
-                      //         state.extra as dynamic Function(String)?;
+                      GoRoute(
+                        path: AppRoutes.createStories.name,
+                        name: AppRoutes.createStories.name,
+                        parentNavigatorKey: _rootNavigatorKey,
+                        pageBuilder: (context, state) {
+                          final onDone =
+                              state.extra as dynamic Function(String)?;
 
-                      //     return CustomTransitionPage(
-                      //       key: state.pageKey,
-                      //       child: StoriesEditor(
-                      //         onDone: onDone,
-                      //         storiesEditorLocalizationDelegate:
-                      //             storiesEditorLocalizationDelegate(context),
-                      //         galleryThumbnailQuality: 900,
-                      //       ),
-                      //       transitionsBuilder: (
-                      //         context,
-                      //         animation,
-                      //         secondaryAnimation,
-                      //         child,
-                      //       ) {
-                      //         return SharedAxisTransition(
-                      //           animation: animation,
-                      //           secondaryAnimation: secondaryAnimation,
-                      //           transitionType: SharedAxisTransitionType.scaled,
-                      //           child: child,
-                      //         );
-                      //       },
-                      //     );
-                      //   },
-                      // ),
+                          return CustomTransitionPage(
+                            key: state.pageKey,
+                            child: StoriesEditor(
+                              onDone: onDone,
+                              storiesEditorLocalizationDelegate:
+                                  storiesEditorLocalizationDelegate(context),
+                              galleryThumbnailQuality: 900,
+                            ),
+                            transitionsBuilder: (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                              child,
+                            ) {
+                              return SharedAxisTransition(
+                                animation: animation,
+                                secondaryAnimation: secondaryAnimation,
+                                transitionType: SharedAxisTransitionType.scaled,
+                                child: child,
+                              );
+                            },
+                          );
+                        },
+                      ),
                       GoRoute(
                         path: AppRoutes.editProfile.name,
                         name: AppRoutes.editProfile.name,

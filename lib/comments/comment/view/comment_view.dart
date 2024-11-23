@@ -4,6 +4,7 @@ import 'package:conexion/app/app.dart';
 import 'package:conexion/comments/comment/comment.dart';
 import 'package:conexion/comments/comments.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:conexion/stories/stories.dart';
 import 'package:conexion_blocks_ui/conexion_blocks_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,15 +75,15 @@ class CommentGroup extends StatelessWidget {
             AppRoutes.userProfile.name,
             pathParameters: {'user_id': comment.author.id},
           ),
-          // avatarBuilder: (context, author, onAvatarTap, radius) =>
-          //     UserStoriesAvatar(
-          //   resizeHeight: 108,
-          //   author: author,
-          //   onAvatarTap: onAvatarTap,
-          //   radius: radius,
-          //   enableInactiveBorder: false,
-          //   withAdaptiveBorder: false,
-          // ),
+          avatarBuilder: (context, author, onAvatarTap, radius) =>
+              UserStoriesAvatar(
+            resizeHeight: 108,
+            author: author,
+            onAvatarTap: onAvatarTap,
+            radius: radius,
+            enableInactiveBorder: false,
+            withAdaptiveBorder: false,
+          ),
           onReplyButtonTap: (username) => commentInputController.setReplyingTo(
             commentId: isReplied ? comment.repliedToCommentId! : comment.id,
             username: username,
