@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:shared/shared.dart';
 import 'package:flutter/widgets.dart';
 import 'package:conexion/l10n/l10n.dart';
+import 'package:stories_editor/stories_editor.dart';
 
 void initUtilities(BuildContext context, Locale locale) {
   final isSameLocal = Localizations.localeOf(context) == locale;
@@ -69,21 +70,21 @@ void initUtilities(BuildContext context, Locale locale) {
   );
 }
 
-// StoriesEditorLocalizationDelegate storiesEditorLocalizationDelegate(
-//   BuildContext context,
-// ) {
-//   final l10n = context.l10n;
-//   return StoriesEditorLocalizationDelegate(
-//     cancelText: l10n.cancelText,
-//     discardEditsText: l10n.discardEditsText,
-//     discardText: l10n.discardText,
-//     doneText: l10n.doneText,
-//     draftEmpty: l10n.draftEmpty,
-//     errorText: l10n.errorText,
-//     loseAllEditsText: l10n.loseAllEditsText,
-//     saveDraft: l10n.saveDraft,
-//     successfullySavedText: l10n.successfullySavedText,
-//     tapToTypeText: l10n.tapToTypeText,
-//     uploadText: l10n.uploadText,
-//   );
-// }
+StoriesEditorLocalizationDelegate storiesEditorLocalizationDelegate(
+  BuildContext context,
+) {
+  final l10n = context.l10n;
+  return StoriesEditorLocalizationDelegate(
+    cancelText: l10n.cancelText,
+    discardEditsText: l10n.discardEditsText,
+    discardText: l10n.discardText,
+    doneText: l10n.doneText,
+    draftEmpty: l10n.draftEmpty,
+    errorText: l10n.errorText,
+    loseAllEditsText: l10n.loseAllEditsText,
+    saveDraft: l10n.saveDraft,
+    successfullySavedText: l10n.successfullySavedText,
+    tapToTypeText: l10n.tapToTypeText,
+    uploadText: l10n.uploadText,
+  );
+}

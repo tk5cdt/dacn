@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:app_ui/app_ui.dart';
 import 'package:collection/collection.dart';
 import 'package:con_blocks/con_blocks.dart';
+import 'package:conexion/app/app.dart';
 import 'package:conexion/feed/feed.dart';
 import 'package:conexion/feed/post/video/video.dart';
 import 'package:conexion/l10n/l10n.dart';
@@ -15,24 +16,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:posts_repository/posts_repository.dart';
 import 'package:shared/shared.dart';
-
-class ReelsPage extends StatelessWidget {
-  const ReelsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => FeedBloc(
-        postsRepository: context.read<PostsRepository>(),
-        firebaseRemoteConfigRepository:
-            context.read<FirebaseRemoteConfigRepository>(),
-      ),
-      child: const Scaffold(
-        body: ReelsView(),
-      ),
-    );
-  }
-}
 
 class ReelsView extends StatefulWidget {
   const ReelsView({super.key});
@@ -80,19 +63,7 @@ class _ReelsViewState extends State<ReelsView> {
                   );
             },
             builder: (context, state) {
-              if (state.status == FeedStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state.status == FeedStatus.failure) {
-                return Center(
-                  child: Text('Error loading reels: ${state.failure}'),
-                );
-              }
-
               final blocks = state.feed.reelsPage.blocks;
-
-              print('Reels blocks: ${blocks.length}');
 
               if (blocks.isEmpty) {
                 return const NoReelsFound();
@@ -153,7 +124,8 @@ class _ReelsViewState extends State<ReelsView> {
           right: AppSpacing.md,
           top: AppSpacing.md,
           child: Tappable.faded(
-            onTap: () => context.pushNamed('create_post', extra: true),
+            onTap: () =>
+                context.pushNamed(AppRoutes.createPost.name, extra: true),
             child: Icon(
               Icons.camera_alt_outlined,
               size: AppSize.iconSize,

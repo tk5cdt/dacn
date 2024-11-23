@@ -14,6 +14,7 @@ import 'package:con_blocks/con_blocks.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis/servicecontrol/v1.dart' as servicecontrol;
+import 'package:flutter/foundation.dart';
 
 abstract class UserBaseRepository {
   const UserBaseRepository();
@@ -218,20 +219,52 @@ abstract class PostsBaseRepository {
   });
 }
 
+/// The abstract base class for a stories repository.
+abstract class StoriesBaseRepository {
+  /// {@macro stories_base_repository}
+  const StoriesBaseRepository();
+
+  /// Broadcasts the stream of the stories from the database.
+  Stream<List<Story>> getStories({
+    required String userId,
+    bool includeAuthor = true,
+  });
+
+  /// Creates the [Story] with the provided data.
+  Future<void> createStory({
+    required User author,
+    required StoryContentType contentType,
+    required String contentUrl,
+    String? id,
+    int? duration,
+  });
+
+  /// Deletes the [Story] identified by [id].
+  Future<void> deleteStory({required String id});
+
+  /// Uploads the story media into the Supabase storage.
+  Future<String> uploadStoryMedia({
+    required String storyId,
+    required File imageFile,
+    required Uint8List imageBytes,
+  });
+}
+
 /// {@template database_client}
 /// A Very Good Project created by Very Good CLI.
 /// {@endtemplate}
 abstract class DatabaseClient
-    implements UserBaseRepository, PostsBaseRepository, ChatsBaseRepository
-// SearchBaseRepository,
-{
+    implements
+        UserBaseRepository,
+        PostsBaseRepository,
+        ChatsBaseRepository,
+        StoriesBaseRepository {
   /// {@macro database_client}
   const DatabaseClient();
 }
 
-class PowerSyncDatabaseClient
-    implements DatabaseClient, PostsBaseRepository, ChatsBaseRepository
-// SearchBaseRepository,
+class PowerSyncDatabaseClient extends DatabaseClient
+// implements DatabaseClient, PostsBaseRepository, ChatsBaseRepository
 {
   const PowerSyncDatabaseClient({
     required PowerSyncRepository powerSyncRepository,
@@ -981,7 +1014,6 @@ where
         parameters: [chatId],
       ).map((event) => event.safeMap(Message.fromRow).toList(growable: false));
 
-
   @override
   Future<void> sendMessage({
     required String chatId,
@@ -990,9 +1022,9 @@ where
     required Message message,
     PostAuthor? postAuthor,
   }) async {
-      await _powerSyncRepository.db().writeTransaction((sqlContext) async {
-        await sqlContext.execute(
-          '''
+    await _powerSyncRepository.db().writeTransaction((sqlContext) async {
+      await sqlContext.execute(
+        '''
           insert into
             messages (
               id, conversation_id, from_id, type, message, reply_message_id, created_at, 
@@ -1002,23 +1034,23 @@ where
           values
             (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, ?, ?, ?)
           ''',
-          [
-            message.id,
-            chatId,
-            sender.id,
-            message.type.value,
-            message.message,
-            message.replyMessageId,
-            DateTime.now().toIso8601String(),
-            DateTime.now().toIso8601String(),
-            message.replyMessageUsername,
-            message.replyMessageAttachmentUrl,
-            message.sharedPostId,
-          ],
-        );
+        [
+          message.id,
+          chatId,
+          sender.id,
+          message.type.value,
+          message.message,
+          message.replyMessageId,
+          DateTime.now().toIso8601String(),
+          DateTime.now().toIso8601String(),
+          message.replyMessageUsername,
+          message.replyMessageAttachmentUrl,
+          message.sharedPostId,
+        ],
+      );
 
-        await sqlContext.executeBatch(
-          '''
+      await sqlContext.executeBatch(
+        '''
 insert into
   attachments (
     id, message_id, title, text, title_link, image_url,
@@ -1026,52 +1058,50 @@ insert into
   )
 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ''',
-          message.attachments
-              .map(
-                (a) => [
-                  a.id,
-                  message.id,
-                  a.title,
-                  a.text,
-                  a.titleLink,
-                  a.imageUrl,
-                  a.thumbUrl,
-                  a.authorName,
-                  a.authorLink,
-                  a.assetUrl,
-                  a.ogScrapeUrl,
-                  a.type,
-                ],
-              )
-              .toList(),
-        );
-        
-      });
-      try {
-          final receivePort = ReceivePort();
-          final List<dynamic> args = [
-            receivePort.sendPort,
-            receiver.displayUsername,
-            sender.displayUsername,
-            message.message,
-            postAuthor?.username,
-            chatId,
-            receiver.pushToken,
-          ];
+        message.attachments
+            .map(
+              (a) => [
+                a.id,
+                message.id,
+                a.title,
+                a.text,
+                a.titleLink,
+                a.imageUrl,
+                a.thumbUrl,
+                a.authorName,
+                a.authorLink,
+                a.assetUrl,
+                a.ogScrapeUrl,
+                a.type,
+              ],
+            )
+            .toList(),
+      );
+    });
+    try {
+      final receivePort = ReceivePort();
+      final List<dynamic> args = [
+        receivePort.sendPort,
+        receiver.displayUsername,
+        sender.displayUsername,
+        message.message,
+        postAuthor?.username,
+        chatId,
+        receiver.pushToken,
+      ];
 
-          await Isolate.spawn(sendBackgroundNotification, args);
-        } catch (error, stackTrace) {
-          logE(
-            'Error send notification.',
-            error: error,
-            stackTrace: stackTrace,
-          );
-        }
+      await Isolate.spawn(sendBackgroundNotification, args);
+    } catch (error, stackTrace) {
+      logE(
+        'Error send notification.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   /// Sends notification in a background isolate.
   Future<void> sendBackgroundNotification(List<dynamic> args) async {
-    
     logD('Sending notification in background isolate...');
     await sendNotification(
       reciever: args[1] as String,
@@ -1102,11 +1132,11 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     //get access token
     final auth.AccessCredentials credentials =
         await auth.obtainAccessCredentialsViaServiceAccount(
-            auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
-            scopes,
-            client,
-          );
-    
+      auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
+      scopes,
+      client,
+    );
+
     client.close();
 
     return credentials.accessToken.data;
@@ -1125,8 +1155,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     final notificationMessage = postAuthor != null
         ? 'Sent post by ${postAuthor}'
         : message ?? 'Sent a message';
-    final notificationBody =
-        '($reciever): $sender: '
+    final notificationBody = '($reciever): $sender: '
         '$notificationMessage';
 
     final headers = {
@@ -1511,5 +1540,75 @@ LIMIT ? OFFSET ?
     );
     if (result.isEmpty) return [];
     return result.safeMap(User.fromJson).toList(growable: false);
+  }
+
+  @override
+  Future<void> createStory({
+    required User author,
+    required StoryContentType contentType,
+    required String contentUrl,
+    String? id,
+    int? duration,
+  }) =>
+      _powerSyncRepository.db().execute(
+        '''
+insert into stories (id, user_id, content_type, content_url, duration, created_at, expires_at)
+values (?, ?, ?, ?, ?, ?, ?)
+''',
+        [
+          id ?? uuid.v4(),
+          author.id,
+          contentType.toJson(),
+          contentUrl,
+          duration,
+          DateTime.timestamp().toIso8601String(),
+          DateTime.timestamp().add(1.days).toIso8601String(),
+        ],
+      );
+
+  @override
+  Future<void> deleteStory({required String id}) =>
+      _powerSyncRepository.db().execute(
+        '''
+DELETE FROM stories WHERE id = ?
+''',
+        [id],
+      );
+
+  @override
+  Stream<List<Story>> getStories({
+    required String userId,
+    bool includeAuthor = true,
+  }) =>
+      _powerSyncRepository.db().watch(
+        '''
+SELECT 
+  s.*${includeAuthor ? ', p.id as user_id, p.username, p.full_name, p.avatar_url' : ''}
+FROM stories s
+  ${includeAuthor ? 'LEFT JOIN profiles p ON s.user_id = p.id' : ''}
+WHERE user_id = ? AND expires_at > current_timestamp
+''',
+        parameters: [userId],
+      ).map((event) => event.safeMap(Story.fromJson).toList(growable: false));
+
+  @override
+  Future<String> uploadStoryMedia({
+    required String storyId,
+    required File imageFile,
+    required Uint8List imageBytes,
+  }) async {
+    final stories = _powerSyncRepository.supabase.storage.from('stories');
+    final imageExtension = imageFile.path.split('.').last.toLowerCase();
+    final imagePath = '$storyId/image';
+
+    await stories.uploadBinary(
+      imagePath,
+      imageBytes,
+      fileOptions: FileOptions(
+        contentType: 'image/$imageExtension',
+        cacheControl: '9000000',
+      ),
+    );
+    return stories.getPublicUrl(imagePath);
   }
 }
