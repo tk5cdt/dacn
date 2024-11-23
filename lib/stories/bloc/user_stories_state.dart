@@ -16,7 +16,7 @@ class UserStoriesState extends Equatable {
       : this(
           author: User.anonymous,
           stories: const [],
-          showStories: false,
+          showStories: true,
         );
 
   final User author;

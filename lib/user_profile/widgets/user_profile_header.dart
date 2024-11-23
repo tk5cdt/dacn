@@ -50,17 +50,6 @@ class UserProfileHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                UserProfileAvatar(
-                  avatarUrl: user.avatarUrl,
-                  onLongPress: (avatarUrl) => avatarUrl == null
-                      ? null
-                      : context.showImagePreview(avatarUrl),
-                  onTap: (imageUrl) {
-                    if (imageUrl == null) return;
-                    if (!isOwner) context.showImagePreview(imageUrl);
-                    if (isOwner) {}
-                  },
-                ),
                 UserStoriesAvatar(
                   resizeHeight: 252,
                   author: user,
