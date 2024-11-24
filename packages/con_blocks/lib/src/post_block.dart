@@ -1,8 +1,11 @@
-import 'package:con_blocks/con_blocks.dart';
-import 'package:con_blocks/src/models/models.dart';
 import 'package:equatable/equatable.dart';
-
+import 'package:con_blocks/src/block_action.dart';
+import 'package:con_blocks/src/models/models.dart';
 import 'package:shared/shared.dart';
+
+import '../con_blocks.dart';
+import 'block_action.dart';
+import 'models/models.dart';
 
 /// {@template post_block}
 /// An abstract block which represents a post block.
@@ -104,22 +107,22 @@ extension PostBlockActions on PostBlock {
       action?.actionType == BlockActionType.navigation;
 }
 
-// /// {@template post_block_list_extension}
-// /// Extends the functionality of a list of [PostLargeBlock] by providing a
-// /// method to add a navigation action to each element in the list.
-// ///
-// /// Usage:
-// /// ```dart
-// /// List<PostLargeBlock> postList = ...;
-// ///
-// /// List<PostLargeBlock> postListWithAction =
-// ///   postList.withNavigateToPostAuthorAction;
-// /// ```
-// /// The `withNavigateToPostAuthorAction` method returns a new list where each
-// /// element has the action [NavigateToPostAuthorProfileAction] added to it.
-// /// The action is created using the author ID of each element in the original
-// /// list.
-// /// {@endtemplate}
+/// {@template post_block_list_extension}
+/// Extends the functionality of a list of [PostLargeBlock] by providing a
+/// method to add a navigation action to each element in the list.
+///
+/// Usage:
+/// ```dart
+/// List<PostLargeBlock> postList = ...;
+///
+/// List<PostLargeBlock> postListWithAction =
+///   postList.withNavigateToPostAuthorAction;
+/// ```
+/// The `withNavigateToPostAuthorAction` method returns a new list where each
+/// element has the action [NavigateToPostAuthorProfileAction] added to it.
+/// The action is created using the author ID of each element in the original
+/// list.
+/// {@endtemplate}
 extension PostBlockListExtension on List<PostLargeBlock> {
   /// Provides each element in list of [PostLargeBlock] with action
   /// [NavigateToPostAuthorProfileAction].

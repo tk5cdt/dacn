@@ -1,5 +1,5 @@
-import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
+import 'package:con_blocks/con_blocks.dart';
 
 /// {@template reels_page}
 /// Represents a page of blocks data containing reels [blocks],

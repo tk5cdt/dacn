@@ -1,5 +1,6 @@
-import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
+import 'package:con_blocks/con_blocks.dart';
+import 'package:con_blocks/src/con_blocks_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'feed_page.g.dart';

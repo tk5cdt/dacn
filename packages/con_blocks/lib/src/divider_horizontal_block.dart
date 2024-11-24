@@ -1,7 +1,7 @@
-import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared/shared.dart';
+import 'package:con_blocks/con_blocks.dart';
 
 part 'divider_horizontal_block.g.dart';
 
