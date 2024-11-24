@@ -36,13 +36,13 @@ class ChatInboxTile extends StatelessWidget {
             .read<ChatsBloc>()
             .add(ChatsDeleteChatRequested(chatId: chat.id, userId: user.id)),
       ),
-      // leading: UserStoriesAvatar(
-      //   resizeHeight: 156,
-      //   author: participant,
-      //   enableInactiveBorder: false,
-      //   withAdaptiveBorder: false,
-      //   radius: 26,
-      // ),
+      leading: UserStoriesAvatar(
+        resizeHeight: 156,
+        author: participant,
+        enableInactiveBorder: false,
+        withAdaptiveBorder: false,
+        radius: 26,
+      ),
       title: Text(participant.displayFullName),
       subtitle: Text(chat.lastMessage ?? context.l10n.noLastMessagesText),
     );

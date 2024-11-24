@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:con_blocks/con_blocks.dart';
+import 'package:con_blocks/src/models/post_author_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared/shared.dart';
 

@@ -1,4 +1,5 @@
 import 'package:con_blocks/con_blocks.dart';
+import 'package:con_blocks/src/models/models.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared/shared.dart';
 
@@ -21,14 +22,8 @@ class PostReelBlock extends PostBlock {
   });
 
   /// Converts a `Map<String, dynamic>` into a [PostReelBlock] instance.
-  factory PostReelBlock.fromJson(Map<String, dynamic> json) {
-    try {
-      return _$PostReelBlockFromJson(json);
-    } catch (e) {
-      print('Error parsing PostReelBlock: $e');
-      rethrow;
-    }
-  }
+  factory PostReelBlock.fromJson(Map<String, dynamic> json) =>
+      _$PostReelBlockFromJson(json);
 
   /// The large post block type identifier.
   static const identifier = '__post_reel__';

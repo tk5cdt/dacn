@@ -1,7 +1,11 @@
-import 'package:con_blocks/con_blocks.dart';
+import 'package:con_blocks/src/models/post_author_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared/shared.dart';
-import 'package:user_repository/user_repository.dart';
+import 'package:con_blocks/con_blocks.dart';
+
+import 'block_action.dart';
+import 'models/post_author.dart';
+import 'post_block.dart';
 
 part 'post_large_block.g.dart';
 
@@ -19,7 +23,6 @@ class PostLargeBlock extends PostBlock {
     required super.caption,
     super.action,
     super.type = PostLargeBlock.identifier,
-    this.likersInFollowings = const [],
   });
 
   /// Converts a `Map<String, dynamic>` into a [PostLargeBlock] instance.
@@ -28,8 +31,6 @@ class PostLargeBlock extends PostBlock {
 
   /// The large post block type identifier.
   static const identifier = '__post_large__';
-
-  final List<User> likersInFollowings;
 
   @override
   PostLargeBlock copyWith({

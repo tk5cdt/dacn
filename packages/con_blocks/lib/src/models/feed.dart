@@ -1,5 +1,6 @@
 import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
+import 'package:con_blocks/con_blocks.dart';
 
 /// {@template feed}
 /// Represents a page of feed data containing [Feed] blocks, the page number,

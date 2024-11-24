@@ -455,13 +455,13 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         contentPadding: EdgeInsets.zero,
         title: Text(participant.displayUsername),
         subtitle: Text(context.l10n.onlineText),
-        // leading: UserStoriesAvatar(
-        //   resizeHeight: 156,
-        //   author: participant,
-        //   enableInactiveBorder: false,
-        //   withAdaptiveBorder: false,
-        //   radius: 22,
-        // ),
+        leading: UserStoriesAvatar(
+          resizeHeight: 156,
+          author: participant,
+          enableInactiveBorder: false,
+          withAdaptiveBorder: false,
+          radius: 22,
+        ),
       ),
       bottom: const PreferredSize(
         preferredSize: Size.fromHeight(AppSpacing.xxs),

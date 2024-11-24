@@ -1,7 +1,7 @@
-import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared/shared.dart';
+import 'package:con_blocks/con_blocks.dart';
 
 part 'section_header_block.g.dart';
 

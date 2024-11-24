@@ -1,5 +1,5 @@
-import 'package:con_blocks/con_blocks.dart';
 import 'package:equatable/equatable.dart';
+import 'package:con_blocks/con_blocks.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'unknown_block.g.dart';
