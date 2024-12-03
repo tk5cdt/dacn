@@ -35,11 +35,20 @@ class LoginView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Gap.v(AppSpacing.xxxlg + AppSpacing.xxxlg),
-            const AppLogo(
-              height: AppSpacing.xxxlg,
-              fit: BoxFit.fitHeight,
-              width: double.infinity,
+            Text(
+              'Conexion',
+              style: context.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+                fontFamily: FontFamily.inter,
+              ),
             ),
+            const Gap.v(AppSpacing.xxlg),
+            // const AppLogo(
+            //   height: AppSpacing.xxxlg,
+            //   fit: BoxFit.fitHeight,
+            //   width: double.infinity,
+            // ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,13 +96,13 @@ class LoginView extends StatelessWidget {
                           context.read<LoginCubit>().loginWithGoogle(),
                     ),
                   ),
-                  Align(
-                    child: AuthProviderSignInButton(
-                      provider: AuthProvider.github,
-                      onPressed: () =>
-                          context.read<LoginCubit>().loginWithGithub(),
-                    ),
-                  ),
+                  // Align(
+                  //   child: AuthProviderSignInButton(
+                  //     provider: AuthProvider.github,
+                  //     onPressed: () =>
+                  //         context.read<LoginCubit>().loginWithGithub(),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

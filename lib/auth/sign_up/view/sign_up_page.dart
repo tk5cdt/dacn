@@ -46,7 +46,16 @@ class _SignUpViewState extends State<SignUpView> {
         child: Column(
           children: [
             const Gap.v(AppSpacing.xxxlg + AppSpacing.xlg),
-            const AppLogo(fit: BoxFit.fitHeight),
+            Text(
+              'Conexion',
+              style: context.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+                fontFamily: FontFamily.inter,
+              ),
+            ),
+            const Gap.v(AppSpacing.md),
+            // const AppLogo(fit: BoxFit.fitHeight),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

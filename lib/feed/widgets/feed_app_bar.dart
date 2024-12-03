@@ -14,7 +14,14 @@ class FeedAppBar extends StatelessWidget {
       sliver: SliverAppBar(
         centerTitle: false,
         forceElevated: innerBoxIsScrolled,
-        title: const AppLogo(),
+        title: Text(
+          'Conexion',
+          style: context.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 28,
+            fontFamily: FontFamily.inter,
+          ),
+        ),
         floating: true,
         snap: true,
         actions: [
