@@ -69,7 +69,7 @@ dependencies:
     path: packages/shared
   slang: ^4.2.1
   slang_build_runner: ^4.1.0
-  slang_flutter: ^4.1.0
+  slang_flutter: ^4.4.0
   sliver_tools: ^0.2.12
   stories_editor:
     path: packages/stories_editor
