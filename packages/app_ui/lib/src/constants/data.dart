@@ -67,7 +67,7 @@ enum PremiumGradient {
 }
 
 List<String> get commentEmojies =>
-    ['🩷', '🙌', '🔥', '👏🏻', '😢', '😍', '😮', '😂'];
+    ['💖', '🙌', '🔥', '👏🏻', '😢', '😍', '😮', '😂'];
 
 List<ModalOption> createMediaModalOptions({
   required String reelLabel,

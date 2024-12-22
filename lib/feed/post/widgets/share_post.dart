@@ -299,7 +299,7 @@ class _SharePostButtonState extends State<SharePostButton> {
                   message: _messageController.text.trim().isEmpty
                       ? null
                       : Message(
-                          message: _messageController.text,
+                          message: _messageController.text.trim(),
                           sender: sender,
                         ),
                 ),
