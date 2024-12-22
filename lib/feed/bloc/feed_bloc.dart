@@ -156,7 +156,7 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> with FeedBlocMixin {
 
       emit(state.populated(feed: feed));
 
-      if (!hasMore) add(const FeedRecommendedPostsPageRequested());
+      // if (!hasMore) add(const FeedRecommendedPostsPageRequested());
     } catch (error, stackTrace) {
       addError(error, stackTrace);
       emit(state.failure());

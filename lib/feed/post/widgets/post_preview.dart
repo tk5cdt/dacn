@@ -30,7 +30,14 @@ class PostPreviewAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const AppLogo(),
+      title: Text(
+        'Conexion',
+        style: context.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 28,
+          fontFamily: FontFamily.inter,
+        ),
+      ),
       centerTitle: false,
     );
   }

@@ -43,6 +43,40 @@ class AppRouter {
             name: AppRoutes.auth.name,
             builder: (context, state) => const AuthPage(),
           ),
+          // GoRoute(
+          //   path: AppRoutes.userProfile.path!,
+          //   name: AppRoutes.userProfile.name,
+          //   parentNavigatorKey: _rootNavigatorKey,
+          //   pageBuilder: (context, state) {
+          //     final userId = state.pathParameters['user_id']!;
+          //     final props = state.extra as UserProfileProps?;
+
+          //     return CustomTransitionPage(
+          //       key: state.pageKey,
+          //       child: BlocProvider(
+          //         create: (context) => CreateStoriesBloc(
+          //           storiesRepository: context.read<StoriesRepository>(),
+          //           firebaseRemoteConfigRepository:
+          //               context.read<FirebaseRemoteConfigRepository>(),
+          //         ),
+          //         child: UserProfilePage(
+          //           userId: userId,
+          //           props: props ?? const UserProfileProps.build(),
+          //         ),
+          //       ),
+          //       transitionsBuilder:
+          //           (context, animation, secondaryAnimation, child) {
+          //         return SharedAxisTransition(
+          //           animation: animation,
+          //           secondaryAnimation: secondaryAnimation,
+          //           transitionType: SharedAxisTransitionType.horizontal,
+          //           child: child,
+          //         );
+          //       },
+          //     );
+          //   },
+          // ),
+
           GoRoute(
             path: AppRoutes.userProfile.path!,
             name: AppRoutes.userProfile.name,
@@ -64,6 +98,10 @@ class AppRouter {
                     props: props ?? const UserProfileProps.build(),
                   ),
                 ),
+                // child: UserProfilePage(
+                //   userId: userId,
+                //   props: props ?? const UserProfileProps.build(),
+                // ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   return SharedAxisTransition(
@@ -76,44 +114,6 @@ class AppRouter {
               );
             },
           ),
-
-          // GoRoute(
-          //   path: AppRoutes.userProfile.path!,
-          //   name: AppRoutes.userProfile.name,
-          //   parentNavigatorKey: _rootNavigatorKey,
-          //   pageBuilder: (context, state) {
-          //     final userId = state.pathParameters['user_id']!;
-          //     final props = state.extra as UserProfileProps?;
-
-          //     return CustomTransitionPage(
-          //       key: state.pageKey,
-          //       // child: BlocProvider(
-          //       //   create: (context) => CreateStoriesBloc(
-          //       //     storiesRepository: context.read<StoriesRepository>(),
-          //       //     firebaseRemoteConfigRepository:
-          //       //         context.read<FirebaseRemoteConfigRepository>(),
-          //       //   ),
-          //       //   child: UserProfilePage(
-          //       //     userId: userId,
-          //       //     props: props ?? const UserProfileProps.build(),
-          //       //   ),
-          //       // ),
-          //       child: UserProfilePage(
-          //         userId: userId,
-          //         props: props ?? const UserProfileProps.build(),
-          //       ),
-          //       transitionsBuilder:
-          //           (context, animation, secondaryAnimation, child) {
-          //         return SharedAxisTransition(
-          //           animation: animation,
-          //           secondaryAnimation: secondaryAnimation,
-          //           transitionType: SharedAxisTransitionType.horizontal,
-          //           child: child,
-          //         );
-          //       },
-          //     );
-          //   },
-          // ),
           GoRoute(
             path: AppRoutes.chat.path!,
             name: AppRoutes.chat.name,

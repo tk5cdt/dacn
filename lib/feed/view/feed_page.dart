@@ -134,7 +134,7 @@ class FeedBody extends StatelessWidget {
           SliverOverlapInjector(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
-          const StoriesCarousel(),
+          // const StoriesCarousel(),
           const AppSliverDivider(),
           BlocBuilder<FeedBloc, FeedState>(
             buildWhen: (previous, current) {
